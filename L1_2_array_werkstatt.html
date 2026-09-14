@@ -1,0 +1,2858 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BPE 7.1 – Array-Werkstatt – Friedrich-List-Schule Mannheim</title>
+<style>
+  :root {
+    --navy: #1E3A5F;
+    --navy-dark: #142943;
+    --amber: #E8963C;
+    --amber-dark: #C97A24;
+    --paper: #FFFFFF;
+    --line: #DDE3EA;
+    --ink: #1C1F26;
+    --muted: #5B6472;
+    --empty: #EEF1F5;
+    --good: #2E7D5B;
+    --bad: #B3413A;
+    --info: #0B5C8A;
+    --info-bg: #EFF5FB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Iowan Old Style", "Georgia", serif;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 28px 24px 0;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  header img.logo { height: 58px; width: auto; flex: 0 0 auto; }
+  header .titles { flex: 1 1 auto; }
+  h1 {
+    font-family: "Iowan Old Style", Georgia, serif;
+    font-size: 1.9rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: var(--muted);
+    font-size: 0.98rem;
+    margin: 0;
+  }
+  code.inline {
+    font-family: "SF Mono", Menlo, monospace;
+    background: var(--navy);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .tab {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    padding: 10px 16px;
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.92rem;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+  .tab.active { color: var(--navy); border-bottom-color: var(--amber); }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* View header with info button */
+  .view-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .view-head h2 {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 1.05rem;
+    color: var(--navy);
+    margin: 0;
+  }
+  .info-btn {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: var(--info-bg);
+    color: var(--info);
+    border: 1px solid #CFE1F2;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .info-btn:hover { background: #E1EEF9; }
+
+  /* Persistent cabinet (shared across build/loop/struktogramm) */
+  .cabinet-wrap { margin-bottom: 16px; }
+  .cabinet {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 28px 16px 16px;
+    background: var(--navy-dark);
+    border-radius: 10px;
+    overflow-x: auto;
+    min-height: 150px;
+    position: relative;
+  }
+  .slot {
+    flex: 0 0 auto;
+    width: 88px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .drawer {
+    width: 100%;
+    height: 74px;
+    background: var(--empty);
+    border: 2px solid #37507A;
+    border-radius: 6px 6px 3px 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--navy-dark);
+    text-align: center;
+    padding: 4px;
+    word-break: break-word;
+    transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  }
+  .drawer.filled { background: #FFFFFF; }
+  .drawer.active {
+    background: var(--amber);
+    color: white;
+    border-color: var(--amber-dark);
+    transform: translateY(-6px);
+    box-shadow: 0 6px 14px rgba(232,150,60,0.45);
+  }
+  .index {
+    margin-top: 8px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 0.8rem;
+    color: #AEBBD0;
+  }
+  .index.active { color: var(--amber); font-weight: 700; }
+
+  .toast {
+    position: absolute;
+    left: 16px; right: 16px; bottom: -14px;
+    transform: translateY(100%);
+    background: var(--navy);
+    color: white;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.82rem;
+    padding: 8px 14px;
+    border-radius: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 5;
+  }
+  .toast.visible { opacity: 1; }
+
+  /* Code / Output blocks */
+  .block-label {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    margin: 14px 0 4px;
+  }
+  .code-block-live {
+    font-family: "SF Mono", Menlo, monospace;
+    background: var(--empty);
+    color: var(--ink);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    border: 1px solid var(--line);
+    line-height: 1.7;
+  }
+  .code-line-row { display: flex; align-items: baseline; }
+  .code-line-num {
+    flex: 0 0 auto;
+    width: 22px;
+    color: #A9B2BD;
+    -webkit-user-select: none;
+    user-select: none;
+    text-align: right;
+    margin-right: 12px;
+  }
+  .code-line-text { flex: 1 1 auto; }
+
+  /* Code + side column layout */
+  .code-output-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .code-output-row .code-col { flex: 2 1 0; min-width: 0; }
+  .code-output-row .side-col { flex: 1 1 220px; min-width: 210px; }
+  @media (max-width: 760px) {
+    .code-output-row { flex-direction: column; }
+    .code-output-row .side-col { width: 100%; }
+  }
+  .vars-panel {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 0.85rem;
+    background: var(--navy-dark);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .var-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #2A4568;
+  }
+  .var-row:last-child { border-bottom: none; }
+  .var-name { color: #FFD9A8; font-weight: 700; }
+  .var-value { color: #D9E4F5; text-align: right; word-break: break-word; }
+  .struk-mini-wrap {
+    border: 1.5px solid var(--navy);
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.78rem;
+  }
+  .struk-band-mini {
+    padding: 8px 10px;
+    border-bottom: 1.5px solid var(--navy);
+    background: var(--paper);
+    line-height: 1.35;
+  }
+  .struk-band-mini:last-child { border-bottom: none; }
+  .struk-mini-empty {
+    padding: 10px;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .struk-loop-frame {
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    overflow: hidden;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 0.8rem;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  .struk-loop-header {
+    padding: 8px 10px;
+    line-height: 1.4;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .struk-loop-row { display: flex; }
+  .struk-loop-gutter {
+    flex: 0 0 auto;
+    width: 22px;
+    border-right: 1.5px solid var(--ink);
+  }
+  .struk-loop-body {
+    flex: 1 1 auto;
+    padding: 8px 10px;
+    line-height: 1.4;
+  }
+  .console {
+    display: none;
+    font-family: "SF Mono", Menlo, monospace;
+    background: #0F1B2E;
+    color: #D9E4F5;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .console.visible { display: block; }
+  .console .out { color: #9FE6B0; }
+  .no-output-hint {
+    display: none;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    background: #FAFAFA;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .no-output-hint.visible { display: block; }
+  .no-output-hint button {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-style: normal;
+    font-size: 0.82rem;
+    padding: 5px 10px;
+    margin-left: 4px;
+  }
+  .traceback { color: #FF8A80; }
+
+  .code-click {
+    cursor: pointer;
+    border-bottom: 1.5px dotted var(--amber-dark);
+    padding: 0 1px;
+  }
+  .code-click:hover { background: rgba(232,150,60,0.25); border-radius: 3px; }
+
+  /* Generic panels */
+  .error-panel, .concept-panel {
+    display: none;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 10px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .error-panel {
+    background: #FBEAE8;
+    border: 1.5px solid var(--bad);
+    color: var(--ink);
+  }
+  .error-panel strong { color: var(--bad); }
+  .concept-panel {
+    background: var(--info-bg);
+    border: 1.5px solid var(--info);
+    color: var(--ink);
+  }
+  .concept-panel strong { color: var(--info); }
+  .error-panel ul { margin: 8px 0 0; padding-left: 20px; }
+  .error-panel li { margin-bottom: 4px; }
+  .error-panel code, .concept-panel code {
+    font-family: "SF Mono", Menlo, monospace;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.88em;
+  }
+
+  section.panel {
+    margin-top: 20px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+  .panel h3 {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.98rem;
+    color: var(--navy);
+    margin: 0 0 4px;
+  }
+  .panel .desc {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+  }
+  input[type=text], input[type=number] {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.95rem;
+    width: 130px;
+  }
+  input:focus { outline: 2px solid var(--amber); border-color: var(--amber); }
+  button {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--navy);
+    color: white;
+    transition: background 0.15s ease;
+  }
+  button:hover { background: var(--navy-dark); }
+  button.secondary { background: var(--empty); color: var(--navy); }
+  button.secondary:hover { background: #E2E8F1; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Access card */
+  .access-card { background: var(--empty); border-radius: 10px; padding: 18px 20px; }
+  .access-step {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+  .access-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .overwrite-inline {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #C9D3DF;
+  }
+  .overwrite-inline.open { display: flex; }
+
+  /* Tool grid */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 700px) { .tool-grid { grid-template-columns: 1fr; } }
+  .tool-card {
+    background: var(--empty);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tool-card button { width: 100%; }
+  .tool-card p {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Loop view */
+  .code-block {
+    font-family: "SF Mono", Menlo, monospace;
+    background: var(--navy-dark);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.95rem;
+    color: #D9E4F5;
+  }
+  .code-block .line-wrap {
+    padding: 4px 0;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  .code-block .line-wrap.on { background: rgba(232,150,60,0.18); }
+  .code-block .annot {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.72rem;
+    color: #8FA3BE;
+    display: block;
+    margin: 2px 0 0 34px;
+    font-style: italic;
+  }
+  .code-block .indent.code-line-text { padding-left: 22px; }
+  .code-block .code-click { border-bottom-color: var(--amber); color: #FFD9A8; }
+
+  .status-strip {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: var(--empty);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 14px;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+  .status-strip b { color: var(--navy); }
+  .status-strip .amber-val { color: var(--amber-dark); font-weight: 700; }
+
+  /* Quiz */
+  .quiz-array-label {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .quiz-question-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--empty);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+  }
+  .quiz-question-row .qtext { font-size: 0.95rem; }
+  .quiz-question-row input { width: 110px; }
+  .quiz-question-row.correct { background: #E4F3EA; border: 1px solid var(--good); }
+  .quiz-question-row.wrong { background: #FBEAE8; border: 1px solid var(--bad); }
+  .quiz-question-row .verdict { font-size: 0.85rem; font-weight: 700; min-width: 130px; text-align: right; }
+  .quiz-question-row.correct .verdict { color: var(--good); }
+  .quiz-question-row.wrong .verdict { color: var(--bad); }
+  .quiz-score {
+    display: none;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: var(--navy-dark);
+    color: white;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .quiz-score.visible { display: block; }
+
+  /* Struktogramm */
+  .struk-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.86rem;
+  }
+  .struk-table th, .struk-table td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .struk-table th { background: var(--empty); color: var(--navy); }
+  .struk-table code {
+    font-family: "SF Mono", Menlo, monospace;
+    background: var(--navy-dark);
+    color: #D9E4F5;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+  .struk-diagram-wrap {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: stretch;
+    margin-top: 18px;
+  }
+  .struk-diagram {
+    flex: 1 1 320px;
+    border: 2px solid var(--navy);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .struk-band {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 14px;
+    border-bottom: 2px solid var(--navy);
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.85rem;
+  }
+  .struk-band:last-child { border-bottom: none; }
+  .struk-num {
+    flex: 0 0 auto;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 0.78rem;
+  }
+  .struk-code {
+    flex: 1 1 280px;
+    font-family: "SF Mono", Menlo, monospace;
+    background: var(--navy-dark);
+    color: #D9E4F5;
+    border-radius: 4px;
+    padding: 14px;
+    font-size: 0.88rem;
+    line-height: 2.15;
+  }
+  .struk-code .num-badge {
+    display: inline-flex;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--amber);
+    color: var(--navy-dark);
+    align-items: center; justify-content: center;
+    font-family: -apple-system, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(20, 41, 67, 0.55);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 10px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 26px 28px;
+    position: relative;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .modal-box strong { color: var(--navy); }
+  .modal-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 2px 8px;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--ink); background: none; }
+
+  /* Footer */
+  footer {
+    margin-top: 40px;
+    padding: 16px 0 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  footer img { height: 26px; width: auto; opacity: 0.85; }
+
+  /* Aufgaben & Handbuch shared components */
+  .search-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+  }
+  .search-row input {
+    flex: 1 1 auto;
+    width: auto;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .chip {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: var(--empty);
+    color: var(--navy);
+    cursor: pointer;
+    border: 1.5px solid transparent;
+  }
+  .chip.active { background: var(--navy); color: white; }
+
+  .section-heading {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    margin: 22px 0 10px;
+  }
+  .section-heading:first-child { margin-top: 0; }
+
+  .task-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .task-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    background: var(--paper);
+    font-family: -apple-system, "Segoe UI", sans-serif;
+  }
+  .task-head:hover { background: var(--empty); }
+  .task-title { font-weight: 700; color: var(--navy); font-size: 0.96rem; }
+  .task-sub { font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 8px; }
+  .task-chevron { color: var(--muted); transition: transform 0.15s ease; flex: 0 0 auto; }
+  .task-card.open .task-chevron { transform: rotate(180deg); }
+  .task-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: var(--amber);
+    color: var(--navy-dark);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .task-body {
+    display: none;
+    padding: 4px 18px 18px;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    border-top: 1px solid var(--line);
+  }
+  .task-card.open .task-body { display: block; }
+  .task-body p { margin: 10px 0; }
+  .task-body ol, .task-body ul { margin: 8px 0; padding-left: 22px; }
+  .task-body li { margin-bottom: 4px; }
+  .task-body .hinweis {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 8px 0;
+  }
+  .task-io {
+    font-family: "SF Mono", Menlo, monospace;
+    background: var(--navy-dark);
+    color: #D9E4F5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin: 10px 0;
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+  .task-help-btn {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: var(--info-bg);
+    color: var(--info);
+    border: 1px solid #CFE1F2;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 4px 6px 4px 0;
+  }
+  .task-help-btn:hover { background: #E1EEF9; }
+
+  .hb-section {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+  }
+  .hb-section h3 {
+    font-size: 1rem;
+    color: var(--navy);
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hb-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: var(--empty);
+    color: var(--muted);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .hb-section .content { font-size: 0.92rem; line-height: 1.6; color: var(--ink); }
+  .hb-section .content code {
+    font-family: "SF Mono", Menlo, monospace;
+    background: var(--empty);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  .hb-empty {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: var(--muted);
+    font-style: italic;
+    padding: 20px 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="data:image/png;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPxQQgj/AZHt7n3IxG06AAAAAElFTkSuQmCC" alt="Logo Friedrich-List-Schule Mannheim">
+    <div class="titles">
+      <h1>Array-Werkstatt</h1>
+      <p class="subtitle">Ausprobieren, bevor wir es erklären: Wie funktioniert ein <code class="inline">array</code> wirklich?</p>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-view="build">Aufbauen &amp; Zugreifen</div>
+    <div class="tab" data-view="loop">Schleife durchlaufen</div>
+    <div class="tab" data-view="veraendern">Verändern</div>
+    <div class="tab" data-view="auswerten">Auswerten</div>
+    <div class="tab" data-view="struktogramm">Struktogramm</div>
+    <div class="tab" data-view="quiz">Rätsel-Modus</div>
+    <div class="tab" data-view="aufgaben">Aufgaben</div>
+    <div class="tab" data-view="handbuch">Handbuch</div>
+  </div>
+
+  <!-- shared cabinet: visible for build, loop, struktogramm -->
+  <div class="cabinet-wrap" id="cabinetWrap">
+    <div class="cabinet" id="cabinet">
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+  <!-- BUILD VIEW -->
+  <div class="view active" id="view-build">
+    <div class="view-head">
+      <h2>Aufbauen &amp; Zugreifen</h2>
+      <button class="info-btn" onclick="openModal('build')">ℹ️ Erklärung</button>
+    </div>
+
+    <div class="code-output-row">
+      <div class="code-col">
+        <div class="block-label">Code</div>
+        <div class="code-block-live" id="buildCode"></div>
+
+        <div class="block-label" id="buildConsoleLabel" style="display:none;">Ausgabe (Konsole)</div>
+        <div class="console" id="buildConsole"></div>
+        <div class="no-output-hint" id="noOutputHint"></div>
+      </div>
+      <div class="side-col">
+        <div class="block-label">Variablen</div>
+        <div class="vars-panel" id="buildVarsPanel"></div>
+
+        <div class="block-label">Struktogramm (automatisch)</div>
+        <div class="struk-mini-wrap" id="buildStruk"></div>
+      </div>
+    </div>
+
+    <div class="error-panel" id="errorPanel"></div>
+    <div class="concept-panel" id="conceptPanel"></div>
+
+    <section class="panel">
+      <h3>1. Werte hinzufügen</h3>
+      <p class="desc">array.append(...) fügt einen neuen Wert immer ganz hinten an – niemals mittendrin.</p>
+      <div class="row">
+        <input type="text" id="appendInput" placeholder="z. B. Nord" maxlength="12" oninput="updateAppendLabel()">
+        <button id="appendBtn" onclick="appendValue()">array.append(...)</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>2. Zugriff über den Index</h3>
+      <p class="desc">Wähle zuerst einen Index. Entscheide danach, ob du den Wert nur ansehen oder überschreiben willst.</p>
+      <div class="access-card">
+        <div class="access-step">Schritt 1 · Index wählen</div>
+        <div class="row">
+          <input type="number" id="accessIndex" placeholder="Index" min="0" style="width:90px">
+          <span class="desc" style="margin:0;">gültig: 0 bis aktuelle Länge − 1</span>
+        </div>
+
+        <div class="access-step" style="margin-top:16px;">Schritt 2 · Aktion wählen</div>
+        <div class="access-actions">
+          <button onclick="accessValue()">🔍 Wert auslesen</button>
+          <button class="secondary" onclick="toggleOverwrite()">✏️ Wert überschreiben</button>
+        </div>
+
+        <div class="overwrite-inline" id="overwriteInline">
+          <input type="text" id="overwriteInput" placeholder="neuer Wert" maxlength="12">
+          <button onclick="overwriteValue()">Übernehmen</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Weitere Werkzeuge</h3>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <button class="secondary" onclick="showLength()">len(array) anzeigen</button>
+          <p>Zeigt, <strong>wie viele</strong> Elemente das Array gerade enthält.</p>
+        </div>
+        <div class="tool-card">
+          <button class="secondary" onclick="restoreArray()">Ausgangsdaten wiederherstellen</button>
+          <p>Setzt das Array zurück auf die Startwerte Nord, Ost, Süd.</p>
+        </div>
+        <div class="tool-card">
+          <button class="secondary" onclick="resetArray()">Array leeren</button>
+          <p>Entfernt <strong>alle</strong> Elemente – das Array ist danach leer.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- LOOP VIEW -->
+  <div class="view" id="view-loop">
+    <div class="view-head">
+      <h2>Schleife durchlaufen</h2>
+      <button class="info-btn" onclick="openModal('loop')">ℹ️ Erklärung</button>
+    </div>
+
+    <div class="code-output-row">
+      <div class="code-col">
+        <div class="block-label">Code</div>
+        <div class="code-block" id="loopCodeBlock">
+          <div class="line-wrap" id="loopLineFor">
+            <div class="code-line-row">
+              <span class="code-line-num">1</span>
+              <span class="code-line-text">for i in range(len(<span class="code-click" data-idx="all">array</span>)):</span>
+            </div>
+            <span class="annot">bestimmt, wie oft wiederholt wird</span>
+          </div>
+          <div class="line-wrap" id="loopLinePrint">
+            <div class="code-line-row">
+              <span class="code-line-num">2</span>
+              <span class="code-line-text indent">print(<span class="code-click" data-idx="current">array[i]</span>)</span>
+            </div>
+            <span class="annot">wird bei jedem Durchlauf einmal ausgeführt</span>
+          </div>
+        </div>
+
+        <div class="block-label">Ausgabe (Konsole)</div>
+        <div class="console visible" id="loopOutput">Noch keine Ausgabe.</div>
+      </div>
+      <div class="side-col">
+        <div class="block-label">Variablen</div>
+        <div class="vars-panel" id="loopVarsPanel"></div>
+
+        <div class="block-label">Struktogramm</div>
+        <div class="struk-loop-frame">
+          <div class="struk-loop-header">Wiederhole von i = 0 solange i &lt; len(array), Schrittweite 1</div>
+          <div class="struk-loop-row">
+            <div class="struk-loop-gutter"></div>
+            <div class="struk-loop-body">Ausgabe: array[i]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="row">
+        <button onclick="loopStep()">Nächster Schritt</button>
+        <button class="secondary" onclick="loopReset()">Zurücksetzen</button>
+        <button class="secondary" onclick="explainLoopStep()">❓ Diesen Schritt erklären</button>
+      </div>
+      <div class="status-strip" id="loopStatus">Noch nicht gestartet – klicke auf „Nächster Schritt“.</div>
+      <div class="concept-panel" id="loopExplainBox"></div>
+    </section>
+  </div>
+
+  <!-- VERAENDERN VIEW -->
+  <div class="view" id="view-veraendern">
+    <div class="view-head">
+      <h2>Verändern</h2>
+      <button class="info-btn" onclick="openModal('veraendern')">ℹ️ Erklärung</button>
+    </div>
+
+    <section class="panel" style="margin-top:0;border-top:none;padding-top:0;">
+      <h3>1. Zwei Werte tauschen</h3>
+      <p class="desc">Wählt zwei Indizes. Ein sicherer Tausch braucht eine Zwischenspeicher-Variable – sonst geht ein Wert verloren.</p>
+      <div class="access-card">
+        <div class="row">
+          <input type="number" id="swapIndexA" placeholder="Index A" min="0" style="width:100px">
+          <input type="number" id="swapIndexB" placeholder="Index B" min="0" style="width:100px">
+        </div>
+        <div class="access-actions">
+          <button onclick="doSwap(true)">🔁 Sicher tauschen</button>
+          <button class="secondary" onclick="doSwap(false)">⚠️ Ohne Zwischenspeicher (Fehler zeigen)</button>
+        </div>
+      </div>
+      <div class="block-label">Code</div>
+      <div class="code-block-live" id="swapCode">Noch keine Aktion ausgeführt.</div>
+      <div class="error-panel" id="swapErrorPanel"></div>
+    </section>
+
+    <section class="panel">
+      <h3>2. Element einfügen</h3>
+      <p class="desc">Ein neuer Wert soll an einer bestimmten Stelle stehen, ohne bestehende Werte zu überschreiben – dafür müssen erst alle folgenden Werte einen Platz nach hinten rücken.</p>
+      <div class="access-card">
+        <div class="row">
+          <input type="text" id="insertValue" placeholder="Wert" maxlength="12">
+          <input type="number" id="insertIndex" placeholder="Index" min="0" style="width:100px">
+          <button onclick="insertStart()">Einfügen starten</button>
+        </div>
+      </div>
+      <div class="code-block" id="insertCodeBlock">
+        <div class="line-wrap" id="insertLine1">
+          <div class="code-line-row"><span class="code-line-num">1</span><span class="code-line-text">array.append(array[letzter Index])</span></div>
+          <span class="annot">Array um einen Platz verlängern</span>
+        </div>
+        <div class="line-wrap" id="insertLine2">
+          <div class="code-line-row"><span class="code-line-num">2</span><span class="code-line-text">für j von hinten bis Index+1: array[j] = array[j-1]</span></div>
+          <span class="annot">Werte ab Index eine Stelle nach hinten schieben</span>
+        </div>
+        <div class="line-wrap" id="insertLine3">
+          <div class="code-line-row"><span class="code-line-num">3</span><span class="code-line-text">array[Index] = neuer Wert</span></div>
+          <span class="annot">neuen Wert eintragen</span>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <button onclick="insertStep()">Nächster Schritt</button>
+        <button class="secondary" onclick="insertReset()">Zurücksetzen</button>
+        <button class="secondary" onclick="explainInsertStep()">❓ Diesen Schritt erklären</button>
+      </div>
+      <div class="status-strip" id="insertStatus">Gebt Wert und Index ein und klickt „Einfügen starten“.</div>
+      <div class="concept-panel" id="insertExplainBox"></div>
+    </section>
+
+    <section class="panel">
+      <h3>3. Element entfernen</h3>
+      <p class="desc">Der Wert an einer bestimmten Stelle soll verschwinden – dafür rücken alle folgenden Werte einen Platz nach vorne, dann wird der letzte (jetzt doppelte) Platz entfernt.</p>
+      <div class="access-card">
+        <div class="row">
+          <input type="number" id="removeIndex" placeholder="Index" min="0" style="width:100px">
+          <button onclick="removeStart()">Entfernen starten</button>
+        </div>
+      </div>
+      <div class="code-block" id="removeCodeBlock">
+        <div class="line-wrap" id="removeLine1">
+          <div class="code-line-row"><span class="code-line-num">1</span><span class="code-line-text">für j von Index bis vorletzter Platz: array[j] = array[j+1]</span></div>
+          <span class="annot">folgende Werte eine Stelle nach vorne schieben</span>
+        </div>
+        <div class="line-wrap" id="removeLine2">
+          <div class="code-line-row"><span class="code-line-num">2</span><span class="code-line-text">array = array[0 : letzter Index]</span></div>
+          <span class="annot">letzten (jetzt doppelten) Platz entfernen</span>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <button onclick="removeStep()">Nächster Schritt</button>
+        <button class="secondary" onclick="removeReset()">Zurücksetzen</button>
+        <button class="secondary" onclick="explainRemoveStep()">❓ Diesen Schritt erklären</button>
+      </div>
+      <div class="status-strip" id="removeStatus">Gebt einen Index ein und klickt „Entfernen starten“.</div>
+      <div class="concept-panel" id="removeExplainBox"></div>
+    </section>
+  </div>
+
+  <!-- AUSWERTEN VIEW -->
+  <div class="view" id="view-auswerten">
+    <div class="view-head">
+      <h2>Auswerten</h2>
+      <button class="info-btn" onclick="openModal('auswerten')">ℹ️ Erklärung</button>
+    </div>
+    <p class="desc" style="margin-top:-6px;">Eigenes Zahlen-Array, weil Summe/Durchschnitt/Maximum/Minimum nur bei Zahlen Sinn ergeben.</p>
+
+    <div class="cabinet" id="auswCabinet" style="border-radius:10px;"></div>
+
+    <div class="row" style="margin-top:12px;">
+      <input type="text" id="auswArrayInput" placeholder="Eigenes Array, z. B. 12, 45, 33, 8, 20" style="width:280px">
+      <button class="secondary" onclick="setAuswArray()">Array übernehmen</button>
+    </div>
+
+    <div class="chip-row" id="auswModeChips" style="margin-top:16px;"></div>
+
+    <div class="code-output-row">
+      <div class="code-col">
+        <div class="block-label">Code</div>
+        <div class="code-block" id="auswCodeBlock"></div>
+        <div class="block-label">Ausgabe (Konsole)</div>
+        <div class="console" id="auswOutput"></div>
+      </div>
+      <div class="side-col">
+        <div class="block-label">Variablen</div>
+        <div class="vars-panel" id="auswVarsPanel"></div>
+        <div class="block-label">Struktogramm</div>
+        <div class="struk-mini-wrap" id="auswStruk"></div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="row">
+        <button onclick="auswStep()">Nächster Schritt</button>
+        <button class="secondary" onclick="auswReset()">Zurücksetzen</button>
+        <button class="secondary" onclick="explainAuswStep()">❓ Diesen Schritt erklären</button>
+      </div>
+      <div class="status-strip" id="auswStatus">Noch nicht gestartet – klickt auf „Nächster Schritt“.</div>
+      <div class="concept-panel" id="auswExplainBox"></div>
+    </section>
+  </div>
+
+  <!-- STRUKTOGRAMM VIEW -->
+  <div class="view" id="view-struktogramm">
+    <div class="view-head">
+      <h2>Struktogramm ↔ Code</h2>
+      <button class="info-btn" onclick="openModal('struktogramm')">ℹ️ Erklärung</button>
+    </div>
+
+    <table class="struk-table">
+      <tr><th>Struktogramm-Baustein</th><th>Python-Code</th><th>Bedeutung</th></tr>
+      <tr>
+        <td>Deklaration und Initialisierung:<br><code>array = ["Nord", "Ost", "Süd"]</code></td>
+        <td><code class="auto-annotate">array = ["Nord", "Ost", "Süd"]</code></td>
+        <td>Array mit Startwerten anlegen</td>
+      </tr>
+      <tr>
+        <td>Zuweisung:<br><code>array[1] = "Nordost"</code></td>
+        <td><code class="auto-annotate">array[1] = "Nordost"</code></td>
+        <td>Bestehenden Wert an Index 1 ändern</td>
+      </tr>
+      <tr>
+        <td>Zuweisung (Anhängen):<br><code>array[3] = "West"</code><br><span style="color:#5B6472;">Index 3 existiert noch nicht → wird neu angelegt</span></td>
+        <td><code class="auto-annotate">array.append("West")</code></td>
+        <td>Neues Element anhängen – <strong>Achtung:</strong> Im Struktogramm wird dafür einem neuen Index ein Wert zugewiesen. Python bietet dafür stattdessen die Methode <code>append()</code>.</td>
+      </tr>
+      <tr>
+        <td>Anzahl der Elemente des Arrays <code>array</code></td>
+        <td><code class="auto-annotate">len(array)</code></td>
+        <td>Anzahl der gespeicherten Elemente ermitteln</td>
+      </tr>
+      <tr>
+        <td>Ausgabe:<br><code>array[2]</code></td>
+        <td><code class="auto-annotate">print(array[2])</code></td>
+        <td>Einzelnes Element ausgeben</td>
+      </tr>
+      <tr>
+        <td>Ausgabe:<br><code>array</code></td>
+        <td><code class="auto-annotate">print(array)</code></td>
+        <td>Gesamtes Array auf einmal ausgeben</td>
+      </tr>
+    </table>
+
+    <p class="panel desc" style="margin-top:18px;">
+      Klicke auf <code class="inline" style="cursor:pointer;">array</code>, <code class="inline" style="cursor:pointer;">array[i]</code>
+      oder einen Wert wie <code class="inline" style="cursor:pointer;">"Nord"</code> in der Tabelle oder im Beispiel unten –
+      im Array oben wird dann hervorgehoben, worauf sich die Zeile bezieht.
+    </p>
+
+    <section class="panel">
+      <h3>Ein Beispiel im Zusammenhang</h3>
+      <p class="desc">So gehören ein Struktogramm und der zugehörige Python-Code zusammen – Zeile für Zeile:</p>
+      <div class="struk-diagram-wrap">
+        <div class="struk-diagram">
+          <div class="struk-band"><span class="struk-num">1</span> Deklaration und Initialisierung: array = ["Nord", "Ost", "Süd"]</div>
+          <div class="struk-band"><span class="struk-num">2</span> Zuweisung: array[1] = "Nordost"</div>
+          <div class="struk-band"><span class="struk-num">3</span> Ausgabe: array</div>
+        </div>
+        <div class="struk-code">
+          <span class="num-badge">1</span><span class="auto-annotate">array = ["Nord", "Ost", "Süd"]</span><br>
+          <span class="num-badge">2</span><span class="auto-annotate">array[1] = "Nordost"</span><br>
+          <span class="num-badge">3</span><span class="auto-annotate">print(array)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- QUIZ VIEW -->
+  <div class="view" id="view-quiz">
+    <div class="view-head">
+      <h2>Rätsel-Modus</h2>
+      <button class="info-btn" onclick="openModal('quiz')">ℹ️ Erklärung</button>
+    </div>
+
+    <section class="panel" style="margin-top:0;border-top:none;padding-top:0;">
+      <div class="cabinet" id="quizCabinet" style="border-radius:10px;"></div>
+      <div class="quiz-array-label" id="quizArrayLabel">array = [...]</div>
+      <p class="desc" style="margin-top:10px;">Diese Runde deckt alle Bereiche der Werkstatt ab – von den Grundlagen bis zum Struktogramm.</p>
+
+      <div class="quiz-score" id="quizScore"></div>
+      <div id="quizQuestions"></div>
+
+      <div class="row" style="margin-top:6px;">
+        <button onclick="evaluateQuiz()">Auswertung starten</button>
+        <button class="secondary" onclick="newQuiz()">Neue Runde</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- AUFGABEN VIEW -->
+  <div class="view" id="view-aufgaben">
+    <div class="view-head">
+      <h2>Aufgaben</h2>
+      <button class="info-btn" onclick="openModal('aufgaben')">ℹ️ Erklärung</button>
+    </div>
+    <div class="search-row">
+      <input type="text" id="aufgabenSearch" placeholder="Aufgabe suchen (z. B. „einfügen“, „Schreibtischtest“, „L1_3.4“)…" oninput="renderAufgaben()">
+    </div>
+    <div class="section-heading">Pflichtaufgaben · L1_2 – L1_5</div>
+    <div id="aufgabenListPflicht"></div>
+    <div class="section-heading">Zusatzaufgaben · Vertiefung im Abitur-Stil</div>
+    <p class="panel desc" style="margin-top:-4px;">Freiwillig, für alle, die mehr üben oder sich auf Klausur/Abitur vorbereiten möchten.</p>
+    <div id="aufgabenListZusatz"></div>
+  </div>
+
+  <!-- HANDBUCH VIEW -->
+  <div class="view" id="view-handbuch">
+    <div class="view-head">
+      <h2>Handbuch</h2>
+      <button class="info-btn" onclick="openModal('handbuch')">ℹ️ Erklärung</button>
+    </div>
+    <p class="panel desc" style="margin-top:-6px;">Nachschlagewerk zu allem, was wir bisher zu Arrays besprochen haben. Wächst mit jeder weiteren BPE weiter.</p>
+    <div class="search-row">
+      <input type="text" id="handbuchSearch" placeholder="Begriff oder Thema suchen (z. B. „len“, „Index“, „append“)…" oninput="renderHandbuch()">
+    </div>
+    <div class="chip-row" id="handbuchChips"></div>
+    <div id="handbuchList"></div>
+  </div>
+
+  <footer>
+    <img src="data:image/png;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPxQQgj/AZHt7n3IxG06AAAAAElFTkSuQmCC" alt="Logo FLS Mannheim">
+    <span>Friedrich-List-Schule Mannheim · Jahrgangsstufe 2 · Informatik · Arrays · BPE 7.1</span>
+  </footer>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const INITIAL_ARRAY = ["Nord", "Ost", "Süd"];
+let arr = [...INITIAL_ARRAY];
+let lastStatements = [];
+let lastStatementStruks = [];
+let lastOutputHtml = null;
+let lastStateBeforeAction = null; // snapshot of arr BEFORE the last mutating statement
+
+// ---------- helpers ----------
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function arrLiteral(data) {
+  return '[' + data.map(v => '"' + esc(v) + '"').join(', ') + ']';
+}
+
+function reprList(data) {
+  return '[' + data.map(v => "'" + esc(v) + "'").join(', ') + ']';
+}
+
+// Wraps "array", "array[N]" and quoted string values ("Nord") in clickable spans.
+function annotateCode(text) {
+  return text.replace(/array\[(\d+)\]|\barray\b|"([^"]*)"/g, function(match, idxGroup, valGroup) {
+    if (idxGroup !== undefined) {
+      return '<span class="code-click" data-idx="' + idxGroup + '">array[' + idxGroup + ']</span>';
+    }
+    if (valGroup !== undefined) {
+      return '<span class="code-click" data-value="' + valGroup + '">"' + valGroup + '"</span>';
+    }
+    return '<span class="code-click" data-idx="all">array</span>';
+  });
+}
+
+// Finds plain-text runs inside an element (skipping existing tags) and applies annotateCode,
+// so hand-written example code becomes clickable too, including quoted values.
+function autoAnnotate(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(node => {
+    const text = node.nodeValue;
+    if (!text.includes('array') && !text.includes('"')) return;
+    const html = annotateCode(esc(text));
+    const span = document.createElement('span');
+    span.innerHTML = html;
+    node.parentNode.replaceChild(span, node);
+  });
+}
+
+function codeLinesHtml(annotatedLines) {
+  return annotatedLines.map((lineHtml, i) =>
+    '<div class="code-line-row"><span class="code-line-num">' + (i + 1) + '</span>' +
+    '<span class="code-line-text">' + lineHtml + '</span></div>'
+  ).join('');
+}
+
+function renderCabinet(targetId, data, highlight) {
+  const cab = document.getElementById(targetId);
+  const toast = targetId === 'cabinet' ? document.getElementById('toast') : null;
+  cab.innerHTML = '';
+  if (data.length === 0) {
+    cab.innerHTML = '<p style="color:#AEBBD0;font-family:-apple-system,sans-serif;margin:0;">Das Array ist leer.</p>';
+  } else {
+    data.forEach((val, i) => {
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      const drawer = document.createElement('div');
+      drawer.className = 'drawer filled' + (i === highlight ? ' active' : '');
+      drawer.textContent = val;
+      const idx = document.createElement('div');
+      idx.className = 'index' + (i === highlight ? ' active' : '');
+      idx.textContent = i;
+      slot.appendChild(drawer);
+      slot.appendChild(idx);
+      cab.appendChild(slot);
+    });
+  }
+  if (toast) cab.appendChild(toast);
+}
+
+function renderMainCabinet(highlight = -1) {
+  renderCabinet('cabinet', arr, highlight);
+}
+
+function flashToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => toast.classList.remove('visible'), 3200);
+}
+
+// ---------- clickable code (global) ----------
+document.addEventListener('click', function(e) {
+  const el = e.target.closest('.code-click');
+  if (!el) return;
+
+  if (el.dataset.value !== undefined) {
+    highlightByValue(el.dataset.value);
+    return;
+  }
+
+  const idx = el.dataset.idx;
+  if (idx === 'all') {
+    highlightWholeArray();
+  } else if (idx === 'current') {
+    if (typeof loopIndex !== 'undefined' && loopIndex >= 0 && loopIndex < arr.length) {
+      renderMainCabinet(loopIndex);
+    } else {
+      renderMainCabinet(-1);
+      flashToast('Die Schleife läuft gerade nicht – klicke zuerst „Nächster Schritt“, dann zeigt array[i] auf ein konkretes Element.');
+    }
+  } else {
+    const i = parseInt(idx);
+    if (i >= 0 && i < arr.length) {
+      renderMainCabinet(i);
+    } else {
+      renderMainCabinet(-1);
+      flashToast('Index ' + i + ' existiert im aktuellen Array (Länge ' + arr.length + ') gerade nicht.');
+    }
+  }
+});
+
+function highlightByValue(val) {
+  const i = arr.indexOf(val);
+  if (i === -1) {
+    renderMainCabinet(-1);
+    flashToast('Der Wert "' + val + '" ist im aktuellen Array gerade nicht enthalten.');
+  } else {
+    renderMainCabinet(i);
+  }
+}
+
+function highlightWholeArray() {
+  renderMainCabinet(-1);
+  const cab = document.getElementById('cabinet');
+  cab.querySelectorAll('.drawer').forEach(d => d.classList.add('active'));
+  cab.querySelectorAll('.index').forEach(d => d.classList.add('active'));
+}
+
+// ---------- BUILD tab ----------
+function updateAppendLabel() {
+  const val = document.getElementById('appendInput').value;
+  document.getElementById('appendBtn').textContent =
+    'array.append(' + (val ? '"' + val + '"' : '...') + ')';
+}
+
+function hidePanels() {
+  document.getElementById('errorPanel').style.display = 'none';
+  document.getElementById('errorPanel').innerHTML = '';
+  document.getElementById('conceptPanel').style.display = 'none';
+  document.getElementById('conceptPanel').innerHTML = '';
+}
+
+// Line 1 always shows the array's state BEFORE the last statement (or the current
+// state if nothing has run yet); line 2 (if present) is the statement that was just
+// executed. This avoids ever showing a state that already includes an effect the
+// statement below it would still be about to cause (e.g. append shown twice).
+function refreshCodeDisplay() {
+  const base = lastStateBeforeAction !== null ? lastStateBeforeAction : arr;
+  const lines = ['array = ' + arrLiteral(base)];
+  if (lastStatements.length) lines.push(...lastStatements);
+  const annotated = lines.map(l => annotateCode(esc(l)));
+  document.getElementById('buildCode').innerHTML = codeLinesHtml(annotated);
+}
+
+// The variables panel always shows the CURRENT, real value of array right now —
+// independent of what the code trace above is explaining.
+function refreshVarsPanel() {
+  const valueHtml = annotateCode(esc(arrLiteral(arr)));
+  document.getElementById('buildVarsPanel').innerHTML =
+    '<div class="var-row"><span class="var-name">array</span><span class="var-value">' + valueHtml + '</span></div>';
+}
+
+function refreshStrukPanel() {
+  const panel = document.getElementById('buildStruk');
+  if (!lastStatementStruks.length) {
+    panel.innerHTML = '<div class="struk-mini-empty">Noch keine Aktion ausgeführt.</div>';
+    return;
+  }
+  const base = lastStateBeforeAction !== null ? lastStateBeforeAction : arr;
+  const stateStruk = 'Deklaration und Initialisierung: array = ' + arrLiteral(base);
+  const bands = [stateStruk, ...lastStatementStruks];
+  panel.innerHTML = bands.map(b => '<div class="struk-band-mini">' + esc(b) + '</div>').join('');
+}
+
+function refreshOutputDisplay() {
+  const consoleBox = document.getElementById('buildConsole');
+  const label = document.getElementById('buildConsoleLabel');
+  const hint = document.getElementById('noOutputHint');
+  if (lastOutputHtml !== null) {
+    consoleBox.innerHTML = lastOutputHtml;
+    consoleBox.classList.add('visible');
+    label.style.display = 'block';
+    hint.classList.remove('visible');
+  } else {
+    consoleBox.classList.remove('visible');
+    consoleBox.innerHTML = '';
+    label.style.display = 'none';
+    hint.classList.add('visible');
+    hint.innerHTML =
+      'Diese Zeile erzeugt für sich genommen <strong>keine Ausgabe</strong> – sie verändert nur das Array im Speicher. ' +
+      'Sichtbar wird das erst, wenn du es ausdruckst: ' +
+      '<button class="secondary" onclick="printArrayNow()">print(array) ausführen</button>';
+  }
+}
+
+function printArrayNow() {
+  lastStatements.push('print(array)');
+  lastStatementStruks.push('Ausgabe: array');
+  lastOutputHtml = '<span class="out">' + reprList(arr) + '</span>';
+  refreshCodeDisplay();
+  refreshOutputDisplay();
+  refreshStrukPanel();
+}
+
+function appendValue() {
+  const input = document.getElementById('appendInput');
+  const rawVal = input.value.trim();
+  if (!rawVal) return;
+  hidePanels();
+  const before = [...arr];
+  arr.push(rawVal);
+  input.value = '';
+  updateAppendLabel();
+  renderMainCabinet(arr.length - 1);
+  lastStateBeforeAction = before;
+  lastStatements = ['array.append("' + esc(rawVal) + '")  # neues Element ganz hinten anfügen'];
+  lastStatementStruks = ['Zuweisung: array[' + before.length + '] = "' + esc(rawVal) + '"  (Anhängen, da Index ' + before.length + ' noch nicht existierte)'];
+  lastOutputHtml = null;
+  refreshCodeDisplay();
+  refreshOutputDisplay();
+  refreshVarsPanel();
+  refreshStrukPanel();
+}
+
+function toggleOverwrite() {
+  const box = document.getElementById('overwriteInline');
+  box.classList.toggle('open');
+  if (box.classList.contains('open')) document.getElementById('overwriteInput').focus();
+}
+
+function showIndexError(i, mode) {
+  renderMainCabinet(-1);
+  const call = mode === 'overwrite' ? 'array[' + i + '] = "..."' : 'print(array[' + i + '])';
+  lastStateBeforeAction = null;
+  lastStatements = [call];
+  lastStatementStruks = [];
+  lastOutputHtml = null;
+  refreshCodeDisplay();
+  refreshVarsPanel();
+  refreshStrukPanel();
+
+  document.getElementById('noOutputHint').classList.remove('visible');
+  const consoleBox = document.getElementById('buildConsole');
+  consoleBox.innerHTML =
+    '<span class="traceback">Traceback (most recent call last):</span><br>' +
+    '<span class="traceback">IndexError: list index out of range</span>';
+  consoleBox.classList.add('visible');
+  document.getElementById('buildConsoleLabel').style.display = 'block';
+
+  const gueltig = arr.length > 0 ? ('0 bis ' + (arr.length - 1)) : 'keiner, das Array ist leer';
+  const ursache = arr.length === 0
+    ? 'Das Array enthält aktuell gar keine Elemente – jeder Index führt hier zum Fehler.'
+    : (i >= arr.length
+        ? 'Dein Index (' + i + ') ist zu groß. Der letzte gültige Index ist immer len(array) \u2212 1, nicht len(array) selbst.'
+        : 'Dein Index (' + i + ') ist negativ und liegt damit vor dem ersten Element.');
+
+  const panel = document.getElementById('errorPanel');
+  panel.innerHTML =
+    '<strong>IndexError \u2013 was bedeutet das?</strong> Python erlaubt hier nur Indizes, die tatsächlich ' +
+    'auf eine vorhandene Schublade zeigen. Hier gibt es keine.' +
+    '<ul>' +
+    '<li>Aktuelle Länge: <code>len(array)</code> = ' + arr.length + '</li>' +
+    '<li>Gültiger Indexbereich: <code>' + gueltig + '</code></li>' +
+    '<li>Verwendeter Index: <code>' + i + '</code> \u2192 ' + ursache + '</li>' +
+    '<li>So findest du den Fehler selbst: Zähl die Schubladen im Bild von 0 an durch, oder rechne ' +
+    '<code>len(array) - 1</code> aus, bevor du auf das letzte Element zugreifst.</li>' +
+    '</ul>';
+  panel.style.display = 'block';
+}
+
+function accessValue() {
+  const i = parseInt(document.getElementById('accessIndex').value);
+  if (isNaN(i)) return;
+  if (i < 0 || i >= arr.length) { showIndexError(i, 'access'); return; }
+  hidePanels();
+  renderMainCabinet(i);
+  lastStateBeforeAction = null; // nothing changes, so "before" == current
+  lastStatements = ['print(array[' + i + '])'];
+  lastStatementStruks = ['Ausgabe: array[' + i + ']'];
+  lastOutputHtml = '<span class="out">' + esc(arr[i]) + '</span>';
+  refreshCodeDisplay();
+  refreshOutputDisplay();
+  refreshVarsPanel();
+  refreshStrukPanel();
+}
+
+function overwriteValue() {
+  const i = parseInt(document.getElementById('accessIndex').value);
+  const rawVal = document.getElementById('overwriteInput').value.trim();
+  if (isNaN(i) || !rawVal) return;
+  if (i < 0 || i >= arr.length) { showIndexError(i, 'overwrite'); return; }
+  hidePanels();
+  const before = [...arr];
+  arr[i] = rawVal;
+  document.getElementById('overwriteInput').value = '';
+  document.getElementById('overwriteInline').classList.remove('open');
+  renderMainCabinet(i);
+  lastStateBeforeAction = before;
+  lastStatements = ['array[' + i + '] = "' + esc(rawVal) + '"  # bestehenden Wert überschreiben'];
+  lastStatementStruks = ['Zuweisung: array[' + i + '] = "' + esc(rawVal) + '"'];
+  lastOutputHtml = null;
+  refreshCodeDisplay();
+  refreshOutputDisplay();
+  refreshVarsPanel();
+  refreshStrukPanel();
+}
+
+function showLength() {
+  hidePanels();
+  renderMainCabinet(-1);
+  lastStateBeforeAction = null; // nothing changes
+  lastStatements = ['print(len(array))  # gibt die Anzahl der Elemente aus'];
+  lastStatementStruks = ['Ausgabe: Anzahl der Elemente des Arrays array'];
+  lastOutputHtml = '<span class="out">' + arr.length + '</span>';
+  refreshCodeDisplay();
+  refreshOutputDisplay();
+  refreshVarsPanel();
+  refreshStrukPanel();
+
+  const panel = document.getElementById('conceptPanel');
+  if (arr.length === 0) {
+    panel.innerHTML = '<strong>len(array)</strong> ist hier 0 – das Array ist leer. Es gibt weder Elemente noch einen gültigen Index.';
+  } else {
+    const liste = arr.map((v, i) => esc(v) + ' = Index ' + i).join(', ');
+    panel.innerHTML =
+      '<strong>Länge und höchster Index sind nicht dasselbe:</strong> ' + liste + ' \u2192 das sind ' + arr.length + ' Elemente, ' +
+      'also ist <code>len(array)</code> = ' + arr.length + '.<br>' +
+      'Der höchste <strong>gültige Index</strong> ist aber <code>len(array) - 1 = ' + (arr.length - 1) + '</code>, ' +
+      'weil die Zählung bei 0 beginnt. Einen Index ' + arr.length + ' gibt es in diesem Array nicht.';
+  }
+  panel.style.display = 'block';
+}
+
+function resetArray() {
+  hidePanels();
+  const before = [...arr];
+  arr = [];
+  renderMainCabinet(-1);
+  lastStateBeforeAction = before;
+  lastStatements = ['array = []  # Array geleert, alle Elemente entfernt'];
+  lastStatementStruks = ['Deklaration und Initialisierung: array als Array = [ ]'];
+  lastOutputHtml = null;
+  refreshCodeDisplay();
+  refreshOutputDisplay();
+  refreshVarsPanel();
+  refreshStrukPanel();
+}
+
+function restoreArray() {
+  hidePanels();
+  const before = [...arr];
+  arr = [...INITIAL_ARRAY];
+  renderMainCabinet(-1);
+  lastStateBeforeAction = before;
+  lastStatements = ['array = ' + arrLiteral(arr) + '  # Ausgangsdaten wiederhergestellt'];
+  lastStatementStruks = ['Deklaration und Initialisierung: array = ' + arrLiteral(arr)];
+  lastOutputHtml = null;
+  refreshCodeDisplay();
+  refreshOutputDisplay();
+  refreshVarsPanel();
+  refreshStrukPanel();
+}
+
+// ---------- LOOP tab ----------
+let loopIndex = -1;
+
+function refreshLoopVarsPanel() {
+  const arrValueHtml = annotateCode(esc(arrLiteral(arr)));
+  const iValue = loopIndex < 0
+    ? '– (noch nicht gestartet)'
+    : (loopIndex < arr.length ? String(loopIndex) : '– (Schleife beendet)');
+  document.getElementById('loopVarsPanel').innerHTML =
+    '<div class="var-row"><span class="var-name">array</span><span class="var-value">' + arrValueHtml + '</span></div>' +
+    '<div class="var-row"><span class="var-name">i</span><span class="var-value">' + iValue + '</span></div>';
+}
+
+function loopReset() {
+  loopIndex = -1;
+  document.getElementById('loopOutput').textContent = 'Noch keine Ausgabe.';
+  document.getElementById('loopStatus').textContent = 'Noch nicht gestartet – klicke auf „Nächster Schritt“.';
+  document.getElementById('loopLineFor').classList.remove('on');
+  document.getElementById('loopLinePrint').classList.remove('on');
+  document.getElementById('loopExplainBox').style.display = 'none';
+  renderMainCabinet(-1);
+  refreshLoopVarsPanel();
+}
+
+function loopStep() {
+  if (arr.length === 0) {
+    document.getElementById('loopStatus').textContent = 'Das Array ist leer – es gibt nichts zu durchlaufen.';
+    return;
+  }
+  loopIndex++;
+  const forLine = document.getElementById('loopLineFor');
+  const printLine = document.getElementById('loopLinePrint');
+
+  if (loopIndex >= arr.length) {
+    forLine.classList.remove('on');
+    printLine.classList.remove('on');
+    document.getElementById('loopStatus').innerHTML =
+      '<b>Schleife beendet.</b> Alle ' + arr.length + ' Indizes (0 bis ' + (arr.length - 1) + ') wurden durchlaufen.';
+    renderMainCabinet(-1);
+    const out = document.getElementById('loopOutput');
+    out.innerHTML += '<br><span class="out">-- Schleife beendet --</span>';
+    refreshLoopVarsPanel();
+    return;
+  }
+
+  forLine.classList.add('on');
+  printLine.classList.add('on');
+  renderMainCabinet(loopIndex);
+  refreshLoopVarsPanel();
+
+  document.getElementById('loopStatus').innerHTML =
+    'Durchlauf <b>' + (loopIndex + 1) + '</b> von <b>' + arr.length + '</b> &nbsp;·&nbsp; ' +
+    'i = <span class="amber-val">' + loopIndex + '</span> &nbsp;·&nbsp; ' +
+    'array[' + loopIndex + '] = <span class="amber-val">"' + esc(arr[loopIndex]) + '"</span>';
+
+  const out = document.getElementById('loopOutput');
+  const line = 'i = ' + loopIndex + '  →  print(array[' + loopIndex + '])  →  <span class="out">' + esc(arr[loopIndex]) + '</span>';
+  out.innerHTML = (loopIndex === 0 ? '' : out.innerHTML + '<br>') + line;
+}
+
+function explainLoopStep() {
+  const box = document.getElementById('loopExplainBox');
+  box.style.display = 'block';
+  if (loopIndex < 0) {
+    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Nächster Schritt“.';
+    return;
+  }
+  if (loopIndex >= arr.length) {
+    box.innerHTML =
+      '<strong>Die Schleife ist beendet.</strong> Das liegt daran, dass <code>i</code> jetzt ' + arr.length +
+      ' erreicht hat – und die Bedingung <code>i &lt; len(array)</code> (also <code>' + arr.length + ' &lt; ' + arr.length +
+      '</code>) ist nicht mehr wahr. Python bricht deshalb die Schleife ab, ohne den Rumpf noch einmal auszuführen.';
+    return;
+  }
+  box.innerHTML =
+    '<strong>Es gibt hier nur eine einzige Schleife</strong> (<code>for i in range(len(array)):</code>), die das ganze Array einmal ' +
+    'von vorne nach hinten durchläuft.<br><br>' +
+    'Wir sind gerade beim Durchlauf mit <code>i = ' + loopIndex + '</code>. Das bedeutet konkret:<br>' +
+    '1. Python nimmt den Wert an genau dieser Stelle: <code>array[' + loopIndex + ']</code> ist "' + esc(arr[loopIndex]) + '".<br>' +
+    '2. Der Schleifenrumpf wird mit diesem Wert ausgeführt: <code>print(array[' + loopIndex + '])</code> gibt "' + esc(arr[loopIndex]) + '" aus.<br>' +
+    '3. Danach erhöht Python <code>i</code> automatisch um 1 (auf ' + (loopIndex + 1) + ') und prüft erneut, ob <code>i &lt; len(array)</code> ' +
+    '(also <code>' + (loopIndex + 1) + ' &lt; ' + arr.length + '</code>) noch gilt, bevor der nächste Durchlauf beginnt.';
+}
+
+// ---------- VERAENDERN: Tauschen ----------
+function doSwap(safe) {
+  const a = parseInt(document.getElementById('swapIndexA').value);
+  const b = parseInt(document.getElementById('swapIndexB').value);
+  const panel = document.getElementById('swapErrorPanel');
+  panel.style.display = 'none';
+  panel.innerHTML = '';
+
+  if (isNaN(a) || isNaN(b) || a < 0 || b < 0 || a >= arr.length || b >= arr.length) {
+    document.getElementById('swapCode').textContent = 'Ungültige Eingabe.';
+    panel.innerHTML = '<strong>Ungültige Indizes.</strong> Beide Indizes müssen zwischen 0 und ' + (arr.length - 1) + ' liegen.';
+    panel.style.display = 'block';
+    return;
+  }
+
+  if (safe) {
+    const valA = arr[a], valB = arr[b];
+    const temp = valA;
+    arr[a] = arr[b];
+    arr[b] = temp;
+    renderMainCabinet(-1);
+    const lines = [
+      'temp = array[' + a + ']         # "' + valA + '" retten',
+      'array[' + a + '] = array[' + b + ']    # "' + valB + '" nach Index ' + a,
+      'array[' + b + '] = temp         # geretteten Wert "' + valA + '" nach Index ' + b
+    ];
+    document.getElementById('swapCode').innerHTML = codeLinesHtml(lines.map(l => annotateCode(esc(l))));
+  } else {
+    const valA = arr[a], valB = arr[b];
+    const lines = [
+      'array[' + a + '] = array[' + b + ']    # "' + valA + '" wird hier bereits überschrieben',
+      'array[' + b + '] = array[' + a + ']    # kopiert den (falschen) neuen Wert zurück'
+    ];
+    document.getElementById('swapCode').innerHTML = codeLinesHtml(lines.map(l => annotateCode(esc(l))));
+    panel.innerHTML =
+      '<strong>So geht ein Wert verloren:</strong> Nach Zeile 1 steht an Index ' + a + ' bereits der Wert "' + valB + '" – ' +
+      'der ursprüngliche Wert "' + valA + '" existiert an keiner Stelle mehr. Zeile 2 kopiert daher nur denselben ' +
+      '("' + valB + '") zurück. Ergebnis: <code>array[' + a + ']</code> und <code>array[' + b + ']</code> enthalten am Ende ' +
+      'beide "' + valB + '" – "' + valA + '" ist unwiederbringlich weg. (Das reale Array oben bleibt zur Sicherheit unverändert – dies ist nur eine Simulation.)';
+    panel.style.display = 'block';
+  }
+}
+
+// ---------- VERAENDERN: Einfügen ----------
+let insertQueue = [];
+let insertQueueRunning = false;
+let insertDone = false;
+let lastInsertStep = null;
+
+function highlightInsertLine(n) {
+  [1, 2, 3].forEach(i => document.getElementById('insertLine' + i).classList.toggle('on', i === n));
+}
+
+function insertStart() {
+  const val = document.getElementById('insertValue').value.trim();
+  const idx = parseInt(document.getElementById('insertIndex').value);
+  if (!val || isNaN(idx) || idx < 0 || idx > arr.length) {
+    document.getElementById('insertStatus').textContent =
+      'Bitte einen Wert und einen gültigen Index (0 bis ' + arr.length + ') eingeben.';
+    return;
+  }
+  insertQueue = [];
+  insertDone = false;
+  lastInsertStep = null;
+  document.getElementById('insertExplainBox').style.display = 'none';
+  const n = arr.length;
+  insertQueue.push({ type: 'extend' });
+  for (let j = n; j > idx; j--) insertQueue.push({ type: 'shift', j });
+  insertQueue.push({ type: 'place', idx, val });
+  insertQueueRunning = true;
+  document.getElementById('insertStatus').textContent = 'Bereit – klickt „Nächster Schritt“, um die Verschiebung zu starten.';
+  highlightInsertLine(1);
+}
+
+function insertStep() {
+  if (insertDone) {
+    document.getElementById('insertStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu beginnen.';
+    return;
+  }
+  if (!insertQueueRunning || insertQueue.length === 0) {
+    document.getElementById('insertStatus').textContent = 'Klickt zuerst „Einfügen starten“.';
+    return;
+  }
+  const step = insertQueue.shift();
+  lastInsertStep = step;
+  if (step.type === 'extend') {
+    arr.push(arr[arr.length - 1]);
+    renderMainCabinet(arr.length - 1);
+    document.getElementById('insertStatus').innerHTML =
+      'Array um einen Platz verlängert (Index ' + (arr.length - 1) + ' ist vorerst eine Kopie von Index ' + (arr.length - 2) + ').';
+    highlightInsertLine(1);
+  } else if (step.type === 'shift') {
+    const j = step.j;
+    arr[j] = arr[j - 1];
+    renderMainCabinet(j);
+    document.getElementById('insertStatus').innerHTML =
+      'array[' + j + '] = array[' + (j - 1) + '] &nbsp;→&nbsp; Wert von Index ' + (j - 1) + ' nach Index ' + j + ' verschoben.';
+    highlightInsertLine(2);
+  } else if (step.type === 'place') {
+    arr[step.idx] = step.val;
+    renderMainCabinet(step.idx);
+    document.getElementById('insertStatus').innerHTML =
+      '<b>Fertig!</b> array[' + step.idx + '] = "' + esc(step.val) + '" wurde eingetragen.';
+    highlightInsertLine(3);
+    insertQueueRunning = false;
+    insertDone = true;
+  }
+  if (document.getElementById('insertExplainBox').style.display === 'block') explainInsertStep();
+}
+
+function explainInsertStep() {
+  const box = document.getElementById('insertExplainBox');
+  box.style.display = 'block';
+  if (!lastInsertStep) {
+    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Einfügen starten“ und dann „Nächster Schritt“.';
+    return;
+  }
+  if (lastInsertStep.type === 'extend') {
+    box.innerHTML =
+      '<strong>Das ist der Vorbereitungsschritt, noch keine Schleife.</strong> Bevor irgendetwas verschoben werden kann, ' +
+      'braucht das Array einen zusätzlichen freien Platz am Ende. Deshalb wird der letzte Wert einfach dupliziert – ' +
+      'das Array ist jetzt einen Platz länger.';
+  } else if (lastInsertStep.type === 'shift') {
+    box.innerHTML =
+      '<strong>Wir sind in der Schleife, die von hinten nach vorne läuft.</strong> Die Laufvariable steht gerade bei ' +
+      '<code>j = ' + lastInsertStep.j + '</code>. In diesem Durchlauf wird der Wert von Index ' + (lastInsertStep.j - 1) +
+      ' nach Index ' + lastInsertStep.j + ' kopiert.<br><br>' +
+      '<strong>Warum von hinten nach vorne?</strong> Würde man vorne beginnen, würde man einen Wert überschreiben, bevor er ' +
+      'kopiert wurde. Von hinten beginnend ist an jeder Zielposition erst noch die "alte Kopie" von der vorherigen ' +
+      'Verlängerung vorhanden, die gefahrlos überschrieben werden kann.';
+  } else if (lastInsertStep.type === 'place') {
+    box.innerHTML =
+      '<strong>Die Schleife ist jetzt fertig durchlaufen</strong> – alle nötigen Werte wurden verschoben, sodass an der ' +
+      'Zielposition <code>' + lastInsertStep.idx + '</code> jetzt eine "Lücke" (ein doppelter Wert) frei ist. In diesem letzten ' +
+      'Schritt wird dort der eigentliche neue Wert "' + esc(lastInsertStep.val) + '" eingetragen.';
+  }
+}
+
+function insertReset() {
+  insertQueue = [];
+  insertQueueRunning = false;
+  insertDone = false;
+  lastInsertStep = null;
+  document.getElementById('insertStatus').textContent = 'Gebt Wert und Index ein und klickt „Einfügen starten“.';
+  document.getElementById('insertExplainBox').style.display = 'none';
+  highlightInsertLine(0);
+  renderMainCabinet(-1);
+}
+
+// ---------- VERAENDERN: Entfernen ----------
+let removeQueue = [];
+let removeQueueRunning = false;
+let removeDone = false;
+let lastRemoveStep = null;
+
+function highlightRemoveLine(n) {
+  [1, 2].forEach(i => document.getElementById('removeLine' + i).classList.toggle('on', i === n));
+}
+
+function removeStart() {
+  const idx = parseInt(document.getElementById('removeIndex').value);
+  if (isNaN(idx) || idx < 0 || idx >= arr.length) {
+    document.getElementById('removeStatus').textContent =
+      'Bitte einen gültigen Index (0 bis ' + (arr.length - 1) + ') eingeben.';
+    return;
+  }
+  removeQueue = [];
+  removeDone = false;
+  lastRemoveStep = null;
+  document.getElementById('removeExplainBox').style.display = 'none';
+  const n = arr.length;
+  for (let j = idx; j < n - 1; j++) removeQueue.push({ type: 'shift', j });
+  removeQueue.push({ type: 'shrink' });
+  removeQueueRunning = true;
+  document.getElementById('removeStatus').textContent = 'Bereit – klickt „Nächster Schritt“.';
+  highlightRemoveLine(1);
+}
+
+function removeStep() {
+  if (removeDone) {
+    document.getElementById('removeStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu beginnen.';
+    return;
+  }
+  if (!removeQueueRunning || removeQueue.length === 0) {
+    document.getElementById('removeStatus').textContent = 'Klickt zuerst „Entfernen starten“.';
+    return;
+  }
+  const step = removeQueue.shift();
+  lastRemoveStep = step;
+  if (step.type === 'shift') {
+    const j = step.j;
+    arr[j] = arr[j + 1];
+    renderMainCabinet(j);
+    document.getElementById('removeStatus').innerHTML =
+      'array[' + j + '] = array[' + (j + 1) + '] &nbsp;→&nbsp; Wert von Index ' + (j + 1) + ' nach Index ' + j + ' verschoben.';
+    highlightRemoveLine(1);
+  } else if (step.type === 'shrink') {
+    arr = arr.slice(0, arr.length - 1);
+    renderMainCabinet(-1);
+    document.getElementById('removeStatus').innerHTML = '<b>Fertig!</b> Der letzte (jetzt doppelte) Platz wurde entfernt.';
+    highlightRemoveLine(2);
+    removeQueueRunning = false;
+    removeDone = true;
+  }
+  if (document.getElementById('removeExplainBox').style.display === 'block') explainRemoveStep();
+}
+
+function explainRemoveStep() {
+  const box = document.getElementById('removeExplainBox');
+  box.style.display = 'block';
+  if (!lastRemoveStep) {
+    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Entfernen starten“ und dann „Nächster Schritt“.';
+    return;
+  }
+  if (lastRemoveStep.type === 'shift') {
+    const j = lastRemoveStep.j;
+    box.innerHTML =
+      '<strong>Wir sind in der Schleife, die von vorne nach hinten läuft.</strong> Die Laufvariable steht gerade bei ' +
+      '<code>j = ' + j + '</code>. In diesem Durchlauf wird der Wert von Index ' + (j + 1) + ' nach Index ' + j + ' kopiert.<br><br>' +
+      '<strong>Warum von vorne nach hinten?</strong> Anders als beim Einfügen wollen wir hier eine Lücke schließen, die weiter ' +
+      'vorne entstanden ist – jeder Wert rückt eine Position auf, immer von der Lücke aus in Richtung Ende.';
+  } else if (lastRemoveStep.type === 'shrink') {
+    box.innerHTML =
+      '<strong>Die Schleife ist jetzt fertig durchlaufen</strong> – alle Werte nach der Löschstelle wurden bereits eine Position ' +
+      'nach vorne verschoben. Dadurch ist der letzte Platz im Array jetzt doppelt belegt (er enthält noch eine Kopie vom ' +
+      'vorletzten Wert). In diesem letzten Schritt wird dieser überflüssige letzte Platz entfernt, damit das Array wieder ' +
+      'die richtige Länge hat.';
+  }
+}
+
+function removeReset() {
+  removeQueue = [];
+  removeQueueRunning = false;
+  removeDone = false;
+  lastRemoveStep = null;
+  document.getElementById('removeStatus').textContent = 'Gebt einen Index ein und klickt „Entfernen starten“.';
+  document.getElementById('removeExplainBox').style.display = 'none';
+  highlightRemoveLine(0);
+  renderMainCabinet(-1);
+}
+
+// ---------- AUSWERTEN ----------
+let auswArr = [12, 45, 33, 8, 20];
+let auswMode = 'summe';
+let auswIndex = -1;
+let auswAcc = 0;
+
+function setAuswArray() {
+  const raw = document.getElementById('auswArrayInput').value.trim();
+  if (raw) {
+    const parts = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+    if (parts.length > 0) auswArr = parts;
+  }
+  document.getElementById('auswArrayInput').value = '';
+  auswReset();
+}
+
+function renderAuswChips() {
+  const modes = [['summe', 'Summe'], ['durchschnitt', 'Durchschnitt'], ['maximum', 'Maximum'], ['minimum', 'Minimum']];
+  document.getElementById('auswModeChips').innerHTML = modes.map(([key, label]) =>
+    '<span class="chip' + (auswMode === key ? ' active' : '') + '" onclick="setAuswMode(\'' + key + '\')">' + label + '</span>'
+  ).join('');
+}
+
+function setAuswMode(mode) {
+  auswMode = mode;
+  auswReset();
+}
+
+function auswCodeSkeleton() {
+  if (auswMode === 'summe' || auswMode === 'durchschnitt') {
+    const varName = auswMode === 'durchschnitt' ? 'summe' : 'ergebnis';
+    const lines = [varName + ' = 0', 'for i in range(len(array)):', '    ' + varName + ' = ' + varName + ' + array[i]'];
+    if (auswMode === 'durchschnitt') lines.push('durchschnitt = summe / len(array)');
+    return lines;
+  } else {
+    const varName = auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert';
+    const cmp = auswMode === 'maximum' ? '>' : '<';
+    return [varName + ' = array[0]', 'for i in range(1, len(array)):', '    if array[i] ' + cmp + ' ' + varName + ':', '        ' + varName + ' = array[i]'];
+  }
+}
+
+function renderAuswCodeBlock() {
+  const lines = auswCodeSkeleton();
+  document.getElementById('auswCodeBlock').innerHTML = lines.map((l, idx) =>
+    '<div class="line-wrap" id="auswLine' + idx + '"><div class="code-line-row">' +
+    '<span class="code-line-num">' + (idx + 1) + '</span>' +
+    '<span class="code-line-text">' + annotateCode(esc(l)) + '</span></div></div>'
+  ).join('');
+}
+
+function highlightAuswLine(idx) {
+  document.querySelectorAll('#auswCodeBlock .line-wrap').forEach((el, i) => el.classList.toggle('on', i === idx));
+}
+
+function renderAuswStruk() {
+  const panel = document.getElementById('auswStruk');
+  let bands;
+  if (auswMode === 'summe' || auswMode === 'durchschnitt') {
+    bands = [
+      'Deklaration und Initialisierung: summe = 0',
+      'Wiederhole von i = 0 solange i < len(array), Schrittweite 1',
+      '    Zuweisung: summe = summe + array[i]'
+    ];
+    if (auswMode === 'durchschnitt') bands.push('Zuweisung: durchschnitt = summe / len(array)');
+    bands.push('Ausgabe: ' + (auswMode === 'durchschnitt' ? 'durchschnitt' : 'summe'));
+  } else {
+    const v = auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert';
+    const cmp = auswMode === 'maximum' ? '>' : '<';
+    bands = [
+      'Deklaration und Initialisierung: ' + v + ' = array[0]',
+      'Wiederhole von i = 1 solange i < len(array), Schrittweite 1',
+      '    Wenn array[i] ' + cmp + ' ' + v + ': ' + v + ' = array[i]',
+      'Ausgabe: ' + v
+    ];
+  }
+  panel.innerHTML = bands.map(b => '<div class="struk-band-mini">' + esc(b) + '</div>').join('');
+}
+
+function updateAuswVars() {
+  const varName = auswMode === 'summe' ? 'ergebnis' : auswMode === 'durchschnitt' ? 'summe' : (auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert');
+  const iVal = auswIndex >= 0 && auswIndex < auswArr.length ? auswIndex : (auswIndex === -2 ? '– (fertig)' : '– (noch nicht gestartet)');
+  document.getElementById('auswVarsPanel').innerHTML =
+    '<div class="var-row"><span class="var-name">array</span><span class="var-value">[' + auswArr.join(', ') + ']</span></div>' +
+    '<div class="var-row"><span class="var-name">i</span><span class="var-value">' + iVal + '</span></div>' +
+    '<div class="var-row"><span class="var-name">' + varName + '</span><span class="var-value">' + auswAcc + '</span></div>';
+}
+
+let auswLastPhase = null;
+let auswLastInfo = {};
+
+function auswStep() {
+  if (auswIndex === -2) {
+    document.getElementById('auswStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu starten.';
+    return;
+  }  if (auswIndex === -1) {
+    const isMinMax = auswMode === 'maximum' || auswMode === 'minimum';
+    auswAcc = isMinMax ? auswArr[0] : 0;
+    auswIndex = isMinMax ? 1 : 0;
+    renderCabinet('auswCabinet', auswArr, isMinMax ? 0 : -1);
+    updateAuswVars();
+    highlightAuswLine(0);
+    document.getElementById('auswStatus').innerHTML = isMinMax
+      ? 'Startwert gesetzt: array[0] = ' + auswArr[0]
+      : 'Startwert gesetzt: 0';
+    auswLastPhase = 'init';
+    auswLastInfo = { isMinMax };
+    if (document.getElementById('auswExplainBox').style.display === 'block') explainAuswStep();
+    return;
+  }
+  if (auswIndex >= auswArr.length) {
+    let result = auswAcc;
+    if (auswMode === 'durchschnitt') result = Math.round((auswAcc / auswArr.length) * 100) / 100;
+    document.getElementById('auswOutput').innerHTML = '<span class="out">' + result + '</span>';
+    document.getElementById('auswOutput').classList.add('visible');
+    document.getElementById('auswStatus').innerHTML = '<b>Fertig!</b> Ergebnis: ' + result;
+    renderCabinet('auswCabinet', auswArr, -1);
+    highlightAuswLine(auswMode === 'durchschnitt' ? 3 : -1);
+    auswIndex = -2;
+    auswLastPhase = 'done';
+    auswLastInfo = { result };
+    if (document.getElementById('auswExplainBox').style.display === 'block') explainAuswStep();
+    return;
+  }
+  const i = auswIndex;
+  const val = auswArr[i];
+  if (auswMode === 'summe' || auswMode === 'durchschnitt') {
+    auswAcc += val;
+    document.getElementById('auswStatus').innerHTML =
+      'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' &nbsp;·&nbsp; neue Summe = ' + auswAcc;
+    highlightAuswLine(2);
+    auswLastPhase = 'accumulate';
+    auswLastInfo = { i, val, acc: auswAcc };
+  } else {
+    const better = auswMode === 'maximum' ? (val > auswAcc) : (val < auswAcc);
+    if (better) {
+      auswAcc = val;
+      document.getElementById('auswStatus').innerHTML =
+        'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' → neuer ' + (auswMode === 'maximum' ? 'Höchstwert' : 'Tiefstwert') + ': ' + auswAcc;
+      highlightAuswLine(3);
+    } else {
+      document.getElementById('auswStatus').innerHTML =
+        'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' → keine Änderung (' + auswAcc + ' bleibt).';
+      highlightAuswLine(2);
+    }
+    auswLastPhase = 'compare';
+    auswLastInfo = { i, val, better, acc: auswAcc };
+  }
+  renderCabinet('auswCabinet', auswArr, i);
+  updateAuswVars();
+  auswIndex++;
+  if (document.getElementById('auswExplainBox').style.display === 'block') explainAuswStep();
+}
+
+function explainAuswStep() {
+  const box = document.getElementById('auswExplainBox');
+  box.style.display = 'block';
+  const varName = auswMode === 'summe' ? 'ergebnis' : auswMode === 'durchschnitt' ? 'summe' : (auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert');
+  if (!auswLastPhase) {
+    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Nächster Schritt“.';
+    return;
+  }
+  if (auswLastPhase === 'init') {
+    box.innerHTML = '<strong>Das ist die Zeile vor der Schleife</strong>, sie läuft nur ein einziges Mal. Hier wird die Variable ' +
+      '<code>' + varName + '</code> auf ihren Startwert gesetzt' + (auswLastInfo.isMinMax
+        ? ' – und zwar auf <code>array[0]</code>, den ersten Wert. Deshalb startet die eigentliche Schleife bei Maximum/Minimum ' +
+          'auch erst bei <code>i = 1</code>, nicht bei 0: array[0] ist ja bereits "verbraucht".'
+        : ' – bei einer Summe ist der neutrale Startwert 0, weil das Addieren dann nichts verfälscht.');
+  } else if (auswLastPhase === 'done') {
+    box.innerHTML = '<strong>Die Schleife ist komplett durchlaufen</strong> – es gibt kein <code>array[i]</code> mit gültigem Index mehr. ' +
+      'Deshalb wird jetzt nur noch das Endergebnis ausgegeben' +
+      (auswMode === 'durchschnitt' ? ' (die Summe wurde zusätzlich noch durch <code>len(array)</code> geteilt).' : '.');
+  } else if (auswLastPhase === 'accumulate') {
+    box.innerHTML = '<strong>Es gibt hier nur eine einzige Schleife</strong>, die einmal durchs Array läuft. Wir sind beim Durchlauf mit ' +
+      '<code>i = ' + auswLastInfo.i + '</code>: Der Wert <code>array[' + auswLastInfo.i + '] = ' + auswLastInfo.val + '</code> wird zur bisherigen ' +
+      '<code>' + varName + '</code> addiert, das Ergebnis ist jetzt <code>' + auswLastInfo.acc + '</code>. Danach erhöht Python <code>i</code> um 1 ' +
+      'und prüft, ob noch ein weiteres Element folgt.';
+  } else if (auswLastPhase === 'compare') {
+    box.innerHTML = '<strong>Es gibt hier nur eine einzige Schleife</strong>, die einmal durchs Array läuft. Wir sind beim Durchlauf mit ' +
+      '<code>i = ' + auswLastInfo.i + '</code>: Es wird verglichen, ob <code>array[' + auswLastInfo.i + '] = ' + auswLastInfo.val + '</code> ' +
+      (auswMode === 'maximum' ? 'größer' : 'kleiner') + ' ist als der bisherige <code>' + varName + '</code>.<br><br>' +
+      (auswLastInfo.better
+        ? 'Das ist hier der Fall – deshalb wird <code>' + varName + '</code> jetzt auf ' + auswLastInfo.acc + ' aktualisiert.'
+        : 'Das ist hier <strong>nicht</strong> der Fall – deshalb bleibt <code>' + varName + '</code> unverändert bei ' + auswLastInfo.acc + '.') +
+      ' Danach erhöht Python <code>i</code> um 1 und prüft das nächste Element.';
+  }
+}
+
+function auswReset() {
+  auswIndex = -1;
+  auswAcc = 0;
+  auswLastPhase = null;
+  auswLastInfo = {};
+  renderAuswChips();
+  renderAuswCodeBlock();
+  renderAuswStruk();
+  renderCabinet('auswCabinet', auswArr, -1);
+  updateAuswVars();
+  const out = document.getElementById('auswOutput');
+  out.classList.remove('visible');
+  out.innerHTML = '';
+  document.getElementById('auswStatus').textContent = 'Noch nicht gestartet – klickt auf „Nächster Schritt“.';
+  document.getElementById('auswExplainBox').style.display = 'none';
+}
+
+// ---------- Tabs ----------
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+
+    const cabinetWrap = document.getElementById('cabinetWrap');
+    const hiddenViews = ['quiz', 'aufgaben', 'handbuch', 'auswerten'];
+    if (hiddenViews.includes(tab.dataset.view)) {
+      cabinetWrap.style.display = 'none';
+      if (tab.dataset.view === 'auswerten') auswReset();
+    } else {
+      cabinetWrap.style.display = 'block';
+      renderMainCabinet(-1);
+      if (tab.dataset.view === 'build') {
+        hidePanels();
+        refreshCodeDisplay();
+        refreshOutputDisplay();
+        refreshVarsPanel();
+        refreshStrukPanel();
+      }
+      if (tab.dataset.view === 'loop') loopReset();
+      if (tab.dataset.view === 'veraendern') {
+        document.getElementById('swapCode').textContent = 'Noch keine Aktion ausgeführt.';
+        document.getElementById('swapErrorPanel').style.display = 'none';
+        insertReset();
+        removeReset();
+      }
+    }
+  });
+});
+
+// ---------- QUIZ tab (deckt alle Bereiche der Werkstatt ab) ----------
+const quizPools = [
+  ["Nord", "Ost", "Süd", "West"],
+  ["Rechnungswesen", "Marketing", "Personal", "IT"],
+  ["Mo", "Di", "Mi", "Do", "Fr"],
+  ["Apfel", "Birne", "Kirsche", "Pflaume"]
+];
+let quizArr = [];
+let quizItems = [];
+
+function quizRandInt(min, max) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+function checkAnswer(given, answer) {
+  const g = given.trim().toLowerCase();
+  const accepted = Array.isArray(answer) ? answer : [answer];
+  return accepted.some(a => g === String(a).trim().toLowerCase());
+}
+
+function answerLabel(answer) {
+  return Array.isArray(answer) ? answer[0] : answer;
+}
+
+// Jede Funktion erzeugt genau eine Frage zu einem Bereich der Werkstatt.
+const QUIZ_GENERATORS = [
+  // Grundlagen: Index-Zählung
+  arr => {
+    const len = arr.length;
+    return { category: 'Grundlagen', prompt: 'Das Array hat ' + len + ' Elemente. Was ist der höchste gültige Index?', answer: String(len - 1) };
+  },
+  // Zugriff: Wert an Index / Index von Wert
+  arr => {
+    const i = quizRandInt(0, arr.length - 1);
+    if (Math.random() < 0.5) {
+      return { category: 'Zugriff', prompt: 'Welcher Wert steht an Index ' + i + '?', answer: arr[i] };
+    }
+    return { category: 'Zugriff', prompt: 'An welchem Index steht der Wert "' + arr[i] + '"?', answer: String(i) };
+  },
+  // Anhängen: append()
+  arr => {
+    if (Math.random() < 0.5) {
+      return { category: 'Anhängen', prompt: 'array.append("X") wird ausgeführt. Wie viele Elemente hat array danach?', answer: String(arr.length + 1) };
+    }
+    return { category: 'Anhängen', prompt: 'array.append("X") wird ausgeführt. Welchen Index bekommt der neue Wert "X"?', answer: String(arr.length) };
+  },
+  // len()
+  arr => ({ category: 'len()', prompt: 'Was gibt len(array) für dieses Array zurück?', answer: String(arr.length) }),
+  // IndexError
+  arr => {
+    const len = arr.length;
+    return { category: 'IndexError', prompt: 'Das Array hat ' + len + ' Elemente. Ist array[' + len + '] gültig? (ja/nein)', answer: 'nein' };
+  },
+  // Schleife
+  arr => {
+    if (Math.random() < 0.5) {
+      return { category: 'Schleife', prompt: 'for i in range(len(array)): print(i) — wie oft läuft diese Schleife?', answer: String(arr.length) };
+    }
+    return { category: 'Schleife', prompt: 'for i in range(len(array)): print(i) — welchen Wert hat i beim letzten Durchlauf?', answer: String(arr.length - 1) };
+  },
+  // Tauschen
+  () => ({
+    category: 'Tauschen',
+    prompt: 'Wie heißt die Variable, die man zum sicheren Tauschen zweier Arraywerte zusätzlich braucht?',
+    answer: ['zwischenspeicher', 'temp']
+  }),
+  // Einfügen / Entfernen
+  arr => {
+    if (Math.random() < 0.5) {
+      return { category: 'Einfügen', prompt: 'Das Array hat ' + arr.length + ' Elemente. Nach dem Einfügen eines neuen Werts an einer beliebigen Stelle hat es wie viele Elemente?', answer: String(arr.length + 1) };
+    }
+    return { category: 'Entfernen', prompt: 'Das Array hat ' + arr.length + ' Elemente. Nach dem Entfernen eines Werts hat es wie viele Elemente?', answer: String(Math.max(0, arr.length - 1)) };
+  },
+  // Auswerten: eigenes Zahlen-Array
+  () => {
+    const nums = Array.from({ length: 4 }, () => quizRandInt(1, 20));
+    const mode = ['summe', 'maximum', 'minimum'][quizRandInt(0, 2)];
+    const literal = '[' + nums.join(', ') + ']';
+    if (mode === 'summe') {
+      return { category: 'Auswerten', prompt: 'zahlen = ' + literal + ' — wie groß ist die Summe aller Werte?', answer: String(nums.reduce((a, b) => a + b, 0)) };
+    }
+    if (mode === 'maximum') {
+      return { category: 'Auswerten', prompt: 'zahlen = ' + literal + ' — wie groß ist der größte Wert?', answer: String(Math.max(...nums)) };
+    }
+    return { category: 'Auswerten', prompt: 'zahlen = ' + literal + ' — wie groß ist der kleinste Wert?', answer: String(Math.min(...nums)) };
+  },
+  // Struktogramm: Anhängen-Sonderfall
+  () => ({
+    category: 'Struktogramm',
+    prompt: 'Welchen Python-Befehl nutzt man zum Anhängen eines Werts, statt ihn im Struktogramm als Zuweisung an einen neuen Index darzustellen?',
+    answer: ['append', 'append()', '.append()']
+  })
+];
+
+function newQuiz() {
+  quizArr = [...quizPools[Math.floor(Math.random() * quizPools.length)]];
+  renderCabinet('quizCabinet', quizArr, -1);
+  document.getElementById('quizArrayLabel').textContent = 'array = ' + arrLiteral(quizArr);
+  document.getElementById('quizScore').classList.remove('visible');
+
+  quizItems = QUIZ_GENERATORS.map(gen => gen(quizArr));
+  // Reihenfolge mischen, damit die Themen nicht immer in derselben Abfolge kommen.
+  for (let i = quizItems.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [quizItems[i], quizItems[j]] = [quizItems[j], quizItems[i]];
+  }
+  renderQuizQuestions();
+}
+
+function renderQuizQuestions() {
+  const wrap = document.getElementById('quizQuestions');
+  wrap.innerHTML = '';
+  quizItems.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'quiz-question-row';
+    row.id = 'quizRow' + idx;
+    row.innerHTML =
+      '<span class="qtext"><span class="hb-tag" style="margin-right:8px;">' + item.category + '</span>' + (idx + 1) + '. ' + item.prompt + '</span>' +
+      '<input type="text" id="quizInput' + idx + '">' +
+      '<span class="verdict" id="quizVerdict' + idx + '"></span>';
+    wrap.appendChild(row);
+  });
+}
+
+function evaluateQuiz() {
+  let correctCount = 0;
+  quizItems.forEach((item, idx) => {
+    const input = document.getElementById('quizInput' + idx);
+    const given = input.value;
+    const row = document.getElementById('quizRow' + idx);
+    const verdict = document.getElementById('quizVerdict' + idx);
+    const isCorrect = checkAnswer(given, item.answer);
+    row.classList.remove('correct', 'wrong');
+    if (isCorrect) {
+      correctCount++;
+      row.classList.add('correct');
+      verdict.textContent = 'Richtig ✓';
+    } else {
+      row.classList.add('wrong');
+      verdict.textContent = 'Richtig wäre: ' + answerLabel(item.answer);
+    }
+  });
+  const scoreBox = document.getElementById('quizScore');
+  scoreBox.textContent = 'Ergebnis: ' + correctCount + ' von ' + quizItems.length + ' richtig';
+  scoreBox.classList.add('visible');
+}
+
+// ---------- Modal ----------
+const modalTexts = {
+  build:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'Ein Array speichert mehrere Werte unter einem gemeinsamen Namen. Jeder Wert hat eine feste Position – den ' +
+    '<strong>Index</strong>. Die Zählung beginnt bei 0, nicht bei 1.<br><br>' +
+    'Oben siehst du immer den aktuellen <strong>Code</strong> (was gerade passiert ist) und darunter die ' +
+    '<strong>Ausgabe (Konsole)</strong> – aber nur, wenn die Zeile tatsächlich etwas ausdruckt. Eine reine ' +
+    'Zuweisung wie <code class="inline">array.append(...)</code> verändert nur das Array, gibt aber nichts aus.',
+  loop:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'Eine <code class="inline">for</code>-Schleife durchläuft jeden Index des Arrays einzeln, ohne dass du ihn ' +
+    'von Hand aufschreiben musst. Die Zählvariable <code class="inline">i</code> beginnt bei 0 und erhöht sich ' +
+    'bei jedem Durchlauf um 1 – so lange, bis alle Elemente einmal dran waren.<br><br>' +
+    'Klicke Schritt für Schritt durch und beobachte: welche Codezeile gerade aktiv ist (orange hervorgehoben), ' +
+    'welches Element im Array markiert wird, und was unten in der Konsole ausgegeben wird.',
+  struktogramm:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'In Baden-Württemberg muss im Informatik-Unterricht Code in ein Struktogramm (Nassi-Shneiderman-Diagramm) ' +
+    'übersetzt werden können – und umgekehrt. Für Arrays gibt es dafür eigene, genormte Bausteine, die etwas ' +
+    'anders aussehen als der Python-Code, den wir sonst schreiben.<br><br>' +
+    'Die Tabelle zeigt dir, welcher Struktogramm-Baustein zu welcher Python-Zeile gehört. Besonders wichtig: ' +
+    'Das <strong>Anhängen</strong> eines Elements wird im Struktogramm als Zuweisung an einen neuen Index ' +
+    'dargestellt, in Python nutzen wir dafür aber die Methode <code class="inline">append()</code>.',
+  quiz:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'Jede Runde deckt gezielt alle Bereiche der Werkstatt ab – von den Grundlagen (Index, len()) über Zugriff, ' +
+    'Anhängen, Schleifen und IndexError bis hin zu Tauschen, Einfügen/Entfernen, Auswerten und Struktogramm. Das ' +
+    'kleine Etikett vor jeder Frage zeigt, zu welchem Bereich sie gehört. Beantwortet zuerst alle Fragen, dann ' +
+    'klickt auf „Auswertung starten“. Über „Neue Runde“ gibt es neue Zahlen/Werte zu denselben Bereichen.',
+  aufgaben:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'Hier findet ihr alle Arbeitsaufträge zu diesem Lernfortschritt (L1_2 – L1_5) an einem Ort – ihr müsst also ' +
+    'nichts zusätzlich öffnen oder ausdrucken. Klickt auf eine Aufgabe, um sie aufzuklappen.<br><br>' +
+    'Wichtig: Code wird hier <strong>nicht</strong> eingegeben oder ausgeführt – das macht ihr wie gewohnt in ' +
+    'Thonny bzw. dem Struktogrammer. Bei manchen Aufgaben gibt es einen Hilfe-Button, der euch direkt zur ' +
+    'passenden Stelle in der Array-Werkstatt bringt, wenn ihr etwas erst ausprobieren möchtet.<br><br>' +
+    'Unten findet ihr außerdem 10 freiwillige <strong>Zusatzaufgaben</strong> im Stil der Abitur-Musteraufgaben ' +
+    '– inklusive einiger Schreibtischtests.',
+  handbuch:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'Das Handbuch ist ein Nachschlagewerk zu allem, was wir bisher behandelt haben – sortiert nach Themen und ' +
+    'durchsuchbar. Nutzt die Suche oder die Themen-Chips, um schnell etwas nachzuschlagen, z. B. während ihr an ' +
+    'einer Aufgabe arbeitet.<br><br>' +
+    'Das Handbuch wächst mit: Zu jeder weiteren Bildungsplaneinheit kommen neue Abschnitte dazu, sodass am Ende ' +
+    'der gesamte Stoff an einem Ort steht.',
+  veraendern:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'Drei klassische Array-Operationen, die mehr Sorgfalt brauchen als append() oder eine einfache Zuweisung:<br><br>' +
+    '<strong>Tauschen:</strong> Zwei Werte einfach direkt zu vertauschen überschreibt einen davon, bevor er gerettet ' +
+    'wurde. Testet beide Varianten und seht euch den Unterschied im Code an.<br><br>' +
+    '<strong>Einfügen/Entfernen an einer Stelle:</strong> Anders als beim Anhängen am Ende müssen hier erst alle ' +
+    'betroffenen Werte verschoben werden. Klickt euch Schritt für Schritt durch, um genau zu sehen, welcher Wert ' +
+    'wohin wandert.',
+  auswerten:
+    '<strong>Worum geht\'s hier?</strong><br><br>' +
+    'Viele Array-Aufgaben laufen auf dasselbe Muster hinaus: einmal durchs Array laufen und dabei einen Wert ' +
+    'mitführen – eine Summe, einen Durchschnitt, den größten oder den kleinsten Wert. Wählt einen Modus, klickt ' +
+    'euch durch die Schleife und beobachtet, wie sich die Variable bei jedem Schritt verändert (oder eben nicht).'
+};
+
+function openModal(key) {
+  document.getElementById('modalContent').innerHTML = modalTexts[key] || '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ---------- AUFGABEN (Arbeitsaufträge L1_2 – L1_5) ----------
+function gotoHelp(tabKey, message) {
+  document.querySelector('.tab[data-view="' + tabKey + '"]').click();
+  setTimeout(() => flashToast(message), 350);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+const AUFGABEN_L1 = [
+{
+  title: "L1_2", sub: "Weltmeister",
+  html: `
+    <p class="hinweis">Hinweis: Beachtet dazu das Informationsmaterial sowie die Array-Werkstatt (Tab „Aufbauen &amp; Zugreifen“).</p>
+    <p><strong>Aufgabe 1</strong> – Formuliert den Code, der die folgenden Anweisungen umsetzt (Lösung in Thonny):</p>
+    <ol>
+      <li>Erzeugt ein Array <code class="inline">weltmeister</code> mit den Werten 1954, 1974, 1990 und 2014.</li>
+      <li>Erzeugt ein Array <code class="inline">wmtrainer</code> mit den Werten "Sepp Herberger", "Helmut Schön" und "Franz Beckenbauer".</li>
+      <li>Fügt in <code class="inline">wmtrainer</code> den Namen "Joachim Löw" am Ende ein.</li>
+      <li>Gebt die Anzahl der Weltmeistertitel (Anzahl der Elemente in <code class="inline">weltmeister</code>) in der Konsole aus.</li>
+      <li>Gebt alle in <code class="inline">wmtrainer</code> gespeicherten Namen in der Konsole aus.</li>
+    </ol>
+    <p><strong>Aufgabe 2</strong> (auf Papier lösbar – ein kleiner Schreibtischtest): Gegeben ist <code class="inline">a = [1, 5, 20, 9, 4, 3, 1]</code>. Notiert den Arrayinhalt nach jeder Zeile:</p>
+    <div class="task-io">a[1] = a[2]
+a[5] = a[5] + a[6]
+a[6] = 4
+a.append(4)
+i = 3
+a[i] = i</div>
+    <button class="task-help-btn" onclick="gotoHelp('build','Probiert append() und die Zuweisung an einen Index hier zuerst aus, bevor ihr sie in Thonny nutzt.')">💡 Hilfe: append() &amp; Zuweisung ausprobieren</button>
+    <button class="task-help-btn" onclick="gotoHelp('handbuch','Sucht hier nach „len“ oder „append“, um die passenden Referenz-Abschnitte zu finden.')">📖 Hilfe: im Handbuch nachschlagen</button>
+  `
+},
+{
+  title: "L1_3.1.1", sub: "Vereinsmeisterschaften – Ausgabe von Arrays",
+  html: `
+    <p>Die Teilnehmer der Vereinsmeisterschaft sind in <code class="inline">platzierungen</code> in Reihenfolge ihrer Platzierung gespeichert. Nutzer sollen eine Platzierung eingeben (z. B. "1" für den Erstplatzierten) und den zugehörigen Namen sowie die Teilnehmerzahl ausgegeben bekommen.</p>
+    <p class="hinweis">Vorlage: <code class="inline">L1_3_1_1_vorlage_vereinsmeisterschaften.py</code> · Lösung speichern als <code class="inline">L1_3_1_1_vereinsmeisterschaften.py</code></p>
+    <p><strong>Beispielablauf:</strong></p>
+    <div class="task-io">Welche Platzierung soll ausgegeben werden? 2
+Platzierung 2: Felix Holzmann
+Teilnehmerzahl: 8</div>
+    <button class="task-help-btn" onclick="gotoHelp('build','Testet hier, wie ihr über einen eingegebenen Index auf ein Element zugreift, und wie len(array) die Teilnehmerzahl liefert.')">💡 Hilfe: Zugriff über Index &amp; len()</button>
+  `
+},
+{
+  title: "L1_3.1.2", sub: "Volleyball – Spieler anzeigen",
+  html: `
+    <p>Stammspieler stehen in <code class="inline">spieler</code>, Ersatzspieler in <code class="inline">ersatz</code>. Implementiert drei Funktionen: <code class="inline">zeigeStartaufstellung()</code>, <code class="inline">zeigeErsatzspieler()</code> und <code class="inline">zeigeKader()</code> (Kader = beide Arrays zusammen, jeder Name in einer eigenen Zeile).</p>
+    <p class="hinweis">Tipp: Zwei Arrays lassen sich mit <code class="inline">arrayNeu = array1 + array2</code> zusammenfügen. Vorlage: <code class="inline">L1_3_1_2_Vorlage_volleyball_spieler_anzeigen.py</code> · Lösung speichern als <code class="inline">L1_3_1_2_volleyball_spieler_anzeigen.py</code></p>
+    <p><strong>Beispielausgabe (Kader):</strong></p>
+    <div class="task-io">---------------------
+Kader
+---------------------
+Armin
+Batu
+...
+Luca</div>
+    <button class="task-help-btn" onclick="gotoHelp('loop','Übt hier den Schleifendurchlauf, mit dem ihr jeden Namen einzeln ausgeben könnt.')">💡 Hilfe: Schleife zum Ausgeben aller Namen</button>
+  `
+},
+{
+  title: "L1_3.2", sub: "Gewinnziehung – Implementierung von Arrays",
+  html: `
+    <p>Der Ziehungsleiter soll fünf gezogene Losnummern nacheinander in ein Array eintragen können. Nach der Ziehung sollen alle fünf Losnummern ausgegeben werden.</p>
+    <p class="hinweis">Vorlage: <code class="inline">L1_3_2_vorlage_gewinnziehung.py</code> · Lösung speichern als <code class="inline">L1_3_2_gewinnziehung.py</code></p>
+    <p><strong>Beispielablauf:</strong></p>
+    <div class="task-io">Gezogene Losnummer: 1254
+Gezogene Losnummer: 2365
+Gezogene Losnummer: 4587
+Gezogene Losnummer: 5698
+Gezogene Losnummer: 3146
+
+---Gewinnlose---
+1254
+2365
+4587
+5698
+3146</div>
+    <button class="task-help-btn" onclick="gotoHelp('build','append() ist hier der Schlüssel: jede eingegebene Losnummer wird angehängt.')">💡 Hilfe: Werte nacheinander anhängen</button>
+  `
+},
+{
+  title: "L1_3.3", sub: "Trainingsanalyse",
+  html: `
+    <p>Jeder Dartspieler wirft 6 Pfeile (max. 60 Punkte pro Wurf). Berechnet aus den 6 eingegebenen Würfen die höchste, niedrigste und durchschnittliche Punktzahl.</p>
+    <p class="hinweis">Lösung speichern als <code class="inline">L1_3_3_trainingsanalyse.py</code></p>
+    <p><strong>Beispielablauf:</strong></p>
+    <div class="task-io">Wurf: 5
+Wurf: 40
+Wurf: 3
+Wurf: 60
+Wurf: 20
+Wurf: 16
+
+Bester Wurf: 60
+Schlechtester Wurf: 3
+Durchschnittliche Punktzahl: 24</div>
+    <button class="task-help-btn" onclick="gotoHelp('auswerten','Testet hier Maximum, Minimum und Durchschnitt Schritt für Schritt, bevor ihr es in Thonny umsetzt.')">💡 Hilfe: Auswerten-Tab nutzen</button>
+  `
+},
+{
+  title: "L1_3.4", sub: "Volleyball – Spielerpositionen tauschen (Index)",
+  html: `
+    <p><code class="inline">spieler = ["Armin", "Batu", "Kai", "Sven", "Paul", "Milan"]</code> – Startposition 1 entspricht Index 0. Implementiert <code class="inline">mannschaft_umstellen_pos()</code>, die zwei eingegebene Positionen im Array vertauscht.</p>
+    <p class="hinweis">Vorlage: <code class="inline">L1_3_4_vorlage_volleyball_positionen_tauschen_index.py</code> · Lösung speichern als <code class="inline">L1_3_4_volleyball_positionen_tauschen_index.py</code></p>
+    <p><strong>Beispiel:</strong> Tausch von Position 2 (Batu) und 4 (Sven) →</p>
+    <div class="task-io">["Armin", "Sven", "Kai", "Batu", "Paul", "Milan"]</div>
+    <p class="hinweis">Achtung beim Tauschen: Wenn ihr <code class="inline">spieler[1] = spieler[3]</code> zuweist, wird der alte Wert von <code class="inline">spieler[1]</code> überschrieben und ist verloren – ihr braucht eine Zwischenspeicher-Variable!</p>
+    <button class="task-help-btn" onclick="gotoHelp('veraendern','Probiert hier beide Varianten aus – mit und ohne Zwischenspeicher – und seht direkt, was beim Tauschen schiefgehen kann.')">💡 Hilfe: Tauschen ausprobieren</button>
+  `
+},
+{
+  title: "L1_3.5", sub: "Volleyball – Inhalte einfügen",
+  html: `
+    <p>Implementiert <code class="inline">einfuegen_spieler()</code>, mit der ein neuer Name an einer bestimmten Indexposition eingefügt wird, ohne bestehende Namen zu überschreiben (alle nachfolgenden Namen rücken einen Platz nach hinten).</p>
+    <p class="hinweis">Vorlage: <code class="inline">L1_3_5_vorlage_volleyball_spieler_einfuegen.py</code> · Lösung speichern als <code class="inline">L1_3_5_volleyball_spieler_einfuegen.py</code></p>
+    <p><strong>Beispiel:</strong> Spielername "Tom" an Index 6 einfügen →</p>
+    <div class="task-io">["Armin", "Batu", "Kai", "Sven", "Paul", "Milan", "Tom", "Goran", "Chris", "Nico", "Dennis", "Emin", "Luca"]</div>
+    <button class="task-help-btn" onclick="gotoHelp('veraendern','Klickt euch hier Schritt für Schritt durchs Einfügen – so seht ihr genau, welcher Wert wohin verschoben wird.')">💡 Hilfe: Einfügen Schritt für Schritt ansehen</button>
+  `
+},
+{
+  title: "L1_3.6", sub: "Volleyball – Inhalte entfernen",
+  html: `
+    <p>Implementiert <code class="inline">entferne_spieler()</code>, mit der der Spieler an einer bestimmten Indexposition entfernt wird. Alle nachfolgenden Namen rücken dabei einen Platz nach vorne.</p>
+    <p class="hinweis">Vorlage: <code class="inline">L1_3_6_vorlage_volleyball_spieler_entfernen.py</code> · Lösung speichern als <code class="inline">L1_3_6_volleyball_spieler_entfernen.py</code></p>
+    <p><strong>Beispiel:</strong> Spieler an Index 4 (Paul) entfernen →</p>
+    <div class="task-io">["Armin", "Batu", "Kai", "Sven", "Milan", "Goran", "Chris", "Nico", "Dennis", "Emin", "Luca"]</div>
+    <button class="task-help-btn" onclick="gotoHelp('veraendern','Klickt euch hier Schritt für Schritt durchs Entfernen – so seht ihr genau, welcher Wert wohin verschoben wird.')">💡 Hilfe: Entfernen Schritt für Schritt ansehen</button>
+  `
+},
+{
+  title: "L1_4.1", sub: "Vertiefung – Schreibtischtest", badge: "Schreibtischtest",
+  html: `
+    <p>Mit einem Schreibtischtest protokolliert ihr Variablenwerte während eines Algorithmus von Hand: Tabelle mit allen Variablen anlegen, Startwerte eintragen, dann bei jeder Wertänderung eine neue Zeile ergänzen.</p>
+    <p><strong>Schreibtischtest 1:</strong> Führt den Algorithmus mit <code class="inline">arr = [5, 11, 3, 1, 10]</code> aus, notiert die Ausgabe und beschreibt allgemein, was der Algorithmus tut.</p>
+    <p><strong>Schreibtischtest 2:</strong> Führt denselben Algorithmus mit <code class="inline">arr = [5, 3, 8, 7, 9]</code> aus, notiert die Ausgabe und beschreibt wieder allgemein, was der Algorithmus leistet.</p>
+    <p class="hinweis">Die zugehörigen Struktogramme liegen euch separat vor (Informationsmaterial). Tabellenspalten: Durchgang | i | arr.</p>
+    <button class="task-help-btn" onclick="gotoHelp('struktogramm','Vergleicht die Notation im Struktogramm hier nochmal mit eurem Aufgabenblatt.')">💡 Hilfe: Struktogramm-Notation nachschlagen</button>
+  `
+},
+{
+  title: "Aus der Präsentation", sub: "Schreibtischtest – Array orte", badge: "Schreibtischtest",
+  html: `
+    <p>Rechnet die folgenden Schritte von Hand durch – ohne Computer. Tragt nach jedem Schritt die aktuellen Werte in eine Tabelle mit den Spalten <code class="inline">Schritt</code>, <code class="inline">orte[0]</code>, <code class="inline">orte[1]</code>, <code class="inline">orte[2]</code>, <code class="inline">orte[3]</code> ein.</p>
+    <div class="task-io">Deklaration und Initialisierung: orte als Array = ["Nord", "Ost", "Süd"]
+Zuweisung: orte[3] = "West"
+Zuweisung: orte[0] = orte[3]
+Wenn len(orte) > 3
+    J: Zuweisung: orte[1] = "Mitte"
+    N: Zuweisung: orte[1] = "Rand"
+Ausgabe: orte</div>
+    <p class="hinweis">Tipp: <code class="inline">orte[3]</code> existiert nach der ersten Zeile noch nicht – erst die zweite Zeile legt Index 3 neu an (Anhängen).</p>
+    <button class="task-help-btn" onclick="const s=this.nextElementSibling.style; s.display = (s.display==='block'?'none':'block');">🔎 Lösung anzeigen / verbergen</button>
+    <div style="display:none;margin-top:10px;">
+      <div class="task-io">Schritt 1: orte[0]=Nord  orte[1]=Ost  orte[2]=Süd   orte[3]=–
+Schritt 2: orte[0]=Nord  orte[1]=Ost  orte[2]=Süd   orte[3]=West
+Schritt 3: orte[0]=West  orte[1]=Ost  orte[2]=Süd   orte[3]=West
+Schritt 4 (J, da len(orte)=4 > 3): orte[0]=West  orte[1]=Mitte  orte[2]=Süd   orte[3]=West
+
+Ausgabe: ["West", "Mitte", "Süd", "West"]</div>
+    </div>
+    <button class="task-help-btn" onclick="gotoHelp('struktogramm','Vergleicht die Notation hier nochmal, insbesondere die Anhängen-Zeile.')">💡 Hilfe: Struktogramm-Notation ansehen</button>
+  `
+},
+{
+  title: "L1_4.2", sub: "Vertiefung – Wetterstation",
+  html: `
+    <p>Führt für eine Woche die Höchsttemperaturen (7 Eingaben). Ermittelt und gebt aus: höchste, niedrigste und durchschnittliche Temperatur sowie die Abweichung zwischen höchster und niedrigster Temperatur.</p>
+    <p class="hinweis">Lösung speichern als <code class="inline">L1_4_1_wetterstation.py</code></p>
+    <p><strong>Beispielablauf:</strong></p>
+    <div class="task-io">Montag: 12
+Dienstag: 15
+Mittwoch: 16
+Donnerstag: 10
+Freitag: 17
+Samstag: 20
+Sonntag: 22
+
+---------AUSWERTUNG---------
+Höchste Temperatur: 22.0
+Niedrigste Temperatur: 10.0
+Durchschnittstemperatur: 16.0
+Temperaturunterschied: 12.0</div>
+    <button class="task-help-btn" onclick="gotoHelp('auswerten','Gebt eure eigenen Temperaturwerte ein und testet Maximum, Minimum und Durchschnitt.')">💡 Hilfe: Auswerten-Tab nutzen</button>
+  `
+},
+{
+  title: "L1_4.3", sub: "Vertiefung – Kapitalrechner",
+  html: `
+    <p>Bei einer Anlage über 50.000 € gilt eine Zinsstaffel (Jahr 1: 0,1 %, Jahr 2: 0,2 %, ... Jahr 9: 1 %). Schreibt ein Programm, das nach Eingabe von Anlagebetrag und Laufzeit (1–9 Jahre) den Auszahlungsbetrag berechnet. Bei Beträgen ≤ 50.000 € soll eine Fehlermeldung ausgegeben werden.</p>
+    <p class="hinweis">Die Zinssätze lassen sich gut in einem Array speichern und mit dem Laufzeit-Index ansprechen. Lösung speichern als <code class="inline">L1_4_2_kapitalrechner.py</code></p>
+    <p><strong>Beispielablauf:</strong></p>
+    <div class="task-io">Geben Sie die gewünschte Laufzeit ein: 5
+Geben Sie den gewünschten Anlagebetrag ein: 60000
+Auszahlungsbetrag: 60723.37 EUR
+
+Geben Sie die gewünschte Laufzeit ein: 5
+Geben Sie den gewünschten Anlagebetrag ein: 50000
+Der Anlagebetrag muss über 50.000 EUR sein!</div>
+    <button class="task-help-btn" onclick="gotoHelp('loop','Ein Array mit den 9 Zinssätzen plus eine Schleife über die Laufzeit lösen das Kernproblem.')">💡 Hilfe: Zinsstaffel als Array + Schleife</button>
+  `
+},
+{
+  title: "L1_5", sub: "Zusatzaufgabe – autoGewinnziehung",
+  html: `
+    <p>Erweiterung von L1_3.2: 500 Lose (Losnummern 1000001–1000500) werden verkauft. Nach Eingabe der gewünschten Anzahl an Gewinnlosen soll das Programm die Ziehung automatisch und zufällig durchführen (Baustein <code class="inline">random</code>) und die Gewinnerlose ausgeben.</p>
+    <p class="hinweis">Info zum random-Baustein: inf-schule.de (Zufallsexperimente). Lösung speichern als <code class="inline">L1_5_auto_gewinnziehung.py</code></p>
+    <p><strong>Beispielablauf:</strong></p>
+    <div class="task-io">Anzahl der Gewinnerlose: 2
+1000022
+1000404</div>
+    <button class="task-help-btn" onclick="gotoHelp('build','Auch hier gilt: jede gezogene Losnummer wird an das Ergebnis-Array angehängt.')">💡 Hilfe: append() für die gezogenen Lose</button>
+  `
+}
+];
+
+const ZUSATZAUFGABEN = [
+{
+  title: "Z1", sub: "Schreibtischtest – Zahlenfolge", badge: "Schreibtischtest",
+  html: `
+    <p>Gegeben ist folgendes Struktogramm:</p>
+    <div class="task-io">Deklaration und Initialisierung: werte als Array = [8, 3, 15, 6, 2]
+Deklaration und Initialisierung: summe = 0
+Wiederhole von i = 0 solange i < Anzahl der Elemente des Arrays werte, Schrittweite 1
+    Wenn werte[i] > 5
+      J: Zuweisung: summe = summe + werte[i]
+      N: Zuweisung: werte[i] = 0
+Ausgabe: werte
+Ausgabe: summe</div>
+    <p><strong>Aufgabe (2 BE):</strong> Dokumentiert die Werte von <code class="inline">i</code>, <code class="inline">werte</code> und <code class="inline">summe</code> während des Ablaufs in einer Tabelle.</p>
+    <p><strong>Aufgabe (3 BE):</strong> Implementieren Sie den Algorithmus in Python-Code.</p>
+  `
+},
+{
+  title: "Z2", sub: "Schreibtischtest – Buchstabenrätsel", badge: "Schreibtischtest",
+  html: `
+    <p>Gegeben ist folgendes Struktogramm:</p>
+    <div class="task-io">Deklaration und Initialisierung: wort = ["M", "H", "N", "N", "A", "E", "I", "M"]
+Deklaration und Initialisierung: merke = wort[1]
+Zuweisung: wort[1] = wort[4]
+Zuweisung: wort[4] = merke
+Zuweisung: wort[2] = "A"
+Zuweisung: wort[3] = "N"
+Ausgabe: wort</div>
+    <p><strong>Aufgabe (3 BE):</strong> Dokumentiert die Veränderungen der im Array <code class="inline">wort</code> gespeicherten Werte während des Ablaufs (Tabelle mit den Indizes 0–7 als Spalten).</p>
+    <p><strong>Aufgabe (2 BE):</strong> Welches Wort ergibt die Ausgabe, wenn man die Buchstaben aneinanderreiht?</p>
+  `
+},
+{
+  title: "Z3", sub: "Schreibtischtest – Schleife mit Bedingung", badge: "Schreibtischtest",
+  html: `
+    <p>Gegeben ist folgendes Struktogramm:</p>
+    <div class="task-io">Deklaration und Initialisierung: n als Ganzzahl = 5
+Deklaration und Initialisierung: fakultaet = 1
+Deklaration und Initialisierung: i = 1
+Wiederhole solange i <= n
+    Zuweisung: fakultaet = fakultaet * i
+    Zuweisung: i = i + 1
+Ausgabe: fakultaet</div>
+    <p><strong>Aufgabe (2 BE):</strong> Dokumentiert die Werte von <code class="inline">i</code> und <code class="inline">fakultaet</code> bei jedem Schleifendurchlauf.</p>
+    <p><strong>Aufgabe (2 BE):</strong> Nennt den Wert für <code class="inline">n</code>, für den <code class="inline">fakultaet</code> am Ende 720 beträgt.</p>
+  `
+},
+{
+  title: "Z4", sub: "Getränkeautomat",
+  html: `
+    <p>Ein Getränkeautomat verwaltet seinen Bestand in einem Array. Für 5 Getränkesorten sind Namen und Bestände in zwei parallelen Arrays gespeichert:</p>
+    <div class="task-io">sorten =   ["Cola", "Wasser", "Limo", "Eistee", "Saft"]
+bestand =  [12, 20, 8, 0, 5]</div>
+    <p><strong>Aufgabe (3 BE):</strong> Erstellen Sie ein Struktogramm, das nach Eingabe eines Sortennamens den Index der Sorte im Array <code class="inline">sorten</code> sucht (lineare Suche) und den zugehörigen Bestand ausgibt. Ist die Sorte nicht vorhanden, soll eine passende Meldung ausgegeben werden.</p>
+    <p><strong>Aufgabe (4 BE):</strong> Implementieren Sie ein passendes Python-Programm.</p>
+  `
+},
+{
+  title: "Z5", sub: "Notenspiegel",
+  html: `
+    <p>Für eine Klassenarbeit sind die Noten von 20 Schüler:innen in einem Array <code class="inline">noten</code> gespeichert (Werte 1–6).</p>
+    <p><strong>Aufgabe (3 BE):</strong> Erstellen Sie ein Struktogramm, das die Anzahl der Einsen, Zweien und Dreien zählt und den Notendurchschnitt berechnet.</p>
+    <p><strong>Aufgabe (5 BE):</strong> Implementieren Sie das Struktogramm als Python-Programm. Testen Sie es mit selbst gewählten Beispieldaten.</p>
+    <p><strong>Aufgabe (2 BE):</strong> Erläutern Sie, warum bei der Durchschnittsberechnung eine Division durch <code class="inline">len(noten)</code> und nicht durch eine feste Zahl wie 20 sinnvoller ist.</p>
+  `
+},
+{
+  title: "Z6", sub: "Passwort-Check",
+  html: `
+    <p>Ein einfaches Array <code class="inline">verbotene_pw = ["12345", "passwort", "admin"]</code> enthält gesperrte Passwörter.</p>
+    <p><strong>Aufgabe (2 BE):</strong> Nennen Sie den Operator, mit dem im Struktogramm eine Benutzereingabe eingelesen wird.</p>
+    <p><strong>Aufgabe (4 BE):</strong> Erstellen Sie ein Struktogramm, das ein eingegebenes Passwort mit jedem Eintrag in <code class="inline">verbotene_pw</code> vergleicht und "Passwort gesperrt" bzw. "Passwort akzeptiert" ausgibt.</p>
+    <p><strong>Aufgabe (4 BE):</strong> Implementieren Sie das Struktogramm in Python.</p>
+  `
+},
+{
+  title: "Z7", sub: "Fahrpreise",
+  html: `
+    <p>Ein Verkehrsverbund speichert Fahrpreise für 6 Zonen: <code class="inline">preise = [2.10, 2.80, 3.50, 4.20, 4.90, 5.60]</code> (Index 0 = Zone 1).</p>
+    <p><strong>Aufgabe (3 BE):</strong> Erstellen Sie ein Struktogramm, das nach Eingabe einer Zonenzahl (1–6) den passenden Preis ausgibt. Bei ungültiger Eingabe soll eine Fehlermeldung erscheinen.</p>
+    <p><strong>Aufgabe (4 BE):</strong> Implementieren Sie das Struktogramm als Python-Programm.</p>
+    <p><strong>Aufgabe (2 BE):</strong> Begründen Sie, warum <code class="inline">preise[zone]</code> nicht direkt funktioniert, wenn die Nutzerin "1" für Zone 1 eingibt, und wie man das Problem löst.</p>
+  `
+},
+{
+  title: "Z8", sub: "Fieberkurve",
+  html: `
+    <p>Die Körpertemperatur eines Patienten wurde 6-mal täglich gemessen und in <code class="inline">messungen</code> gespeichert.</p>
+    <p><strong>Aufgabe (4 BE):</strong> Erstellen Sie ein Struktogramm, das die Anzahl der Messungen über 38,0 °C (Fieber) zählt und ausgibt, sowie den höchsten gemessenen Wert.</p>
+    <p><strong>Aufgabe (5 BE):</strong> Implementieren Sie das Struktogramm in Python. Testen Sie mit <code class="inline">messungen = [36.8, 38.5, 39.1, 37.2, 38.9, 36.9]</code>.</p>
+  `
+},
+{
+  title: "Z9", sub: "Inventurliste erweitern",
+  html: `
+    <p>Ein Lager verwaltet Artikelnamen in <code class="inline">artikel = ["Schraube", "Mutter", "Nagel"]</code>.</p>
+    <p><strong>Aufgabe (2 BE):</strong> Erstellen Sie ein Struktogramm, das einen neuen Artikelnamen einliest und am Ende des Arrays anhängt.</p>
+    <p><strong>Aufgabe (3 BE):</strong> Erweitern Sie das Struktogramm so, dass anschließend geprüft wird, ob der neue Artikel bereits vorher im Array vorhanden war (Duplikat), und eine entsprechende Meldung ausgegeben wird.</p>
+    <p><strong>Aufgabe (5 BE):</strong> Implementieren Sie das vollständige Struktogramm als Python-Programm.</p>
+  `
+},
+{
+  title: "Z10", sub: "Höchste Punktzahl mit Position",
+  html: `
+    <p>In einem Quiz sind die Punktzahlen von 8 Teams in <code class="inline">punkte</code> gespeichert.</p>
+    <p><strong>Aufgabe (4 BE):</strong> Erstellen Sie ein Struktogramm, das nicht nur die höchste Punktzahl, sondern auch den zugehörigen Index (also den Platz des Gewinnerteams) ermittelt und beide Werte ausgibt.</p>
+    <p><strong>Aufgabe (5 BE):</strong> Implementieren Sie das Struktogramm als Python-Programm. Testen Sie mit <code class="inline">punkte = [12, 45, 33, 45, 20, 8, 45, 19]</code> und erläutern Sie, welchen Index Ihr Programm bei mehrfachem Maximum ausgibt und warum.</p>
+  `
+}
+];
+
+function renderTaskList(containerId, tasks, query) {
+  const el = document.getElementById(containerId);
+  const q = (query || '').toLowerCase().trim();
+  const filtered = tasks.filter(t => {
+    if (!q) return true;
+    const hay = (t.title + ' ' + t.sub + ' ' + t.html).toLowerCase();
+    return hay.includes(q);
+  });
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="hb-empty">Keine Aufgabe gefunden.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(t =>
+    '<div class="task-card">' +
+      '<div class="task-head" onclick="this.parentElement.classList.toggle(\'open\')">' +
+        '<span><span class="task-title">' + t.title + '</span><span class="task-sub">' + t.sub + '</span>' +
+        (t.badge ? '<span class="task-badge">' + t.badge + '</span>' : '') + '</span>' +
+        '<span class="task-chevron">▾</span>' +
+      '</div>' +
+      '<div class="task-body">' + t.html + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function renderAufgaben() {
+  const q = document.getElementById('aufgabenSearch').value;
+  renderTaskList('aufgabenListPflicht', AUFGABEN_L1, q);
+  renderTaskList('aufgabenListZusatz', ZUSATZAUFGABEN, q);
+}
+
+// ---------- HANDBUCH ----------
+const HANDBUCH_SECTIONS = [
+{ category: "Grundlagen", title: "Was ist ein Array?",
+  html: "Ein Array speichert mehrere Werte gleichen Typs unter einem gemeinsamen Namen, direkt hintereinander im Speicher. Statt vieler einzelner Variablen gibt es einen Namen, über den man mit einer Positionsangabe (dem <code>Index</code>) auf jeden einzelnen Wert zugreifen kann." },
+{ category: "Grundlagen", title: "Index – Zählung ab 0",
+  html: "Die Positionen in einem Array werden von 0 an durchnummeriert, nicht von 1. Bei einem Array mit 5 Elementen sind die gültigen Indizes also 0, 1, 2, 3 und 4 – der Index 5 existiert nicht." },
+{ category: "Zugriff", title: "Wert auslesen: array[i]",
+  html: "<code>print(array[i])</code> gibt den Wert an Position <code>i</code> aus. Dies ist ein echter <code>print()</code>-Aufruf und erzeugt daher eine sichtbare Ausgabe in der Konsole." },
+{ category: "Zugriff", title: "Wert überschreiben: Zuweisung",
+  html: "<code>array[i] = wert</code> überschreibt den bestehenden Wert an Position <code>i</code>. Das ist eine reine Zuweisung – sie verändert das Array im Speicher, gibt aber selbst nichts auf dem Bildschirm aus." },
+{ category: "Verändern", title: "Element anhängen: append()",
+  html: "<code>array.append(wert)</code> fügt einen neuen Wert immer ganz hinten an, niemals mittendrin. Der neue Wert bekommt automatisch den nächsten freien Index (bisherige Länge des Arrays)." },
+{ category: "Verändern", title: "Array leeren",
+  html: "<code>array = []</code> setzt das Array auf eine leere Liste zurück. Alle bisherigen Elemente gehen dabei verloren." },
+{ category: "Referenz", title: "Länge ermitteln: len(array)",
+  html: "<code>len(array)</code> gibt die Anzahl der gespeicherten Elemente zurück. Achtung: Der höchste gültige Index ist nicht <code>len(array)</code>, sondern <code>len(array) - 1</code> – weil die Zählung bei 0 beginnt." },
+{ category: "Schleifen", title: "Alle Elemente durchlaufen",
+  html: "<code>for i in range(len(array)):</code> lässt <code>i</code> automatisch jeden gültigen Index einmal annehmen (0 bis len(array) - 1). Im Schleifenrumpf greift man dann z. B. mit <code>print(array[i])</code> auf das jeweilige Element zu." },
+{ category: "Referenz", title: "Einzelnes Element vs. ganzes Array ausgeben",
+  html: "<code>print(array[i])</code> gibt nur den einzelnen Wert ohne Anführungszeichen aus. <code>print(array)</code> gibt das gesamte Array im Python-typischen Format mit einfachen Anführungszeichen aus, z. B. <code>['Nord', 'Ost', 'Süd']</code>." },
+{ category: "Struktogramm", title: "Deklaration und Initialisierung",
+  html: "Im Struktogramm: <code>Deklaration und Initialisierung: array = [\"Nord\", \"Ost\", \"Süd\"]</code>. Ein leeres Array wird als <code>array als Array = [ ]</code> notiert." },
+{ category: "Struktogramm", title: "Zuweisung an ein Arrayelement",
+  html: "Im Struktogramm: <code>Zuweisung: array[feldindex] = wert</code>. Diese Notation gilt sowohl für das Ändern eines bestehenden Werts als auch für das Anhängen (wenn der Index noch nicht existiert)." },
+{ category: "Struktogramm", title: "Anhängen – Struktogramm vs. Python",
+  html: "Wichtiger Unterschied: Im Struktogramm wird Anhängen als Zuweisung an einen neuen, bisher nicht existierenden Index dargestellt (<code>array[3] = wert</code>, wenn das Array vorher 3 Elemente hatte). In Python nutzen wir dafür stattdessen die bequemere Methode <code>array.append(wert)</code>." },
+{ category: "Struktogramm", title: "Schleife im Struktogramm",
+  html: "Für eine zählergesteuerte Schleife: <code>Wiederhole von i = 0 solange i &lt; len(array), Schrittweite 1</code> mit dem Schleifenrumpf eingerückt darunter. Diese Notation ist in der Abiturprüfung verbindlich." },
+{ category: "Fehler & Debugging", title: "IndexError verstehen",
+  html: "<code>IndexError: list index out of range</code> bedeutet: Der verwendete Index zeigt auf keine vorhandene Position. Prüft: Wie viele Elemente hat das Array (<code>len(array)</code>)? Der gültige Bereich ist 0 bis <code>len(array) - 1</code>." },
+{ category: "Fehler & Debugging", title: "Zustand vs. Ausgabe nicht verwechseln",
+  html: "Eine Zeile wie <code>array.append(wert)</code> oder <code>array[i] = wert</code> verändert nur den Speicher – sie erzeugt für sich genommen keine Ausgabe. Sichtbar wird das Ergebnis erst durch einen eigenen <code>print(...)</code>-Aufruf." },
+{ category: "Fehler & Debugging", title: "Werte beim Tauschen nicht überschreiben",
+  html: "Wer zwei Arrayelemente vertauschen will, darf nicht einfach <code>array[a] = array[b]</code> gefolgt von <code>array[b] = array[a]</code> schreiben – der erste Wert ist dann bereits verloren. Man braucht eine Zwischenspeicher-Variable: <code>temp = array[a]</code>, dann <code>array[a] = array[b]</code>, dann <code>array[b] = temp</code>." },
+{ category: "Schreibtischtest", title: "Schreibtischtest – Vorgehen",
+  html: "Legt eine Tabelle mit allen Variablen an. Tragt die Startwerte ein. Geht den Algorithmus Zeile für Zeile gedanklich durch und tragt bei jeder Wertänderung eine neue Zeile ein. So lässt sich die Ausgabe eines Programms ohne Computer nachvollziehen – das wird auch im Abitur verlangt." },
+{ category: "Verändern", title: "Werte tauschen – die Zwischenspeicher-Falle",
+  html: "<code>array[a] = array[b]</code> gefolgt von <code>array[b] = array[a]</code> funktioniert NICHT: Der ursprüngliche Wert von <code>array[a]</code> ist nach der ersten Zeile bereits überschrieben und für immer verloren. Richtig: <code>temp = array[a]</code>, dann <code>array[a] = array[b]</code>, dann <code>array[b] = temp</code>." },
+{ category: "Verändern", title: "Element mitten im Array einfügen",
+  html: "Um einen Wert an Index i einzufügen, ohne etwas zu überschreiben, müssen zuerst alle Werte ab i einen Platz nach hinten rücken (beginnend am Ende, damit nichts überschrieben wird), bevor der neue Wert an Index i eingetragen wird. Das Array wird dabei um genau ein Element länger." },
+{ category: "Verändern", title: "Element mitten im Array entfernen",
+  html: "Um den Wert an Index i zu entfernen, rücken alle nachfolgenden Werte einen Platz nach vorne (beginnend bei i). Danach ist der letzte Platz doppelt belegt und wird entfernt. Das Array wird dabei um genau ein Element kürzer." },
+{ category: "Auswerten", title: "Summe und Durchschnitt bilden",
+  html: "Grundmuster: eine Variable (z. B. <code>summe</code>) wird vor der Schleife auf 0 gesetzt und in jedem Durchlauf um <code>array[i]</code> erhöht. Für den Durchschnitt wird die Summe am Ende durch <code>len(array)</code> geteilt." },
+{ category: "Auswerten", title: "Maximum und Minimum finden",
+  html: "Grundmuster: eine Variable wird vor der Schleife auf <code>array[0]</code> gesetzt (nicht auf 0!). Die Schleife beginnt daher erst bei Index 1 und vergleicht jeden weiteren Wert – ist er größer (bzw. kleiner), wird die Variable aktualisiert." }
+];
+let handbuchActiveTag = null;
+
+function renderHandbuchChips() {
+  const cats = [...new Set(HANDBUCH_SECTIONS.map(s => s.category))];
+  document.getElementById('handbuchChips').innerHTML = cats.map(c =>
+    '<span class="chip' + (handbuchActiveTag === c ? ' active' : '') + '" onclick="toggleHandbuchTag(\'' + c + '\')">' + c + '</span>'
+  ).join('');
+}
+function toggleHandbuchTag(c) {
+  handbuchActiveTag = (handbuchActiveTag === c) ? null : c;
+  renderHandbuchChips();
+  renderHandbuch();
+}
+function renderHandbuch() {
+  const q = document.getElementById('handbuchSearch').value.toLowerCase().trim();
+  const el = document.getElementById('handbuchList');
+  const filtered = HANDBUCH_SECTIONS.filter(s => {
+    const matchesTag = !handbuchActiveTag || s.category === handbuchActiveTag;
+    const hay = (s.title + ' ' + s.category + ' ' + s.html).toLowerCase();
+    const matchesQuery = !q || hay.includes(q);
+    return matchesTag && matchesQuery;
+  });
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="hb-empty">Kein Treffer. Versucht einen anderen Suchbegriff oder Themen-Chip.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(s =>
+    '<div class="hb-section"><h3>' + s.title + '<span class="hb-tag">' + s.category + '</span></h3>' +
+    '<div class="content">' + s.html + '</div></div>'
+  ).join('');
+}
+
+
+// ---------- init ----------
+renderMainCabinet(-1);
+refreshCodeDisplay();
+refreshOutputDisplay();
+refreshVarsPanel();
+refreshStrukPanel();
+refreshLoopVarsPanel();
+newQuiz();
+renderAufgaben();
+renderHandbuchChips();
+renderHandbuch();
+insertReset();
+removeReset();
+auswReset();
+document.querySelectorAll('.auto-annotate').forEach(el => autoAnnotate(el));
+</script>
+</body>
+</html>
