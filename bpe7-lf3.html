@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sprint Board – Ich-Kann-Liste – Friedrich-List-Schule Mannheim</title>
+<title>BPE 7 – LF3 Dynamische Datenstrukturen – Friedrich-List-Schule Mannheim</title>
 <style>
   :root {
     --navy: #A2222E;
@@ -15,146 +15,143 @@
     --ink: #1C1F26;
     --muted: #67666E;
     --empty: #F2EDEE;
-    --doing-bg: #FDF0DC;
-    --done-bg: #E4F3EA;
     --done-border: #2E7D5B;
-    --grey-dot: #B9B9B9;
-    --yellow-dot: #E8963C;
-    --green-dot: #2E7D5B;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #FAFAFA; color: var(--ink);
-    line-height: 1.45;
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #FAFAFA; color: var(--ink); line-height: 1.45;
   }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 18px 60px; }
-  header {
-    display: flex; align-items: center; gap: 16px;
-    padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 18px;
-  }
+  header { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
   header img { height: 48px; width: auto; }
   header h1 { font-size: 1.5rem; margin: 0 0 2px; color: var(--navy); }
   header p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .inline-code { font-family: Consolas, monospace; background: var(--navy-dark); color: #fff; padding: 1px 7px; border-radius: 5px; font-size: 0.85em; }
 
-  .instructions {
-    background: var(--empty); border-radius: 10px; padding: 14px 20px; margin-bottom: 18px;
-    font-size: 0.92rem;
+  .lf-nav { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .lf-nav a {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;
+    font-size: 0.86rem; font-weight: 600; text-decoration: none; color: var(--muted);
+    background: var(--paper); border: 1px solid var(--line); transition: background 0.15s ease;
   }
-  .instructions strong { color: var(--navy); }
+  .lf-nav a:hover { background: var(--empty); }
+  .lf-nav a.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .lf-nav a.locked { color: var(--muted); opacity: 0.55; cursor: not-allowed; pointer-events: none; }
 
-  .sprint-bar {
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
-    background: var(--navy-dark); color: white; border-radius: 10px; padding: 12px 20px; margin-bottom: 18px;
-  }
-  .sprint-bar .sprint-label { font-weight: 700; }
-  .sprint-bar .sprint-sub { font-size: 0.8rem; color: #EBD3D6; }
-  .carried-over-note { font-size: 0.78rem; background: rgba(255,255,255,0.15); padding: 3px 10px; border-radius: 12px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 2px solid var(--line); margin-bottom: 18px; }
+  .tab { padding: 10px 16px; cursor: pointer; font-weight: 600; font-size: 0.92rem; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab:hover { color: var(--navy); }
+  .tab.active { color: var(--navy); border-bottom-color: var(--amber); }
+  .view { display: none; }
+  .view.active { display: block; }
+  .view-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .view-head h2 { margin: 0; color: var(--navy); font-size: 1.25rem; }
+  .info-btn { background: var(--empty); border: 1px solid var(--line); color: var(--navy); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; }
+  .desc { color: var(--muted); font-size: 0.9rem; }
 
-  .kanban-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 26px; }
-  .kanban-column { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
-  .kanban-column-header {
-    padding: 10px 14px; font-weight: 700; font-size: 0.92rem; border-bottom: 2px solid var(--line);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .kanban-column.todo .kanban-column-header { border-bottom-color: var(--muted); color: var(--muted); }
-  .kanban-column.doing .kanban-column-header { border-bottom-color: var(--amber-dark); color: var(--amber-dark); background: var(--doing-bg); }
-  .kanban-column.done .kanban-column-header { border-bottom-color: var(--done-border); color: var(--done-border); background: var(--done-bg); }
-  .kanban-cards { padding: 10px; display: flex; flex-direction: column; gap: 9px; min-height: 80px; flex: 1; }
-  .kanban-empty { color: var(--muted); font-size: 0.82rem; font-style: italic; padding: 14px 6px; text-align: center; }
-  .kanban-card {
-    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--empty); font-size: 0.86rem;
-    cursor: grab; transition: box-shadow 0.15s ease, opacity 0.15s ease;
-  }
-  .kanban-card:active { cursor: grabbing; }
-  .kanban-card.dragging { opacity: 0.4; }
-  .kanban-cards.drag-over { background: var(--doing-bg); outline: 2px dashed var(--amber); outline-offset: -4px; }
-  .trash-zone {
-    display: none; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 26px; padding: 14px; border: 2px dashed #B3413A; border-radius: 10px;
-    color: #B3413A; font-weight: 700; font-size: 0.88rem; background: #FBEAE8;
-  }
-  .trash-zone.visible { display: flex; }
-  .trash-zone.drag-over { background: #F3C8C4; }
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(20,10,10,0.45); z-index: 100;
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-box {
-    background: var(--paper); border-radius: 12px; padding: 22px 24px; max-width: 380px; width: 90%;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-  }
-  .modal-box h3 { margin: 0 0 10px; color: var(--navy); font-size: 1.05rem; }
-  .modal-box p { margin: 0 0 18px; font-size: 0.92rem; }
-  .modal-box .modal-task-text { font-style: italic; color: var(--muted); }
-  .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; }
-  .modal-buttons button { padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; cursor: pointer; }
-  .modal-buttons .btn-cancel { border: 1px solid var(--line); background: white; color: var(--ink); }
-  .modal-buttons .btn-confirm { border: none; background: #B3413A; color: white; font-weight: 700; }
-  .modal-buttons .btn-confirm.positive { background: var(--done-border); }
+  .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin-top: 14px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  input[type=text], input[type=number] { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 0.9rem; }
+  button { font-family: inherit; border: none; border-radius: 6px; padding: 9px 16px; font-size: 0.9rem; font-weight: 600; cursor: pointer; background: var(--navy); color: white; transition: background 0.15s ease; }
+  button:hover { background: var(--navy-dark); }
+  button.secondary { background: var(--empty); color: var(--navy); }
+  button.secondary:hover { background: #E2E8F1; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .status-strip { background: var(--empty); border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; margin-top: 12px; }
+  .hinweis-box { background: #FBEAE8; border: 1.5px solid #B3413A; border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; margin: 12px 0; }
+  .hinweis-box strong { color: #B3413A; }
 
-  .info-box { max-width: 460px; text-align: left; }
-  .info-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
-  .info-id { font-weight: 700; color: var(--navy); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
-  .info-close { border: none; background: none; color: var(--muted); font-size: 1rem; cursor: pointer; line-height: 1; padding: 2px 4px; }
-  .info-close:hover { color: var(--navy); }
-  .info-block { font-size: 0.9rem; margin-bottom: 12px; }
-  .info-block strong { color: var(--navy); display: block; margin-bottom: 3px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; }
-  .info-io { background: var(--empty); border-radius: 8px; padding: 10px 12px; font-family: "SF Mono", Consolas, monospace; font-size: 0.82rem; white-space: pre-line; }
-  .kanban-card .card-id { font-weight: 700; color: var(--navy); font-size: 0.72rem; text-transform: uppercase; }
-  .kanban-card .card-carried { font-size: 0.68rem; color: var(--amber-dark); font-weight: 700; margin-left: 6px; }
-  .kanban-card .card-text { margin: 5px 0 8px; }
-  .kanban-card .card-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
-  .kanban-card button {
-    border: 1px solid var(--line); background: white; border-radius: 6px; padding: 4px 8px;
-    font-size: 0.72rem; cursor: pointer; color: var(--ink);
+  /* Struktur-Visualisierungen */
+  .cabinet { background: var(--navy-dark); border-radius: 10px; padding: 24px 18px; min-height: 110px; display: flex; align-items: center; }
+  .ll-row, .q-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .ll-node { display: flex; flex-direction: column; align-items: center; }
+  .ll-box { background: white; border: 2px solid var(--amber); border-radius: 8px; min-width: 64px; padding: 10px 8px; text-align: center; font-weight: 700; color: var(--navy); }
+  .ll-box.highlight { border-color: #2E7D5B; box-shadow: 0 0 0 3px rgba(46,125,91,0.35); }
+  .ll-idx { color: #CBD5E1; font-size: 0.72rem; margin-top: 4px; }
+  .ll-arrow { color: var(--amber); font-size: 1.4rem; padding: 0 4px; }
+  .ll-null { color: #CBD5E1; font-weight: 700; font-size: 0.85rem; padding: 0 8px; }
+  .ll-anker { color: var(--amber); font-size: 0.78rem; font-weight: 700; margin-bottom: 4px; }
+
+  .stack-col { display: flex; flex-direction: column-reverse; gap: 4px; align-items: center; width: 100%; }
+  .stack-box { background: white; border: 2px solid var(--amber); border-radius: 8px; min-width: 110px; padding: 10px; text-align: center; font-weight: 700; color: var(--navy); }
+  .stack-box.top { border-color: #2E7D5B; box-shadow: 0 0 0 3px rgba(46,125,91,0.35); }
+  .stack-empty-label { color: #CBD5E1; font-style: italic; font-size: 0.85rem; }
+
+  .queue-front, .queue-back { color: var(--amber); font-size: 0.75rem; font-weight: 700; }
+
+  .tree-svg-wrap { width: 100%; overflow-x: auto; }
+
+  .task-card { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; overflow: hidden; background: var(--paper); }
+  .task-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; cursor: pointer; }
+  .task-head:hover { background: var(--empty); }
+  .task-title { font-weight: 700; color: var(--navy); font-size: 0.96rem; }
+  .task-sub { font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 8px; }
+  .task-chevron { color: var(--muted); transition: transform 0.15s ease; }
+  .task-card.open .task-chevron { transform: rotate(180deg); }
+  .task-body { display: none; padding: 4px 18px 18px; font-size: 0.92rem; border-top: 1px solid var(--line); }
+  .task-card.open .task-body { display: block; }
+
+  .lf1-group { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; overflow: hidden; background: var(--paper); }
+  .lf1-group-header { padding: 12px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; background: var(--empty); }
+  .lf1-group-header:hover { filter: brightness(0.97); }
+  .lf1-chevron { transition: transform 0.15s ease; color: var(--muted); }
+  .lf1-group.open .lf1-chevron { transform: rotate(90deg); }
+  .lf1-group-body { display: none; padding: 8px 16px 12px; }
+  .lf1-group.open .lf1-group-body { display: block; }
+  .lf1-fz-row { display: flex; align-items: center; gap: 10px; padding: 9px 6px; border-radius: 6px; cursor: pointer; }
+  .lf1-fz-row:hover { background: var(--empty); }
+  .lf1-ampel { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .lf1-fz-text { flex: 1; font-size: 0.92rem; }
+  .lf1-fz-points { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+  .lf1-fz-chevron { color: var(--muted); font-size: 0.8rem; }
+  .lf1-fz-tasks { display: none; padding: 4px 6px 10px 28px; }
+  .lf1-fz-row.expanded + .lf1-fz-tasks { display: block; }
+  .lf1-task-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 0.86rem; border-bottom: 1px dashed var(--line); cursor: pointer; }
+  .lf1-task-row:last-child { border-bottom: none; }
+  .lf1-task-row:hover { background: var(--empty); }
+  .lf1-task-row .lf1-task-text { flex: 1; }
+  .lf1-task-row button { border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 6px; padding: 4px 10px; font-size: 0.76rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .lf1-task-row button:hover { background: var(--empty); color: var(--navy); }
+  .lf1-status-label { font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
+
+  .lf1-info-box { max-width: 460px; text-align: left; background: white; border-radius: 12px; padding: 22px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); }
+  .lf1-info-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .lf1-info-id { font-weight: 700; color: var(--navy); font-size: 0.78rem; text-transform: uppercase; }
+  .lf1-info-close { border: none; background: none; color: var(--muted); font-size: 1rem; cursor: pointer; }
+  .lf1-info-block { font-size: 0.9rem; margin-bottom: 12px; }
+  .lf1-info-block strong { color: var(--navy); display: block; margin-bottom: 3px; font-size: 0.8rem; text-transform: uppercase; }
+  .lf1-info-io, .lf1-info-darstellung { background: var(--empty); border-radius: 8px; padding: 10px 12px; font-family: Consolas, monospace; font-size: 0.82rem; white-space: pre-line; }
+  .lf1-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(20,10,10,0.45); z-index: 100; align-items: center; justify-content: center; }
+  .lf1-modal-overlay.open { display: flex; }
+  .lf1-info-hint { font-size: 0.82rem; color: var(--navy); background: #FBF0E8; border: 1px solid var(--amber); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
+  .lf1-pdf-btn { background: none; border: 1px solid var(--navy); color: var(--navy); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
+  .lf1-pdf-btn:hover { background: var(--navy); color: white; }
+  #lf1PrintArea { display: none; }
+  @media print {
+    body > *:not(#lf1PrintArea) { display: none !important; }
+    #lf1PrintArea { display: block !important; }
+    .lf1-print-page { page-break-after: always; padding: 6mm 4mm; font-family: Arial, Helvetica, sans-serif; color: #1C1F26; }
+    .lf1-print-page:last-child { page-break-after: auto; }
+    .lf1-print-head { display: flex; align-items: center; gap: 14px; border-bottom: 3px solid #A2222E; padding-bottom: 8px; margin-bottom: 14px; }
+    .lf1-print-head img { height: 40px; width: auto; }
+    .lf1-print-head .lf1-print-headtext { font-size: 0.78rem; color: #67666E; line-height: 1.3; }
+    .lf1-print-head .lf1-print-headtext strong { color: #A2222E; display: block; font-size: 0.95rem; }
+    .lf1-print-id { font-weight: 700; color: #A2222E; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 4px; }
+    .lf1-print-block { font-size: 0.95rem; margin-bottom: 12px; }
+    .lf1-print-block strong { color: #A2222E; display: block; margin-bottom: 3px; font-size: 0.8rem; text-transform: uppercase; }
+    .lf1-print-io { background: #F2EDEE; border-radius: 6px; padding: 8px 10px; font-family: Consolas, monospace; font-size: 0.85rem; white-space: pre-line; }
+    .lf1-print-hint { font-size: 0.85rem; border: 1px solid #E8963C; border-radius: 6px; padding: 6px 10px; margin-bottom: 12px; }
+    .lf1-print-solution { margin-top: 16px; }
+    .lf1-print-solution h4 { font-size: 0.8rem; text-transform: uppercase; color: #A2222E; margin: 0 0 4px; }
+    .lf1-print-lines { border: 1px solid #E6DCDD; border-radius: 6px; height: 140px; background-image: repeating-linear-gradient(to bottom, transparent, transparent 23px, #E6DCDD 24px); margin-bottom: 14px; }
   }
-  .kanban-card button:hover { border-color: var(--navy); color: var(--navy); }
-  .kanban-card button.remove-btn { color: #B3413A; margin-left: auto; }
 
-  .ichkann-section { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 6px 0 14px; margin-bottom: 20px; }
-  .ichkann-section > h2 { padding: 14px 20px 4px; margin: 0; font-size: 1.1rem; color: var(--navy); }
-  .lf-group { border-top: 1px solid var(--line); }
-  .lf-group-header {
-    padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-    font-weight: 700; font-size: 0.95rem; user-select: none;
-  }
-  .lf-group-header:hover { background: var(--empty); }
-  .lf-group-header .chevron { transition: transform 0.15s ease; color: var(--muted); }
-  .lf-group.open .lf-group-header .chevron { transform: rotate(90deg); }
-  .lf-group-body { display: none; padding: 0 20px 14px; }
-  .lf-group.open .lf-group-body { display: block; }
-
-  .feinziel-row {
-    display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-radius: 6px; cursor: pointer;
-  }
-  .feinziel-row:hover { background: var(--empty); }
-  .ampel-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-  .feinziel-text { flex: 1; font-size: 0.88rem; }
-  .feinziel-points { font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
-  .feinziel-chevron { color: var(--muted); font-size: 0.8rem; }
-
-  .feinziel-tasks { display: none; padding: 4px 6px 10px 28px; }
-  .feinziel-row.expanded + .feinziel-tasks { display: block; }
-  .fz-task-row {
-    display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 0.84rem; border-bottom: 1px dashed var(--line);
-    cursor: pointer;
-  }
-  .fz-task-row:hover { background: var(--empty); }
-  .fz-task-row:last-child { border-bottom: none; }
-  .fz-task-row .fz-task-text { flex: 1; }
-  .fz-task-row button { border: 1px solid var(--line); background: white; border-radius: 6px; padding: 3px 9px; font-size: 0.74rem; cursor: pointer; white-space: nowrap; }
-  .fz-task-row .status-label { font-size: 0.74rem; color: var(--muted); white-space: nowrap; min-width: 70px; text-align: right; }
-  .fz-badge { font-size: 0.68rem; color: var(--navy); background: var(--empty); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
-
-  .retro-toggle { font-size: 0.85rem; color: var(--navy); cursor: pointer; text-decoration: underline; margin-bottom: 10px; display: inline-block; }
-  .retro-box { display: none; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; font-size: 0.88rem; }
-  .retro-box.open { display: block; }
-
-  .bottom-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-  .teacher-toggle { font-size: 0.82rem; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+  .handbuch-chip { display: inline-block; padding: 5px 12px; border-radius: 14px; background: var(--empty); color: var(--navy); font-size: 0.8rem; cursor: pointer; margin: 3px; }
+  .handbuch-chip.active { background: var(--navy); color: white; }
+  .handbuch-entry { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; }
+  .handbuch-entry .cat { font-size: 0.72rem; color: var(--amber-dark); font-weight: 700; text-transform: uppercase; }
+  .handbuch-entry h4 { margin: 3px 0 6px; color: var(--navy); font-size: 0.96rem; }
 
   /* Footer */
   footer {
@@ -169,119 +166,161 @@
     color: var(--muted);
   }
   footer img { height: 26px; width: auto; opacity: 0.85; }
-
-  @media (max-width: 760px) {
-    .kanban-columns { grid-template-columns: 1fr; }
-  }
-  .lf-nav { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
-  .lf-nav a {
-    display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;
-    font-size: 0.86rem; font-weight: 600; text-decoration: none; color: var(--muted);
-    background: var(--paper); border: 1px solid var(--line); transition: background 0.15s ease;
-  }
-  .lf-nav a:hover { background: var(--empty); }
-  .lf-nav a.active { background: var(--navy); color: white; border-color: var(--navy); }
-  .lf-nav a.locked { color: var(--muted); opacity: 0.55; cursor: not-allowed; pointer-events: none; }
 </style>
 </head>
 <body>
+<div id="lf1PrintArea"></div>
 <div class="wrap">
-
   <header>
     <img src="data:image/png;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPxQQgj/AZHt7n3IxG06AAAAAElFTkSuQmCC" alt="Logo">
     <div>
-      <h1>Sprint Board – Ich-Kann-Liste</h1>
-      <p>Informatik J2 – BPE 7 Algorithmen &amp; Datenstrukturen / BPE 8 Gesellschaftliche Aspekte</p>
+      <h1>BPE 7 – LF3 Dynamische Datenstrukturen</h1>
+      <p>Lernfortschritt 3 – Verkettete Liste, Stapelspeicher, Warteschlange, Baum: Schritt für Schritt selbst ausprobieren.</p>
     </div>
   </header>
+
   <div class="lf-nav" id="lfNav"></div>
 
-
-  <div class="instructions">
-    Aufgaben wählt ihr in den jeweiligen Lernfortschritts-Werkstätten aus der dortigen Aufgabenliste aus und zieht sie
-    von dort in euren Sprint. Hier auf dieser Seite seht ihr nur euer <strong>aktuelles Sprint-Board</strong> und eure
-    <strong>Ich-Kann-Übersicht</strong>.
+  <div class="tabs">
+    <div class="tab active" data-view="liste">Verkettete Liste</div>
+    <div class="tab" data-view="stapel">Stapelspeicher</div>
+    <div class="tab" data-view="warteschlange">Warteschlange</div>
+    <div class="tab" data-view="baum">Baum</div>
+    <div class="tab" data-view="aufgaben">Aufgaben</div>
+    <div class="tab" data-view="handbuch">Handbuch</div>
   </div>
 
-  <div class="sprint-bar">
-    <div>
-      <div class="sprint-label" id="sprintLabel">Sprint ...</div>
-      <div class="sprint-sub" id="sprintSub">...</div>
+  <!-- VERKETTETE LISTE VIEW -->
+  <div class="view active" id="view-liste">
+    <div class="view-head"><h2>Verkettete Liste</h2><button class="info-btn" onclick="openHelpModal('liste')">ℹ️ Erklärung</button></div>
+    <p class="desc">Jeder Knoten enthält Daten und einen Zeiger auf den nächsten Knoten. Der Anker zeigt auf den ersten Knoten, der letzte zeigt auf NULL.</p>
+    <div class="cabinet"><div class="ll-row" id="llCabinet"></div></div>
+    <div class="panel">
+      <div class="row">
+        <input type="text" id="llValue" placeholder="Wert" style="width:100px">
+        <input type="number" id="llPos" placeholder="Position" style="width:100px" min="0">
+        <button onclick="llInsert()">Einfügen</button>
+        <button class="secondary" onclick="llDelete()">Löschen</button>
+        <button class="secondary" onclick="llReset()">Zurücksetzen</button>
+      </div>
+      <div class="status-strip" id="llStatus">Startzustand: 3 Knoten.</div>
     </div>
-    <div class="carried-over-note" id="carriedOverNote" style="display:none;"></div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;">
+        <strong>Darstellung (Erwartungshorizont-Stil)</strong>
+      </div>
+      <div class="status-strip" id="llDarstellung" style="font-family:Consolas,monospace;white-space:pre-line;"></div>
+    </div>
   </div>
 
-  <div class="kanban-columns">
-    <div class="kanban-column todo">
-      <div class="kanban-column-header"><span>To Do</span><span id="countTodo">0</span></div>
-      <div class="kanban-cards" id="colTodo" data-status="todo"></div>
+  <!-- STAPELSPEICHER VIEW -->
+  <div class="view" id="view-stapel">
+    <div class="view-head"><h2>Stapelspeicher</h2><button class="info-btn" onclick="openHelpModal('stapel')">ℹ️ Erklärung</button></div>
+    <p class="desc">LIFO-Prinzip: Nur das oberste Element ist zugänglich. <span class="inline-code">push</span> legt oben auf, <span class="inline-code">pop</span> nimmt von oben weg.</p>
+    <div class="cabinet"><div class="stack-col" id="stackCabinet"></div></div>
+    <div class="panel">
+      <div class="row">
+        <input type="text" id="stackValue" placeholder="Wert" style="width:120px">
+        <button onclick="stackPush()">Push</button>
+        <button class="secondary" onclick="stackPop()">Pop</button>
+        <button class="secondary" onclick="stackReset()">Zurücksetzen</button>
+      </div>
+      <div class="status-strip" id="stackStatus">Stapel ist leer.</div>
     </div>
-    <div class="kanban-column doing">
-      <div class="kanban-column-header"><span>Doing</span><span id="countDoing">0</span></div>
-      <div class="kanban-cards" id="colDoing" data-status="doing"></div>
-    </div>
-    <div class="kanban-column done">
-      <div class="kanban-column-header"><span>Done</span><span id="countDone">0</span></div>
-      <div class="kanban-cards" id="colDone" data-status="done"></div>
+    <div class="panel">
+      <strong>Python-Code</strong>
+      <div class="status-strip" id="stackCode" style="font-family:Consolas,monospace;white-space:pre-line;"></div>
     </div>
   </div>
 
-  <div class="trash-zone" id="trashZone">🗑 Hierher ziehen, um die Aufgabe aus dem Sprint zu entfernen</div>
+  <!-- WARTESCHLANGE VIEW -->
+  <div class="view" id="view-warteschlange">
+    <div class="view-head"><h2>Warteschlange</h2><button class="info-btn" onclick="openHelpModal('warteschlange')">ℹ️ Erklärung</button></div>
+    <p class="desc">FIFO-Prinzip: Wer zuerst kommt, wird zuerst bedient. <span class="inline-code">enqueue</span> reiht hinten ein, <span class="inline-code">dequeue</span> entfernt vorne.</p>
+    <div class="cabinet">
+      <div class="q-row" id="queueCabinet"></div>
+    </div>
+    <div class="panel">
+      <div class="row">
+        <input type="text" id="queueValue" placeholder="Wert" style="width:120px">
+        <button onclick="queueEnqueue()">Enqueue</button>
+        <button class="secondary" onclick="queueDequeue()">Dequeue</button>
+        <button class="secondary" onclick="queueReset()">Zurücksetzen</button>
+      </div>
+      <div class="status-strip" id="queueStatus">Warteschlange ist leer.</div>
+    </div>
+    <div class="panel">
+      <strong>Python-Code</strong>
+      <div class="status-strip" id="queueCode" style="font-family:Consolas,monospace;white-space:pre-line;"></div>
+    </div>
+  </div>
 
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-box">
-      <h3 id="modalTitle">...</h3>
-      <p id="modalMessage">...</p>
-      <div class="modal-buttons">
-        <button class="btn-cancel" id="modalCancelBtn">Abbrechen</button>
-        <button class="btn-confirm" id="modalConfirmBtn">...</button>
+  <!-- BAUM VIEW -->
+  <div class="view" id="view-baum">
+    <div class="view-head"><h2>Baum</h2><button class="info-btn" onclick="openHelpModal('baum')">ℹ️ Erklärung</button></div>
+    <p class="desc">Ein sortierter Binärbaum: Werte kleiner als ein Knoten stehen links, größere rechts. Neue Werte werden an der passenden Stelle eingefügt.</p>
+    <div class="cabinet" style="justify-content:center;"><div class="tree-svg-wrap" id="treeCabinet"></div></div>
+    <div class="panel">
+      <div class="row">
+        <input type="number" id="treeValue" placeholder="Wert" style="width:100px">
+        <button onclick="treeInsert()">Einfügen</button>
+        <button class="secondary" onclick="treeReset()">Zurücksetzen</button>
+      </div>
+      <div class="status-strip" id="treeStatus">Startbaum mit 3 Knoten.</div>
+    </div>
+  </div>
+
+  <!-- AUFGABEN-BROWSER VIEW -->
+  <div class="view" id="view-aufgaben">
+    <div class="view-head"><h2>Aufgaben</h2><button class="info-btn" onclick="openHelpModal('aufgaben')">ℹ️ Erklärung</button></div>
+    <p class="desc" style="margin-top:-4px;">Wählt Aufgaben aus und zieht sie in euren aktuellen Sprint – die Auswahl erscheint dann auf dem <a href="index.html">Sprint-Board</a>. Aufgaben sind nicht nach Schwierigkeit beschriftet: Schätzt selbst ein, ob ihr euch eine Aufgabe zutraut.</p>
+    <div style="margin:-6px 0 12px;"><button class="lf1-pdf-btn" onclick="lf3ExportAllAsPdf()">📄 Alle Aufgaben (LF3) als PDF</button></div>
+    <div id="lf3AufgabenBrowser"></div>
+  </div>
+
+  <!-- HANDBUCH VIEW -->
+  <div class="view" id="view-handbuch">
+    <div class="view-head"><h2>Handbuch</h2></div>
+    <input type="text" id="handbuchSearch" placeholder="Begriff suchen…" style="width:100%;margin-bottom:10px;" oninput="renderHandbuch()">
+    <div id="handbuchChips" style="margin-bottom:14px;"></div>
+    <div id="handbuchList"></div>
+  </div>
+
+  <div class="lf1-modal-overlay" id="lf1InfoModalOverlay">
+    <div class="lf1-info-box">
+      <div class="lf1-info-header">
+        <span class="lf1-info-id" id="lf1InfoModalId"></span>
+        <button class="lf1-info-close" id="lf1InfoModalCloseX" aria-label="Schließen">✕</button>
+      </div>
+      <h3 style="margin:0 0 10px;color:var(--navy);font-size:1.05rem;">Aufgabendetails</h3>
+      <div id="lf1InfoModalProblem" class="lf1-info-block"></div>
+      <div id="lf1InfoModalAuftrag" class="lf1-info-block"></div>
+      <div id="lf1InfoModalHint" class="lf1-info-hint" style="display:none;"></div>
+      <div id="lf1InfoModalIo" class="lf1-info-block lf1-info-io"></div>
+      <div id="lf1InfoModalDarstellung" class="lf1-info-block lf1-info-darstellung"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <button class="lf1-pdf-btn" id="lf1InfoModalPdfBtn">📄 Als PDF</button>
+        <button class="secondary" id="lf1InfoModalCloseBtn" style="padding:8px 16px;">Schließen</button>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="infoModalOverlay">
-    <div class="modal-box info-box">
-      <div class="info-header">
-        <span class="info-id" id="infoModalId"></span>
-        <button class="info-close" id="infoModalCloseX" aria-label="Schließen">✕</button>
-      </div>
-      <h3 id="infoModalTitle">...</h3>
-      <div id="infoModalProblem" class="info-block"></div>
-      <div id="infoModalAuftrag" class="info-block info-auftrag"></div>
-      <div id="infoModalIo" class="info-block info-io"></div>
-      <div id="infoModalDarstellung" class="info-block info-io"></div>
-      <div class="modal-buttons">
-        <span id="infoModalStatusLabel" class="status-label" style="display:none;margin-right:auto;align-self:center;"></span>
-        <button class="btn-cancel" id="infoModalCloseBtn">Schließen</button>
-        <button class="btn-confirm positive" id="infoModalAddBtn" style="display:none;">+ Zum Sprint hinzufügen</button>
+  <div class="lf1-modal-overlay" id="helpModalOverlay">
+    <div class="lf1-info-box">
+      <div class="lf1-info-header"><span class="lf1-info-id">Erklärung</span>
+        <button class="lf1-info-close" id="helpModalCloseX">✕</button></div>
+      <div id="helpModalText" style="font-size:0.92rem;"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+        <button class="secondary" id="helpModalCloseBtn" style="padding:8px 16px;">Schließen</button>
       </div>
     </div>
-  </div>
-
-  <span class="retro-toggle" id="retroToggle">▸ Ergebnisübersicht des letzten aktiven Sprints anzeigen</span>
-  <div class="retro-box" id="retroBox"></div>
-
-  <div class="ichkann-section">
-    <h2>Aufgaben nach Thema auswählen</h2>
-    <p style="font-size:0.85rem;color:var(--muted);margin:0 0 10px;">Wählt selbst aus, welche Aufgabe ihr als Nächstes bearbeiten wollt. Angezeigt wird nur das betroffene Feinziel – wie viele Punkte eine Aufgabe bringt, seht ihr erst in der Ich-Kann-Übersicht, nachdem ihr sie abgeschlossen habt.</p>
-    <div id="themaGroups"></div>
-  </div>
-
-  <div class="ichkann-section">
-    <h2>Ich-Kann-Übersicht</h2>
-    <div id="lfGroups"></div>
-  </div>
-
-  <div class="bottom-row">
-    <span style="font-size:0.8rem;color:var(--muted);">Diese Übersicht wird lokal in diesem Browser gespeichert. Ein Zurücksetzen des Fortschritts kann nur die Lehrkraft vornehmen.</span>
   </div>
 
   <footer>
     <img src="data:image/png;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPxQQgj/AZHt7n3IxG06AAAAAElFTkSuQmCC" alt="Logo FLS Mannheim">
-    <span>Friedrich-List-Schule Mannheim · Jahrgangsstufe 2 · Informatik · Sprint-Board</span>
+    <span>Friedrich-List-Schule Mannheim · Jahrgangsstufe 2 · Informatik · Dynamische Datenstrukturen · BPE 7.3</span>
   </footer>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -299,129 +338,8 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 let currentUid = null;
-// ---------------------------------------------------------------------------
-// DATEN: Themen-Bloecke (LF/Grobziel) mit allen Aufgaben.
-// tier: 1=Basis, 2=Normal, 3=Schwer. Text-Praefix [x.y] = Feinziel-Nummer.
-// ---------------------------------------------------------------------------
-const BLOCKS = [
-  {
-    id: "LF1G1",
-    title: "LF1 – Grobziel 1: Datenstrukturen erklären",
-    weeks: "ab Woche 1",
-    tasks: [
-      { id: "LF1_A1.1a", tier: 1, text: "[1.1] Nennen Sie zwei Beispiele fuer Datenstrukturen, die im Unterricht behandelt wurden." },
-      { id: "LF1_A1.1b", tier: 2, text: "[1.1] Definieren Sie den Begriff Datenstruktur." },
-      { id: "LF1_A1.1c", tier: 3, text: "[1.1] Beurteilen Sie, welche Rolle die Wahl einer geeigneten Datenstruktur fuer die Effizienz eines Programms spielt." },
-      { id: "LF1_A1.2a", tier: 1, text: "[1.2] Beschreiben Sie in ein bis zwei Saetzen, was ein Array ist." },
-      { id: "LF1_A1.2b", tier: 2, text: "[1.2] Erklaeren Sie die Datenstruktur Array anhand ihrer charakteristischen Merkmale." },
-      { id: "LF1_A1.2c", tier: 3, text: "[1.2] Erlaeutern Sie den Unterschied zwischen den Datenstrukturen Array und Warteschlange hinsichtlich des Zugriffs auf ihre Elemente." },
-      { id: "LF1_A1.3a", tier: 1, text: "[1.3] Nennen Sie die Datenstruktur, die sich am besten fuer eine Sitzplatzliste mit 30 fest nummerierten, unveraenderlichen Plaetzen eignet." },
-      { id: "LF1_A1.3b", tier: 2, text: "[1.3] Ordnen Sie den folgenden Alltagssituationen jeweils die passende Datenstruktur ein und begruenden Sie kurz: (a) Warteschlange an der Fahrkartenausgabe, (b) ein Stapel frisch gewaschener Handtuecher." },
-      { id: "LF1_A1.3c", tier: 3, text: "[1.3] Beurteilen Sie, ob sich ein Array oder eine verkettete Liste besser eignet, um die Teilnehmerliste eines Wettbewerbs zu verwalten, bei dem sich laufend neue Personen anmelden und wieder abmelden. Begruenden Sie." },
-    ]
-  },
-  {
-    id: "LF1G2",
-    title: "LF1 – Grobziel 2: Arrays anwenden",
-    weeks: "ab Woche 1",
-    tasks: [
-      { id: "LF1_A2.1a", tier: 1, thema: "T1", text: "[2.1] Erstellen Sie ein Array weltmeister mit den Werten 1954, 1974, 1990 und 2014.", problem: "Fussball-Weltmeisterschaften finden alle vier Jahre statt. Die Jahreszahlen vergangener deutscher Weltmeistertitel sollen in einem Array gespeichert werden." },
-      { id: "LF1_A2.1b", tier: 2, thema: "T1", text: "[2.1] Erstellen Sie ein leeres Array namens buchungen.", problem: "Ein Kino moechte fuer die naechste Woche noch keine Buchungen erfasst haben, aber bereits ein Array fuer spaetere Eintraege vorbereiten." },
-      { id: "LF1_A2.1c", tier: 3, thema: "T1", text: "[2.1] Entwerfen Sie zwei parallele Arrays zeitschriften und preise mit je vier zusammengehoerenden Werten und begruenden Sie in einem Satz, warum der gleiche Index in beiden Arrays zusammenpassen muss.", problem: "Ein Kiosk verkauft vier verschiedene Zeitschriften. Zu jeder Zeitschrift gehoert ein Verkaufspreis. Beide Angaben sollen so gespeichert werden, dass gleicher Index in beiden Arrays zusammengehoerende Daten liefert." },
-      { id: "LF1_A2.2a", tier: 1, thema: "T1", text: "[2.2] Gegeben ist platzierungen = [\"Anna\", \"Ben\", \"Clara\", \"David\"]. Ermitteln Sie den Namen, der auf Platzierung 3 steht (denken Sie an die Indexzaehlung ab 0).", problem: "Bei einem Vereinswettbewerb wurden die Platzierungen in der Reihenfolge ihres Erreichens in einem Array gespeichert.", io: "Ausgabe: Clara" },
-      { id: "LF1_A2.2b", tier: 2, thema: "T1", text: "[2.2] Berechnen Sie den Index des letzten Elements eines Arrays teilnehmer und geben Sie den zugehoerigen Wert aus.", problem: "In einem Array mit einer beliebigen Anzahl an Elementen soll unabhaengig von der genauen Laenge stets das letzte Element ausgegeben werden.", io: "Ausgabe: Ida" },
-      { id: "LF1_A2.2c", tier: 3, thema: "T1", text: "[2.2] Entwickeln Sie einen Algorithmus, der nach Einlesen eines Index prueft, ob dieser gueltig ist (zwischen 0 und der Anzahl der Elemente minus 1), und den Wert ausgibt bzw. sonst eine Fehlermeldung.", problem: "In einer Bibliotheks-Software soll ein Nutzer einen Index eingeben, um sich den Titel des zugehoerigen Buchs anzeigen zu lassen. Nicht jede Eingabe ist dabei ein gueltiger Index.", io: "Eingabe: 5 | Ausgabe: Ungueltiger Index" },
-      { id: "LF1_A2.9a", tier: 1, thema: "T1", text: "[2.9,2.2] Gegeben ist b = [10, 20, 30]. Fuehren Sie einen Schreibtischtest durch: Notieren Sie den Arrayinhalt nach der Zeile b[0] = b[1].", problem: "Ein Array wird durch eine einzelne Zuweisung an einer bestimmten Indexposition veraendert." },
-      { id: "LF1_A2.3a", tier: 1, thema: "T4", text: "[2.3] Erstellen Sie einen Algorithmus, der fuenfmal eine Losnummer einliest, jede an ein Array anhaengt und am Ende alle Losnummern ausgibt.", problem: "Bei einer Tombola sollen fuenf nacheinander gezogene Losnummern erfasst werden, bevor sie am Ende gemeinsam bekanntgegeben werden.", io: "Eingabe: 1254, 2365, 4587, 5698, 3146 | Ausgabe: " },
-      { id: "LF1_A2.3b", tier: 2, thema: "T4", text: "[2.3] Erstellen Sie einen Algorithmus, der dreimal einen Namen einliest, an ein Array anhaengt und danach jeweils die aktuelle Anzahl der Kontakte ausgibt.", problem: "Ein Adressbuch soll drei neue Kontakte nacheinander aufnehmen. Nach jedem Hinzufuegen soll die aktuelle Anzahl der gespeicherten Kontakte ausgegeben werden." },
-      { id: "LF1_A2.4a", tier: 1, thema: "T4", text: "[2.4] Gegeben ist bestand = [12, 20, 8, 0, 5]. Erstellen Sie eine Zuweisung, die den Wert an Index 2 um 15 erhoeht, und geben Sie das aktualisierte Array aus.", problem: "Ein Lager verwaltet den Bestand mehrerer Artikel in einem Array. Nach einer Lieferung erhoeht sich der Bestand eines bestimmten Artikels.", io: "Ausgabe: " },
-      { id: "LF1_A2.4b", tier: 2, thema: "T4", text: "[2.4] Erstellen Sie einen Algorithmus, der jeden Wert eines Arrays preise um 10 Prozent verringert und das Array anschliessend ausgibt.", problem: "In einem Onlineshop sollen an einem Rabatttag alle Preise eines Sortiments um 10 Prozent reduziert werden." },
-      { id: "LF1_M_T4", tier: 3, thema: "T4", text: "[2.3,2.4] Entwickeln Sie einen Algorithmus, der (a) ein Array mit der Rundenzahl der ersten 10 Trainingswochen nach der Formel 5 + i*2 befuellt und (b) anschliessend in einem zweiten Durchlauf alle negativen Werte im Array durch 0 ersetzt (falls bei der manuellen Nacherfassung versehentlich negative Werte eingetragen wurden).", problem: "Ein Fitnessstudio bietet einen Lauftreff an. In der ersten Trainingswoche werden 5 Runden gelaufen, in jeder weiteren Woche zwei Runden mehr als in der Vorwoche.", io: "Ausgabe (nach Korrektur): [5, 7, 9, 11, 13, 15, 17, 19, 21, 23]" },
-      { id: "LF1_A2.9b", tier: 2, thema: "T4", text: "[2.9,2.3,2.4] Gegeben ist a = [1, 5, 20, 9, 4, 3, 1]. Fuehren Sie einen Schreibtischtest durch und dokumentieren Sie den Arrayinhalt nach jeder der folgenden Zeilen: a[1]=a[2] / a[5]=a[5]+a[6] / a[6]=4 / a[7]=4 (Anhaengen).", problem: "Ein Array wird durch mehrere aufeinanderfolgende Zuweisungen sowie ein Anhaengen veraendert." },
-      { id: "LF1_A2.5a", tier: 1, thema: "T2", text: "[2.5] Ermitteln und geben Sie aus, wie viele Elemente das Array weltmeister enthaelt.", problem: "Von den deutschen Weltmeistertiteln aus Aufgabe 2.1-a soll die Gesamtanzahl ermittelt werden.", io: "Ausgabe: 4" },
-      { id: "LF1_A2.5b", tier: 2, thema: "T2", text: "[2.5] Erstellen Sie einen Algorithmus, der ermittelt, ob das Array tickets bereits 50 oder mehr Eintraege enthaelt, und eine entsprechende Meldung ausgibt.", problem: "In einem Wartebereich wird bei jedem Einlass ein Ticket in ein Array eingetragen. Es soll geprueft werden, ob die maximale Kapazitaet von 50 Personen erreicht ist." },
-      { id: "LF1_A2.5c", tier: 3, thema: "T2", text: "[2.5] Entwickeln Sie einen Algorithmus, der die Anzahl der Elemente zweier Arrays klasse_a und klasse_b vergleicht und den Namen der groesseren Klasse ausgibt (bei Gleichstand eine entsprechende Meldung).", problem: "Zwei Klassenlisten unterschiedlicher Laenge sollen verglichen werden, um herauszufinden, welche Klasse mehr Schuelerinnen und Schueler hat.", io: "Ausgabe: Klasse B ist groesser" },
-      { id: "LF1_A2.6a", tier: 1, thema: "T2", text: "[2.6] Erstellen Sie einen Algorithmus, der mit einer Schleife jeden Namen des Arrays spieler einzeln in der Konsole ausgibt.", problem: "Die Stammspieler einer Volleyballmannschaft stehen in einem Array. Vor dem Spiel sollen alle Namen einzeln bekanntgegeben werden." },
-      { id: "LF1_A2.6b", tier: 2, thema: "T2", text: "[2.6] Ermitteln Sie mithilfe einer Schleife, wie oft die Note 2 im Array noten vorkommt, und geben Sie die Anzahl aus.", problem: "In einer Klassenarbeit wird gezaehlt, wie viele Schuelerinnen und Schueler eine bestimmte Note erreicht haben.", io: "Ausgabe: 3" },
-      { id: "LF1_A2.6c", tier: 3, thema: "T2", text: "[2.6] Entwickeln Sie einen Algorithmus, der die Anzahl der Frostnaechte einer beliebigen Woche ermittelt und ausgibt.", problem: "Eine Wetterstation warnt vor Frost, wenn die gemessene Bodentemperatur einer Nacht nicht ueber 0 Grad Celsius steigt. Fuer eine Woche liegen die niedrigsten Nachttemperaturen in einem Array vor.", io: "Ausgabe: 3" },
-      { id: "LF1_A2.7a", tier: 1, thema: "T3", text: "[2.7] Ermitteln Sie ohne die Funktion max() den groessten Wert im Array weiten und geben Sie ihn aus.", problem: "Bei einem Sprungwettbewerb wurden vier Weiten gemessen. Es soll herausgefunden werden, wie weit der beste Sprung war.", io: "Ausgabe: 5.1" },
-      { id: "LF1_A2.7b", tier: 2, thema: "T3", text: "[2.7] Ermitteln Sie aus den 6 gespeicherten Wuerfen die hoechste und die niedrigste Punktzahl, ohne dabei die Funktionen max() oder min() zu verwenden.", problem: "Beim Dart-Training wirft jeder Spieler 6 Pfeile. Um die Leistung einzuschaetzen, sollen der beste und der schlechteste Wurf ermittelt werden.", io: "Ausgabe: 60, 3" },
-      { id: "LF1_A2.8a", tier: 1, thema: "T3", text: "[2.8] Berechnen Sie den Durchschnitt der drei Werte im Array punkte und geben Sie ihn aus.", problem: "In einer Bowlingbahn wurden drei Spiele gespielt. Der durchschnittliche Punktestand soll ermittelt werden.", io: "Ausgabe: 121.0" },
-      { id: "LF1_A2.8b", tier: 2, thema: "T3", text: "[2.8] Erstellen Sie einen Algorithmus, der 7 Temperaturen einliest, in einem Array speichert und anschliessend die Durchschnittstemperatur berechnet und ausgibt.", problem: "Eine Wetterstation zeichnet an 7 Tagen jeweils die Hoechsttemperatur auf. Am Ende der Woche soll die Durchschnittstemperatur berechnet werden." },
-      { id: "LF1_M_T3", tier: 3, thema: "T3", text: "[2.7,2.8] Ermitteln Sie ohne die Funktionen max() oder min() die weiteste und kuerzeste Sprungweite im Array weiten, und berechnen Sie zusaetzlich den Durchschnitt aller Sprungweiten ab 90 Metern.", problem: "Bei einem Skisprung-Weltcup wurden mehrere Sprungweiten eines Wettkampfs gemessen.", io: "Ausgabe: 96.0 (weiteste) / 78.0 (kuerzeste) / 93.0 (Durchschnitt ab 90 m)" },
-      { id: "LF1_A2.9c", tier: 3, thema: "T3", text: "[2.9,2.4] Nennen Sie die Ausgabe, die der folgende Algorithmus erzeugt.", problem: "Ein Struktogramm verarbeitet zwei vorgegebene Arrays elementweise und erzeugt daraus zwei neue Arrays sowie eine Summe.", darstellung: "p = [3, 6, 2]\nq = [1, 4, 5]\nr = [0, 0, 0]\ns = [ ]\nt = 0\nfuer i von 0 bis 2:\n  r[i] = 2 * p[i]\n  s[i] = p[i] - q[i]\n  t = t + (p[i] + q[i])\nAusgabe: r, s, t" },
-      { id: "LF1_A2.10a", tier: 1, thema: "T5", text: "[2.10] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays regal vertauscht.", problem: "In einem Regal stehen zwei Buecher an vertauschten Positionen. Sie sollen zurueckgetauscht werden.", io: "Ausgabe: " },
-      { id: "LF1_A2.10b", tier: 2, thema: "T5", text: "[2.10] Erstellen Sie einen Algorithmus, der im Array spieler die Positionen 2 (Batu) und 4 (Sven) vertauscht.", problem: "Ein Trainer moechte kurzfristig zwei Spielerpositionen tauschen, ohne die uebrige Aufstellung zu veraendern." },
-      { id: "LF1_A2.11a", tier: 1, thema: "T5", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Timo an Index 1 des Arrays warteliste einfuegt, wobei der bisherige Eintrag an Index 1 und alle folgenden eine Position nach hinten ruecken.", problem: "In eine kurze Warteliste soll ein Name in der Mitte eingefuegt werden, ohne bestehende Namen zu ueberschreiben.", io: "Ausgabe: " },
-      { id: "LF1_A2.11b", tier: 2, thema: "T5", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Tom an Index 6 in das Array spieler einfuegt. Alle Namen ab dieser Position ruecken eine Stelle nach hinten.", problem: "Ein neuer Spieler soll in die bestehende Aufstellung an einer bestimmten Position eingefuegt werden, ohne dass ein bereits vorhandener Name verloren geht." },
-      { id: "LF1_A2.12a", tier: 1, thema: "T5", text: "[2.12] Erstellen Sie einen Algorithmus, der den Artikel an Index 1 aus dem Array liste entfernt. Alle nachfolgenden Eintraege ruecken eine Position nach vorne.", problem: "Aus einer kurzen Einkaufsliste soll ein bereits gekaufter Artikel entfernt werden.", io: "Ausgabe: " },
-      { id: "LF1_A2.12b", tier: 2, thema: "T5", text: "[2.12] Erstellen Sie einen Algorithmus, der den Spieler an Index 4 (Paul) aus dem Array entfernt. Alle nachfolgenden Namen ruecken dabei eine Position nach vorne.", problem: "Ein Spieler verlaesst die Mannschaft. Sein Eintrag soll aus der Aufstellung entfernt werden, ohne eine Luecke zu hinterlassen." },
-      { id: "LF1_M_T5", tier: 3, thema: "T5", text: "[2.10,2.11,2.12] Gegeben ist die absteigend sortierte Rangliste punkte = [95, 88, 76, 60, 45]. Entwickeln Sie einen Algorithmus, der (a) den Wert 76 sucht und entfernt, (b) den neuen Wert 82 so einsortiert, dass die Liste weiterhin absteigend bleibt, und (c) abschliessend zwei benachbarte Eintraege nur bei Bedarf tauscht, falls die absteigende Reihenfolge verletzt ist.", problem: "Eine Rangliste von Punktzahlen soll gepflegt werden: ein bekannter Eintrag entfernt, ein neuer Wert einsortiert und bei Bedarf zwei benachbarte Eintraege getauscht werden.", io: "Ausgabe: [95, 88, 82, 60, 45]" },
-    ]
-  },
-  {
-    id: "LF2G1",
-    title: "LF2 – Grobziel 1: Algorithmus-Begriff",
-    weeks: "ab Woche 5",
-    tasks: [
-      { id: "LF2_L1.1a", tier: 1, text: "[1.1] Nennen Sie zwei Eigenschaften, die ein Algorithmus erfuellen muss." },
-      { id: "LF2_L1.1b", tier: 2, text: "[1.1] Definieren Sie den Begriff Algorithmus." },
-      { id: "LF2_L1.1c", tier: 3, text: "[1.1] Beurteilen Sie, ob die Anweisung \"Ruehren Sie den Teig, bis er gut aussieht\" die Anforderungen an einen Algorithmus erfuellt." },
-      { id: "LF2_L1.2a", tier: 1, text: "[1.2] Beschreiben Sie in einem Satz, was mit der Eigenschaft Terminiertheit eines Algorithmus gemeint ist." },
-      { id: "LF2_L1.2b", tier: 2, text: "[1.2] Erklaeren Sie die Eigenschaften Eindeutigkeit und Determiniertheit jeweils anhand eines selbst gewaehlten Beispiels." },
-      { id: "LF2_L1.2c", tier: 3, text: "[1.2] Erlaeutern Sie, warum eine Kochanleitung, die \"nach Belieben Salz hinzufuegen\" verlangt, nicht die Eigenschaft der Eindeutigkeit erfuellt." },
-      { id: "LF2_L1.3a", tier: 1, text: "[1.3] Stellen Sie die Schritte, die noetig sind, um ein Ei hart zu kochen, als nummerierte Liste von Anweisungen dar." },
-      { id: "LF2_L1.3b", tier: 2, text: "[1.3] Entwickeln Sie einen Algorithmus in Alltagssprache, der beschreibt, wie man mit einer Filtermaschine Kaffee aufbrueht." },
-      { id: "LF2_L1.3c", tier: 3, text: "[1.3] Entwerfen Sie einen Algorithmus in Alltagssprache fuer das Sortieren von Waesche vor dem Waschen, der eine Fallunterscheidung nach Farbe (hell/dunkel) enthaelt." },
-    ]
-  },
-  {
-    id: "LF2G2",
-    title: "LF2 – Grobziel 2: Sortieren",
-    weeks: "ab Woche 5",
-    tasks: [
-      { id: "LF2_L2.1a", tier: 1, text: "[2.1] Beschreiben Sie in einem Satz, was bei Bubble Sort mit zwei benachbarten Arrayelementen passiert, wenn das linke groesser ist als das rechte." },
-      { id: "LF2_L2.1b", tier: 2, text: "[2.1] Erklaeren Sie die Funktionsweise von Bubble Sort anhand des Arrays [5, 2, 8, 1]: Wie veraendert sich das Array im ersten Durchgang?" },
-      { id: "LF2_L2.1c", tier: 3, text: "[2.1] Erlaeutern Sie, warum bei Bubble Sort nach jedem vollstaendigen Durchgang mindestens ein weiteres Element an seiner endgueltigen Position steht, und warum die innere Schleife deshalb bei jedem Durchgang um ein Element verkuerzt werden kann." },
-      { id: "LF2_L2.2a", tier: 1, text: "[2.2] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays werte vertauscht.", problem: "Beim Sortieren muessen wiederholt zwei benachbarte Werte eines Arrays ihre Position tauschen.", io: "Ausgabe: " },
-      { id: "LF2_L2.2b", tier: 2, text: "[2.2] Erstellen Sie einen Algorithmus, der die Werte an Index j und j+1 des Arrays werte nur bei Bedarf vertauscht.", problem: "Zwei benachbarte Werte sollen nur dann vertauscht werden, wenn der linke Wert groesser ist als der rechte - das ist genau der Kernschritt von Bubble Sort.", io: "Ausgabe: " },
-      { id: "LF2_L2.2c", tier: 3, text: "[2.2] Beurteilen Sie, ob dieser Ansatz funktioniert, und begruenden Sie Ihre Antwort mit einem Schreibtischtest fuer werte = [9, 4].", problem: "Ein Mitschueler behauptet, man koenne zwei Arrayelemente auch ohne eine Zwischenspeicher-Variable vertauschen, indem man einfach werte[j] = werte[j+1] und danach werte[j+1] = werte[j] schreibt." },
-      { id: "LF2_L2.3a", tier: 1, text: "[2.3] Erstellen Sie einen Algorithmus, der das Array zahlen mit Bubble Sort aufsteigend sortiert und ausgibt.", problem: "Ein kurzes Array mit vier Zahlen soll aufsteigend sortiert werden.", io: "Ausgabe: " },
-      { id: "LF2_L2.3b", tier: 2, text: "[2.3] Erweitern Sie die Bubble-Sort-Implementierung so, dass am Ende die Anzahl der Tauschvorgaenge ausgegeben wird.", problem: "Zusaetzlich zum Sortieren soll mitgezaehlt werden, wie viele Tauschvorgaenge insgesamt noetig waren.", io: "Ausgabe: " },
-      { id: "LF2_L2.3c", tier: 3, text: "[2.3] Ueberpruefen Sie den folgenden Code auf einen Fehler, erlaeutern Sie die Ursache und entwickeln Sie eine korrigierte Fassung.", problem: "Ein Mitschueler hat Bubble Sort implementiert, das Array wird jedoch nicht korrekt sortiert." },
-      { id: "LF2_L2.4a", tier: 1, text: "[2.4] Nennen Sie, wie viele Bubble-Phasen (Durchgaenge) Bubble Sort bei einem Array mit 5 Elementen im schlechtesten Fall benoetigt." },
-      { id: "LF2_L2.4b", tier: 2, text: "[2.4] Ermitteln Sie, wie viele Vergleiche insgesamt bei einem Array mit 6 Elementen durchgefuehrt werden, wenn alle Durchgaenge vollstaendig ablaufen." },
-      { id: "LF2_L2.4c", tier: 3, text: "[2.4] Begruenden Sie, warum die Anzahl der Bubble-Phasen unabhaengig von der Ausgangsreihenfolge des Arrays immer gleich bleibt, obwohl die Anzahl der tatsaechlichen Tauschvorgaenge variieren kann." },
-      { id: "LF2_L2.5a", tier: 1, text: "[2.5] Fuehren Sie fuer zahlen = [3, 1, 2] einen Schreibtischtest des ersten Bubble-Sort-Durchgangs durch. Dokumentieren Sie das Array nach jedem Vergleich." },
-      { id: "LF2_L2.5b", tier: 2, text: "[2.5] Fuehren Sie fuer zahlen = [5, 2, 8, 1] einen vollstaendigen Schreibtischtest von Bubble Sort durch. Dokumentieren Sie das Array nach jedem Durchgang und geben Sie die Gesamtzahl der Tauschvorgaenge an." },
-      { id: "LF2_L2.5c", tier: 3, text: "[2.5] Fuehren Sie fuer zahlen = [4, 1, 3, 2, 5] einen Schreibtischtest durch und geben Sie an, nach wie vielen Durchgaengen keine Vertauschung mehr stattfindet, obwohl die aeussere Schleife noch nicht beendet ist. Erlaeutern Sie, wie man diesen Umstand zur vorzeitigen Beendigung nutzen koennte." },
-      { id: "LF2_L2.6a", tier: 1, text: "[2.6] Beschreiben Sie in einem Satz, wonach bei Selection Sort in jedem Durchgang gesucht wird." },
-      { id: "LF2_L2.6b", tier: 2, text: "[2.6] Erklaeren Sie die Funktionsweise von Selection Sort anhand des Arrays [7, 2, 6, 3]: Was passiert im ersten Durchgang?" },
-      { id: "LF2_L2.6c", tier: 3, text: "[2.6] Erlaeutern Sie den zentralen Unterschied zwischen Bubble Sort und Selection Sort bezueglich der Anzahl der Tauschvorgaenge." },
-      { id: "LF2_L2.7a", tier: 1, text: "[2.7] Erstellen Sie einen Algorithmus, der das Array zahlen mit Selection Sort sortiert. Die Funktion min() darf nicht verwendet werden.", problem: "Ein kurzes Array mit vier Zahlen soll mit Selection Sort aufsteigend sortiert werden.", io: "Ausgabe: " },
-      { id: "LF2_L2.7b", tier: 2, text: "[2.7] Erweitern Sie die Selection-Sort-Implementierung um eine Zaehlvariable fuer die Vergleiche und geben Sie diese am Ende aus.", problem: "Zusaetzlich zur Sortierung soll gezaehlt werden, wie viele Vergleiche innerhalb der inneren Schleife insgesamt stattgefunden haben.", io: "Ausgabe: " },
-      { id: "LF2_L2.7c", tier: 3, text: "[2.7] Entwickeln Sie eine Variante von Selection Sort, die in jedem Durchgang das groesste (statt kleinste) Element des unsortierten Bereichs sucht und an die naechste freie Position von vorne einsortiert.", problem: "Statt aufsteigend soll ein Array mit Selection Sort absteigend sortiert werden.", io: "Ausgabe: " },
-    ]
-  },
-  {
-    id: "LF2G3",
-    title: "LF2 – Grobziel 3: Suchen",
-    weeks: "ab Woche 5",
-    tasks: [
-      { id: "LF2_L3.1a", tier: 1, text: "[3.1] Beschreiben Sie in einem Satz, wie die lineare Suche in einem Array vorgeht." },
-      { id: "LF2_L3.1b", tier: 2, text: "[3.1] Erklaeren Sie anhand von zahlen = [10, 5, 18, 50, 42, 25] und dem gesuchten Wert 50, wie viele Vergleiche die lineare Suche benoetigt und warum." },
-      { id: "LF2_L3.1c", tier: 3, text: "[3.1] Beurteilen Sie, wie viele Vergleiche die lineare Suche im ungueststigsten Fall bei einem Array mit n Elementen benoetigt, und nennen Sie ein Beispiel fuer einen solchen Fall." },
-      { id: "LF2_L3.2a", tier: 1, text: "[3.2] Erstellen Sie einen Algorithmus, der im Array namen nach dem Wert \"Mia\" sucht und den gefundenen Index ausgibt.", problem: "In einem Array mit Namen soll geprueft werden, ob ein bestimmter Name enthalten ist.", io: "Ausgabe: 1" },
-      { id: "LF2_L3.2b", tier: 2, text: "[3.2] Erweitern Sie die lineare Suche so, dass nach der Schleife geprueft wird, ob das Element tatsaechlich gefunden wurde, und andernfalls eine Fehlermeldung ausgegeben wird.", problem: "Falls der gesuchte Wert nicht im Array enthalten ist, soll statt eines Index eine Fehlermeldung ausgegeben werden.", io: "Ausgabe: Nicht gefunden" },
-      { id: "LF2_L3.2c", tier: 3, text: "[3.2] Entwickeln Sie einen Algorithmus, der alle Indizes ermittelt, an denen der Wert 3 im Array zahlen vorkommt, und diese in einem Array treffer sammelt.", problem: "Statt nur das erste Vorkommen zu finden, sollen bei der linearen Suche alle Indizes ausgegeben werden, an denen der gesuchte Wert im Array vorkommt.", io: "Ausgabe: " },
-      { id: "LF2_L3.3a", tier: 1, text: "[3.3] Beschreiben Sie in einem Satz, welche Voraussetzung ein Array erfuellen muss, damit binaere Suche angewendet werden kann." },
-      { id: "LF2_L3.3b", tier: 2, text: "[3.3] Erklaeren Sie anhand von zahlen = [5, 10, 11, 18, 20, 25, 39, 42, 50] und dem gesuchten Wert 42, wie die binaere Suche in den ersten beiden Schritten vorgeht." },
-      { id: "LF2_L3.3c", tier: 3, text: "[3.3] Erlaeutern Sie, warum die binaere Suche bei 1000 sortierten Elementen im ungueststigsten Fall nur etwa 10 statt bis zu 1000 Vergleiche benoetigt." },
-      { id: "LF2_L3.4a", tier: 1, text: "[3.4] Erstellen Sie einen Algorithmus, der im sortierten Array zahlen mit binaerer Suche nach dem Wert 18 sucht und den gefundenen Index ausgibt.", problem: "In einem bereits sortierten Array soll ein Wert mithilfe der binaeren Suche gefunden werden.", io: "Ausgabe: 4" },
-      { id: "LF2_L3.4b", tier: 2, text: "[3.4] Erweitern Sie die binaere Suche aus Aufgabe 3.4-a um eine Zaehlvariable fuer die Anzahl der Vergleiche.", problem: "Zusaetzlich soll mitgezaehlt werden, wie viele Vergleiche die binaere Suche bis zum Auffinden des Werts benoetigt hat.", io: "Ausgabe: 2" },
-      { id: "LF2_L3.4c", tier: 3, text: "[3.4] Entwickeln Sie einen Algorithmus, der zunaechst prueft, ob das Array zahlen aufsteigend sortiert ist, und nur dann die binaere Suche nach einem eingelesenen Wert durchfuehrt (sonst eine Fehlermeldung ausgibt).", problem: "Ein Programm soll vor der eigentlichen binaeren Suche selbst pruefen, ob das uebergebene Array ueberhaupt sortiert ist, da die binaere Suche sonst falsche Ergebnisse liefern kann." },
-    ]
-  },
+
+const LF3_BLOCKS = [
   {
     id: "LF3G1",
     title: "LF3 – Grobziel 1: Verkettete Liste",
@@ -495,23 +413,17 @@ const BLOCKS = [
     ]
   },
 ];
-
-
-const LF_META = {
-  LF1G1: { lf: "LF1", grobziel: "Grobziel 1: Datenstrukturen erklären" },
-  LF1G2: { lf: "LF1", grobziel: "Grobziel 2: Arrays anwenden" },
-  LF2G1: { lf: "LF2", grobziel: "Grobziel 1: Algorithmus-Begriff" },
-  LF2G2: { lf: "LF2", grobziel: "Grobziel 2: Sortieren" },
-  LF2G3: { lf: "LF2", grobziel: "Grobziel 3: Suchen" },
-  LF3G1: { lf: "LF3", grobziel: "Grobziel 1: Verkettete Liste" },
-  LF3G2: { lf: "LF3", grobziel: "Grobziel 2: Stapelspeicher" },
-  LF3G3: { lf: "LF3", grobziel: "Grobziel 3: Warteschlange" },
-  LF3G4: { lf: "LF3", grobziel: "Grobziel 4: Baum" }
+const LF3_FEINZIEL_TITLES = {
+  "1.1": "Eigenschaften erklären", "1.2": "Einfügen/Löschen anwenden", "1.3": "Problemstellungen abbilden", "1.4": "Anwendungsbereiche",
+  "2.1": "Stapelspeicher beschreiben", "2.2": "push/pop anwenden", "2.3": "Problemstellungen abbilden", "2.4": "Anwendungsbereiche",
+  "3.1": "Warteschlange beschreiben", "3.2": "enqueue/dequeue anwenden", "3.3": "Problemstellungen abbilden", "3.4": "Anwendungsbereiche",
+  "4.1": "Aufbau/Bestandteile", "4.2": "Binärbaum definieren", "4.3": "Baum bewerten", "4.4": "Bäume modellieren"
 };
 
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
 // ---------------------------------------------------------------------------
-// FREIGABE: wird nach dem Login aus Firestore (klassen/{klasseId}.freigaben)
-// geladen, abhaengig von der Klasse der/des eingeloggten Schuelerin/Schuelers.
+// Navigation + Freigabe (aus Firestore, klassen/{klasseId}.freigaben)
 // ---------------------------------------------------------------------------
 let LF_FREIGABE = { LF1: false, LF2: false, LF3: false };
 const LF_FREIGABE_CACHE_KEY = "ll_lf_freigabe_cache";
@@ -520,551 +432,6 @@ try {
   if (cached) LF_FREIGABE = cached;
 } catch (e) { /* localStorage evtl. blockiert - dann bleibt es beim Default */ }
 
-// Feinziel-Gruppierung ueber alle Bloecke hinweg (fuer die Ich-Kann-Liste).
-// Eine Aufgabe kann mehrere, kommagetrennte Feinziele im Text-Praefix haben
-// (z.B. "[2.7,2.8] ..."); sie wird dann unter jedem betroffenen Feinziel
-// gefuehrt und zaehlt bei Abschluss fuer jedes davon voll mit.
-function buildFeinzielIndex() {
-  const idx = {}; // "LF1|1.1" -> { text-fragment, tasks: [...] }
-  BLOCKS.forEach(block => {
-    block.tasks.forEach(task => {
-      const m = task.text.match(/^\[([\d.,\s]+)\]\s*(.*)$/);
-      const fzList = m ? m[1].split(",").map(s => s.trim()) : ["?"];
-      const text = m ? m[2] : task.text;
-      const lf = LF_META[block.id].lf;
-      fzList.forEach(fz => {
-        const key = lf + "|" + fz;
-        if (!idx[key]) idx[key] = { lf, fz, blockId: block.id, tasks: [] };
-        idx[key].tasks.push({ id: task.id, tier: task.tier, text });
-      });
-    });
-  });
-  return idx;
-}
-const FEINZIEL_INDEX = buildFeinzielIndex();
-
-// Themen-Gruppierung fuer die Aufgaben-Auswahl (nur Aufgaben mit "thema"-Feld).
-// Hier werden bewusst KEINE Niveaustufen (Basis/Normal/Schwer) und KEINE
-// Punktzahlen angezeigt - nur der Aufgabentext und die betroffenen Feinziele.
-// Die Zuordnung nach Niveau/Punkten bleibt der Ich-Kann-Liste vorbehalten.
-const THEMA_META = {
-  T1: "Arrays anlegen & ansprechen",
-  T2: "Arrays durchlaufen",
-  T3: "Werte auswerten",
-  T4: "Arrays veraendern & befuellen",
-  T5: "Reihenfolge gestalten"
-};
-function buildThemaIndex() {
-  const idx = {}; // "LF1G2|T1" -> { blockId, thema, tasks: [...] }
-  BLOCKS.forEach(block => {
-    block.tasks.forEach(task => {
-      if (!task.thema) return;
-      const m = task.text.match(/^\[([\d.,\s]+)\]\s*(.*)$/);
-      const fzList = m ? m[1].split(",").map(s => s.trim()) : [];
-      const text = m ? m[2] : task.text;
-      const key = block.id + "|" + task.thema;
-      if (!idx[key]) idx[key] = { blockId: block.id, thema: task.thema, tasks: [] };
-      idx[key].tasks.push({ id: task.id, fzList, text });
-    });
-  });
-  return idx;
-}
-const THEMA_INDEX = buildThemaIndex();
-
-// ---------------------------------------------------------------------------
-// SPRINT-LOGIK: eine Kalenderwoche (ISO), automatische Berechnung aus dem Datum.
-// ---------------------------------------------------------------------------
-function isoWeekKey(d) {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = (date.getUTCDay() + 6) % 7;
-  date.setUTCDate(date.getUTCDate() - dayNum + 3);
-  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4));
-  const week = 1 + Math.round(((date - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
-  return date.getUTCFullYear() + "-W" + String(week).padStart(2, "0");
-}
-function weekRangeLabel(d) {
-  const day = (d.getDay() + 6) % 7;
-  const monday = new Date(d); monday.setDate(d.getDate() - day);
-  const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
-  const fmt = x => x.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
-  return fmt(monday) + " – " + fmt(sunday);
-}
-
-const LAST_ACTIVE_KEY = "lernlandschaft_last_active_sprint_v1";
-
-let sprints = {};
-const todayKey = isoWeekKey(new Date());
-let carriedOverIds = [];
-
-async function ladeAlleSprints() {
-  sprints = {};
-  const snap = await getDocs(collection(db, "schueler", currentUid, "sprints"));
-  snap.forEach(d => { sprints[d.id] = d.data(); });
-}
-
-function saveSprints() {
-  if (!currentUid || !sprints[todayKey]) return;
-  setDoc(doc(db, "schueler", currentUid, "sprints", todayKey), sprints[todayKey]).catch(err => {
-    console.error("Sprint konnte nicht gespeichert werden:", err);
-    alert("Deine Änderung konnte nicht gespeichert werden (" + (err.code || err.message) + "). Bitte Internetverbindung prüfen und erneut versuchen.");
-  });
-}
-
-async function ensureCurrentSprint() {
-  if (sprints[todayKey]) return;
-  // Letzten vorhandenen Sprint suchen (chronologisch), unfertige Aufgaben uebernehmen.
-  const keys = Object.keys(sprints).sort();
-  const lastKey = keys.length ? keys[keys.length - 1] : null;
-  const newSprint = { tasks: {} }; // taskId -> { status, carried }
-  if (lastKey) {
-    const last = sprints[lastKey];
-    Object.keys(last.tasks).forEach(taskId => {
-      const t = last.tasks[taskId];
-      if (t.status !== "done") {
-        newSprint.tasks[taskId] = { status: t.status, carried: true };
-        carriedOverIds.push(taskId);
-      }
-    });
-  }
-  sprints[todayKey] = newSprint;
-  saveSprints();
-}
-
-function getTaskById(id) {
-  for (const block of BLOCKS) {
-    for (const t of block.tasks) if (t.id === id) return t;
-  }
-  return null;
-}
-
-function addTaskToSprint(taskId) {
-  const sprint = sprints[todayKey];
-  if (sprint.tasks[taskId]) return;
-  sprint.tasks[taskId] = { status: "todo", carried: false };
-  saveSprints();
-  renderAll();
-}
-function setTaskStatus(taskId, status) {
-  sprints[todayKey].tasks[taskId].status = status;
-  saveSprints();
-  renderAll();
-}
-function removeTaskFromSprint(taskId) {
-  delete sprints[todayKey].tasks[taskId];
-  saveSprints();
-  renderAll();
-}
-function taskLabel(taskId) {
-  const task = getTaskById(taskId);
-  if (!task) return taskId;
-  const m = task.text.match(/^\[([\d.,\s]+)\]\s*(.*)$/);
-  return m ? m[2] : task.text;
-}
-
-// ---------------------------------------------------------------------------
-// Generisches Bestaetigungs-Modal, genutzt sowohl fuers Entfernen als auch
-// fuer die Peer-Review-Erinnerung vor dem Setzen auf "Done".
-// ---------------------------------------------------------------------------
-let pendingConfirmAction = null;
-function openConfirmModal(title, messageHtml, confirmLabel, positive, onConfirm) {
-  pendingConfirmAction = onConfirm;
-  document.getElementById("modalTitle").textContent = title;
-  document.getElementById("modalMessage").innerHTML = messageHtml;
-  const confirmBtn = document.getElementById("modalConfirmBtn");
-  confirmBtn.textContent = confirmLabel;
-  confirmBtn.classList.toggle("positive", !!positive);
-  document.getElementById("modalOverlay").classList.add("open");
-}
-function closeModal() {
-  pendingConfirmAction = null;
-  document.getElementById("modalOverlay").classList.remove("open");
-}
-document.getElementById("modalCancelBtn").addEventListener("click", closeModal);
-document.getElementById("modalOverlay").addEventListener("click", (e) => {
-  if (e.target.id === "modalOverlay") closeModal();
-});
-document.getElementById("modalConfirmBtn").addEventListener("click", () => {
-  const action = pendingConfirmAction;
-  closeModal();
-  if (action) action();
-});
-
-function confirmRemoveTask(taskId) {
-  openConfirmModal(
-    "Aufgabe aus dem Sprint entfernen?",
-    "Soll diese Aufgabe wirklich aus dem aktuellen Sprint entfernt werden?<br><span class=\"modal-task-text\">" + esc(taskLabel(taskId)) + "</span>",
-    "Entfernen", false,
-    () => removeTaskFromSprint(taskId)
-  );
-}
-
-// Peer-Review-Erinnerung: bevor eine Aufgabe auf "Done" wechselt, wird daran
-// erinnert, dass die Loesung vorher von einem Teammitglied gegengelesen werden
-// soll. Es wird bewusst nichts gespeichert, wer geprueft hat - reine Erinnerung.
-function confirmMarkDone(taskId) {
-  openConfirmModal(
-    "Aufgabe abschließen?",
-    "Wurde diese Aufgabe von einem Teammitglied gegengelesen, bevor sie auf „Done“ gesetzt wird?<br><span class=\"modal-task-text\">" + esc(taskLabel(taskId)) + "</span>",
-    "Ja, als erledigt markieren", true,
-    () => setTaskStatus(taskId, "done")
-  );
-}
-
-// Zentrale Weiche fuer jeden Statuswechsel: nur der Wechsel NACH "done" wird
-// ueber die Peer-Review-Erinnerung gefuehrt, alle anderen Wechsel direkt.
-function requestStatusChange(taskId, newStatus) {
-  if (newStatus === "done") {
-    confirmMarkDone(taskId);
-  } else {
-    setTaskStatus(taskId, newStatus);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Info-Modal: zeigt alle verfuegbaren Informationen zu einer Aufgabe an
-// (Problemstellung, Arbeitsauftrag, Beispiel-Ausgabe) - rein informativ,
-// keine Musterloesung/kein Struktogramm, das bleibt Lehrkraft-Material.
-// ---------------------------------------------------------------------------
-let infoModalTaskId = null;
-function openTaskInfoModal(taskId) {
-  const task = getTaskById(taskId);
-  if (!task) return;
-  infoModalTaskId = taskId;
-  const m = task.text.match(/^\[([\d.,\s]+)\]\s*(.*)$/);
-  const fzList = m ? m[1].split(",").map(s => s.trim()) : [];
-  const auftragText = m ? m[2] : task.text;
-  const fzLabel = fzList.length > 1 ? "Feinziele " + fzList.join(", ") : (fzList[0] ? "Feinziel " + fzList[0] : "");
-
-  document.getElementById("infoModalId").textContent = taskId + (fzLabel ? " · " + fzLabel : "");
-  document.getElementById("infoModalTitle").textContent = "Aufgabendetails";
-  refreshInfoModalSprintState();
-
-  const problemEl = document.getElementById("infoModalProblem");
-  if (task.problem) {
-    problemEl.innerHTML = "<strong>Problemstellung</strong>" + esc(task.problem);
-    problemEl.style.display = "block";
-  } else {
-    problemEl.style.display = "none";
-  }
-
-  document.getElementById("infoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + esc(auftragText);
-
-  const ioEl = document.getElementById("infoModalIo");
-  if (task.io) {
-    ioEl.innerHTML = "<strong>Gewünschte Ausgabe (Beispiel)</strong>" + esc(task.io);
-    ioEl.style.display = "block";
-  } else {
-    ioEl.style.display = "none";
-  }
-
-  const darstEl = document.getElementById("infoModalDarstellung");
-  if (darstEl) {
-    if (task.darstellung) {
-      darstEl.innerHTML = "<strong>Darstellung (Beispiel)</strong>" + esc(task.darstellung);
-      darstEl.style.display = "block";
-    } else {
-      darstEl.style.display = "none";
-    }
-  }
-
-  document.getElementById("infoModalOverlay").classList.add("open");
-}
-function closeInfoModal() {
-  document.getElementById("infoModalOverlay").classList.remove("open");
-  infoModalTaskId = null;
-}
-document.getElementById("infoModalCloseBtn").addEventListener("click", closeInfoModal);
-document.getElementById("infoModalCloseX").addEventListener("click", closeInfoModal);
-document.getElementById("infoModalOverlay").addEventListener("click", (e) => {
-  if (e.target.id === "infoModalOverlay") closeInfoModal();
-});
-
-// Zeigt im Info-Modal je nach aktuellem Sprint-Status entweder den Button
-// "Zum Sprint hinzufuegen" oder einen Hinweis, dass die Aufgabe bereits im
-// Sprint ist - wird beim Oeffnen des Modals UND nach dem Hinzufuegen aufgerufen,
-// damit sich der Button sofort aktualisiert, ohne das Modal schliessen zu muessen.
-function refreshInfoModalSprintState() {
-  if (!infoModalTaskId) return;
-  const sprint = sprints[todayKey];
-  const inSprint = sprint && sprint.tasks[infoModalTaskId];
-  const addBtn = document.getElementById("infoModalAddBtn");
-  const statusLabel = document.getElementById("infoModalStatusLabel");
-  if (inSprint) {
-    const labelMap = { todo: "im Sprint: To Do", doing: "im Sprint: Doing", done: "✓ Erledigt" };
-    addBtn.style.display = "none";
-    statusLabel.textContent = labelMap[inSprint.status] || "im Sprint";
-    statusLabel.style.display = "inline";
-  } else {
-    addBtn.style.display = "inline-block";
-    statusLabel.style.display = "none";
-  }
-}
-document.getElementById("infoModalAddBtn").addEventListener("click", () => {
-  if (!infoModalTaskId) return;
-  addTaskToSprint(infoModalTaskId);
-  refreshInfoModalSprintState();
-});
-
-// ---------------------------------------------------------------------------
-// Drag-and-Drop: Karten zwischen den drei Spalten verschieben, oder auf die
-// Papierkorb-Zone ziehen, um die Entfernen-Bestaetigung zu oeffnen.
-// ---------------------------------------------------------------------------
-let draggedTaskId = null;
-function attachDragHandlers() {
-  document.querySelectorAll(".kanban-card").forEach(card => {
-    card.addEventListener("dragstart", () => {
-      draggedTaskId = card.dataset.taskId;
-      card.classList.add("dragging");
-      document.getElementById("trashZone").classList.add("visible");
-    });
-    card.addEventListener("dragend", () => {
-      card.classList.remove("dragging");
-      document.getElementById("trashZone").classList.remove("visible");
-      document.querySelectorAll(".kanban-cards, .trash-zone").forEach(z => z.classList.remove("drag-over"));
-    });
-  });
-  document.querySelectorAll(".kanban-cards").forEach(col => {
-    col.addEventListener("dragover", (e) => { e.preventDefault(); col.classList.add("drag-over"); });
-    col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
-    col.addEventListener("drop", (e) => {
-      e.preventDefault();
-      col.classList.remove("drag-over");
-      if (!draggedTaskId) return;
-      const newStatus = col.dataset.status;
-      const sprint = sprints[todayKey];
-      if (sprint.tasks[draggedTaskId] && sprint.tasks[draggedTaskId].status !== newStatus) {
-        requestStatusChange(draggedTaskId, newStatus);
-      }
-      draggedTaskId = null;
-    });
-  });
-  const trash = document.getElementById("trashZone");
-  trash.addEventListener("dragover", (e) => { e.preventDefault(); trash.classList.add("drag-over"); });
-  trash.addEventListener("dragleave", () => trash.classList.remove("drag-over"));
-  trash.addEventListener("drop", (e) => {
-    e.preventDefault();
-    trash.classList.remove("drag-over", "visible");
-    if (draggedTaskId) confirmRemoveTask(draggedTaskId);
-    draggedTaskId = null;
-  });
-}
-
-function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-// Hinweis: Niveaustufen (Basis/Normal/Schwer) werden bewusst nirgends in der
-// Schueler-Oberflaeche angezeigt - weder in der Themen-Auswahl noch in der
-// Ich-Kann-Uebersicht. Punkte erscheinen erst nach Abschluss einer Aufgabe.
-
-// ---------------------------------------------------------------------------
-// RENDER: Sprint-Kanban-Board (3 Spalten)
-// ---------------------------------------------------------------------------
-function renderSprintBoard() {
-  const sprint = sprints[todayKey];
-  const cols = { todo: [], doing: [], done: [] };
-  Object.keys(sprint.tasks).forEach(taskId => {
-    const entry = sprint.tasks[taskId];
-    const task = getTaskById(taskId);
-    if (!task) return;
-    cols[entry.status].push({ taskId, task, carried: entry.carried });
-  });
-
-  const now = new Date();
-  document.getElementById("sprintLabel").textContent = "Aktueller Sprint: " + todayKey;
-  document.getElementById("sprintSub").textContent = weekRangeLabel(now) + " · endet automatisch Sonntag 23:00 Uhr";
-  if (carriedOverIds.length) {
-    document.getElementById("carriedOverNote").style.display = "inline-block";
-    document.getElementById("carriedOverNote").textContent = carriedOverIds.length + " Aufgabe(n) aus dem letzten Sprint übernommen";
-  }
-
-  ["todo", "doing", "done"].forEach(status => {
-    const container = document.getElementById("col" + status.charAt(0).toUpperCase() + status.slice(1));
-    document.getElementById("count" + status.charAt(0).toUpperCase() + status.slice(1)).textContent = cols[status].length;
-    if (cols[status].length === 0) {
-      container.innerHTML = '<div class="kanban-empty">Keine Aufgaben</div>';
-      return;
-    }
-    container.innerHTML = cols[status].map(({ taskId, task, carried }) => {
-      const m = task.text.match(/^\[([\d.]+)\]\s*(.*)$/);
-      const text = m ? m[2] : task.text;
-      let buttons = '';
-      if (status !== "todo") buttons += '<button onclick="requestStatusChange(\'' + taskId + '\',\'' + (status === "doing" ? "todo" : "doing") + '\')">◀ zurück</button>';
-      if (status !== "done") buttons += '<button onclick="requestStatusChange(\'' + taskId + '\',\'' + (status === "todo" ? "doing" : "done") + '\')">' + (status === "todo" ? "▶ Doing" : "▶ Done") + '</button>';
-      buttons += '<button class="remove-btn" onclick="confirmRemoveTask(\'' + taskId + '\')" title="Aus Sprint entfernen">✕</button>';
-      return '<div class="kanban-card" draggable="true" data-task-id="' + esc(taskId) + '" data-status="' + status + '" onclick="if(event.target.tagName!==\'BUTTON\')openTaskInfoModal(\'' + esc(taskId) + '\')"><span class="card-id">' + esc(taskId) + '</span>' +
-        (carried ? '<span class="card-carried">übertragen</span>' : '') +
-        '<div class="card-text">' + esc(text) + '</div>' +
-        '<div class="card-buttons">' + buttons + '</div></div>';
-    }).join("");
-  });
-  attachDragHandlers();
-}
-
-// ---------------------------------------------------------------------------
-// RENDER: Ich-Kann-Uebersicht (LF -> Grobziel -> Feinziel -> Aufgaben)
-// ---------------------------------------------------------------------------
-function pointsForFeinziel(fzKey) {
-  const sprint = sprints[todayKey];
-  let points = 0;
-  FEINZIEL_INDEX[fzKey].tasks.forEach(t => {
-    const entry = sprint.tasks[t.id];
-    if (entry && entry.status === "done") points += t.tier;
-  });
-  return points;
-}
-function ampelColor(points) {
-  if (points >= 3) return "var(--green-dot)";
-  if (points >= 1) return "var(--yellow-dot)";
-  return "var(--grey-dot)";
-}
-
-function renderIchKannListe() {
-  const container = document.getElementById("lfGroups");
-  const openState = {};
-  container.querySelectorAll(".lf-group").forEach(g => openState[g.dataset.blockId] = g.classList.contains("open"));
-  const expandedFz = {};
-  container.querySelectorAll(".feinziel-row.expanded").forEach(r => expandedFz[r.dataset.fzkey] = true);
-
-  const visibleBlocks = BLOCKS.filter(block => LF_FREIGABE[LF_META[block.id].lf]);
-
-  if (visibleBlocks.length === 0) {
-    container.innerHTML = '<p style="padding:14px 20px;color:var(--muted);font-style:italic;">Eure Lehrkraft hat noch keinen Lernfortschritt freigegeben.</p>';
-    return;
-  }
-
-  container.innerHTML = visibleBlocks.map(block => {
-    const feinzielKeys = Object.keys(FEINZIEL_INDEX).filter(k => FEINZIEL_INDEX[k].blockId === block.id);
-    const rows = feinzielKeys.map(fzKey => {
-      const fzData = FEINZIEL_INDEX[fzKey];
-      const points = pointsForFeinziel(fzKey);
-      const isExpanded = !!expandedFz[fzKey];
-      const taskRows = fzData.tasks.map(t => {
-        const sprint = sprints[todayKey];
-        const inSprint = sprint.tasks[t.id];
-        let statusHtml;
-        if (inSprint) {
-          const labelMap = { todo: "im Sprint: To Do", doing: "im Sprint: Doing", done: "✓ Erledigt" };
-          statusHtml = '<span class="status-label">' + labelMap[inSprint.status] + '</span>';
-        } else {
-          statusHtml = '<button onclick="event.stopPropagation();addTaskToSprint(\'' + esc(t.id) + '\')">+ In Sprint</button>';
-        }
-        return '<div class="fz-task-row" onclick="openTaskInfoModal(\'' + esc(t.id) + '\')"><span class="fz-task-text">' + esc(t.text) + '</span>' + statusHtml + '</div>';
-      }).join("");
-      return '<div class="feinziel-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + fzKey + '" onclick="toggleFeinziel(this)">' +
-        '<span class="ampel-dot" style="background:' + ampelColor(points) + '"></span>' +
-        '<span class="feinziel-text">[' + fzData.fz + '] ' + (FEINZIEL_TASK_TITLES[block.id + "|" + fzData.fz] || "") + '</span>' +
-        '<span class="feinziel-points">' + points + ' / 3 Pkt.</span>' +
-        '<span class="feinziel-chevron">▸</span></div>' +
-        '<div class="feinziel-tasks">' + taskRows + '</div>';
-    }).join("");
-    return '<div class="lf-group' + (openState[block.id] ? ' open' : '') + '" data-block-id="' + block.id + '">' +
-      '<div class="lf-group-header" onclick="toggleLfGroup(this)"><span>' + esc(block.title) + '</span><span class="chevron">▸</span></div>' +
-      '<div class="lf-group-body">' + rows + '</div></div>';
-  }).join("");
-}
-
-function toggleLfGroup(headerEl) { headerEl.parentElement.classList.toggle("open"); }
-function toggleFeinziel(rowEl) { rowEl.classList.toggle("expanded"); }
-
-// ---------------------------------------------------------------------------
-// RENDER: Aufgaben-Auswahl nach Thema (bewusst OHNE Niveaustufe/Punkte -
-// die Schuelerinnen und Schueler waehlen frei; Punkte sehen sie erst in der
-// Ich-Kann-Uebersicht nach Abschluss einer Aufgabe).
-// ---------------------------------------------------------------------------
-function renderThemaAuswahl() {
-  const container = document.getElementById("themaGroups");
-  if (!container) return;
-  const openState = {};
-  container.querySelectorAll(".lf-group").forEach(g => openState[g.dataset.blockId] = g.classList.contains("open"));
-  const expandedThema = {};
-  container.querySelectorAll(".feinziel-row.expanded").forEach(r => expandedThema[r.dataset.themakey] = true);
-
-  const blockIdsWithThemen = [...new Set(Object.values(THEMA_INDEX).map(t => t.blockId))]
-    .filter(blockId => LF_FREIGABE[LF_META[blockId].lf]);
-
-  if (blockIdsWithThemen.length === 0) {
-    container.innerHTML = '<p style="padding:14px 20px;color:var(--muted);font-style:italic;">Eure Lehrkraft hat noch keinen Lernfortschritt freigegeben.</p>';
-    return;
-  }
-
-  container.innerHTML = blockIdsWithThemen.map(blockId => {
-    const block = BLOCKS.find(b => b.id === blockId);
-    const themaKeys = Object.keys(THEMA_INDEX).filter(k => THEMA_INDEX[k].blockId === blockId);
-    const rows = themaKeys.map(themaKey => {
-      const themaData = THEMA_INDEX[themaKey];
-      const isExpanded = !!expandedThema[themaKey];
-      const sprint = sprints[todayKey];
-      const taskRows = themaData.tasks.map(t => {
-        const inSprint = sprint.tasks[t.id];
-        let statusHtml;
-        if (inSprint) {
-          const labelMap = { todo: "im Sprint: To Do", doing: "im Sprint: Doing", done: "✓ Erledigt" };
-          statusHtml = '<span class="status-label">' + labelMap[inSprint.status] + '</span>';
-        } else {
-          statusHtml = '<button onclick="event.stopPropagation();addTaskToSprint(\'' + esc(t.id) + '\')">+ In Sprint</button>';
-        }
-        const badge = '<span class="fz-badge">' + esc(t.fzList.length > 1 ? "Feinziele " + t.fzList.join(", ") : "Feinziel " + t.fzList[0]) + '</span>';
-        return '<div class="fz-task-row" onclick="openTaskInfoModal(\'' + esc(t.id) + '\')"><span class="fz-task-text">' + esc(t.text) + '</span>' + badge + statusHtml + '</div>';
-      }).join("");
-      return '<div class="feinziel-row' + (isExpanded ? ' expanded' : '') + '" data-themakey="' + themaKey + '" onclick="toggleFeinziel(this)">' +
-        '<span class="feinziel-text">' + esc(THEMA_META[themaData.thema] || themaData.thema) + '</span>' +
-        '<span class="feinziel-chevron">▸</span></div>' +
-        '<div class="feinziel-tasks">' + taskRows + '</div>';
-    }).join("");
-    return '<div class="lf-group' + (openState[blockId] ? ' open' : '') + '" data-block-id="' + blockId + '">' +
-      '<div class="lf-group-header" onclick="toggleLfGroup(this)"><span>' + esc(block.title) + '</span><span class="chevron">▸</span></div>' +
-      '<div class="lf-group-body">' + rows + '</div></div>';
-  }).join("");
-}
-
-// Kurztitel je Feinziel (aus den Aufgabenpool-Dokumenten uebernommen)
-const FEINZIEL_TASK_TITLES = {
-  "LF1G1|1.1": "Datenstrukturen definieren", "LF1G1|1.2": "Merkmale erklären", "LF1G1|1.3": "Zu Sachverhalten zuordnen",
-  "LF1G2|2.1": "Deklarieren/initialisieren", "LF1G2|2.2": "Index-Zugriff", "LF1G2|2.3": "Hinzufügen", "LF1G2|2.4": "Verändern",
-  "LF1G2|2.5": "Länge ermitteln", "LF1G2|2.6": "Schleife über Array", "LF1G2|2.7": "Größtes/kleinstes Element",
-  "LF1G2|2.8": "Durchschnitt", "LF1G2|2.9": "Schreibtischtest", "LF1G2|2.10": "Vertauschen", "LF1G2|2.11": "Einfügen", "LF1G2|2.12": "Entfernen",
-  "LF2G1|1.1": "Algorithmus definieren", "LF2G1|1.2": "Eigenschaften erklären", "LF2G1|1.3": "Algorithmus formulieren",
-  "LF2G2|2.1": "Bubble Sort beschreiben", "LF2G2|2.2": "Elemente tauschen", "LF2G2|2.3": "Bubble Sort implementieren",
-  "LF2G2|2.4": "Bubble-Phasen benennen", "LF2G2|2.5": "Bubble Sort Schreibtischtest", "LF2G2|2.6": "Selection Sort beschreiben",
-  "LF2G2|2.7": "Selection Sort implementieren", "LF2G3|3.1": "Lineare Suche beschreiben", "LF2G3|3.2": "Lineare Suche implementieren",
-  "LF2G3|3.3": "Binäre Suche beschreiben", "LF2G3|3.4": "Binäre Suche implementieren",
-  "LF3G1|1.1": "Eigenschaften erklären", "LF3G1|1.2": "Einfügen/Löschen anwenden", "LF3G1|1.3": "Problemstellungen abbilden", "LF3G1|1.4": "Anwendungsbereiche",
-  "LF3G2|2.1": "Stapelspeicher beschreiben", "LF3G2|2.2": "push/pop anwenden", "LF3G2|2.3": "Problemstellungen abbilden", "LF3G2|2.4": "Anwendungsbereiche",
-  "LF3G3|3.1": "Warteschlange beschreiben", "LF3G3|3.2": "enqueue/dequeue anwenden", "LF3G3|3.3": "Problemstellungen abbilden", "LF3G3|3.4": "Anwendungsbereiche",
-  "LF3G4|4.1": "Aufbau/Bestandteile", "LF3G4|4.2": "Binärbaum definieren", "LF3G4|4.3": "Baum bewerten", "LF3G4|4.4": "Bäume modellieren"
-};
-
-// ---------------------------------------------------------------------------
-// Ergebnisuebersicht des letzten AKTIVEN Sprints (nicht zwingend die Vorwoche)
-// ---------------------------------------------------------------------------
-function renderRetro() {
-  const keys = Object.keys(sprints).filter(k => k !== todayKey).sort();
-  const box = document.getElementById("retroBox");
-  if (!keys.length) { box.innerHTML = '<p>Noch kein abgeschlossener Sprint vorhanden.</p>'; return; }
-  const lastKey = keys[keys.length - 1];
-  const sprint = sprints[lastKey];
-  const total = Object.keys(sprint.tasks).length;
-  const done = Object.values(sprint.tasks).filter(t => t.status === "done").length;
-  const doneList = Object.keys(sprint.tasks).filter(id => sprint.tasks[id].status === "done")
-    .map(id => { const t = getTaskById(id); return t ? esc(t.id) : id; }).join(", ") || "keine";
-  box.innerHTML = '<p><strong>Letzter aktiver Sprint: ' + lastKey + '</strong></p>' +
-    '<p>' + done + ' von ' + total + ' Aufgaben erledigt.</p>' +
-    '<p>Erledigt: ' + doneList + '</p>';
-}
-document.getElementById("retroToggle").addEventListener("click", () => {
-  const box = document.getElementById("retroBox");
-  const open = box.classList.toggle("open");
-  document.getElementById("retroToggle").textContent = (open ? "▾" : "▸") + " Ergebnisübersicht des letzten aktiven Sprints anzeigen";
-});
-
-function renderAll() {
-  renderSprintBoard();
-  renderThemaAuswahl();
-  renderIchKannListe();
-  renderRetro();
-}
-
-// ---------------------------------------------------------------------------
-// Gemeinsame Navigation ueber alle Seiten (Sprint-Board + je LF-Werkstatt)
-// ---------------------------------------------------------------------------
 function renderLfNav(currentPage) {
   const items = [
     { href: "index.html", label: "Sprint-Board", id: null },
@@ -1087,28 +454,444 @@ function renderLfNav(currentPage) {
 // Sofort mit dem zwischengespeicherten (oder Default-) Freigabe-Stand rendern,
 // statt erst auf den Firestore-Roundtrip zu warten - vermeidet das kurze
 // Aufblitzen einer leeren Navigationsleiste beim Laden der Seite.
-renderLfNav(null);
+renderLfNav("LF3");
 
 // ---------------------------------------------------------------------------
-// Anwesenheits-Heartbeat: aktualisiert regelmaessig lastSeen der Sitzung, die
-// beim Login in anmeldung.html angelegt wurde, damit das Lehrkraft-Dashboard
-// einen halbwegs aktuellen Online-Status und Doppelanmeldungen erkennen kann.
+// Sprint-Zugriff (gemeinsame Firestore-Struktur mit dem Sprint-Board)
 // ---------------------------------------------------------------------------
+function isoWeekKey(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - dayNum + 3);
+  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4));
+  const week = 1 + Math.round(((date - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
+  return date.getUTCFullYear() + "-W" + String(week).padStart(2, "0");
+}
+let sprints = {};
+const lf3TodayKey = isoWeekKey(new Date());
+async function ladeAlleSprints() {
+  sprints = {};
+  const snap = await getDocs(collection(db, "schueler", currentUid, "sprints"));
+  snap.forEach(d => { sprints[d.id] = d.data(); });
+}
+function saveCurrentSprint() {
+  if (!currentUid || !sprints[lf3TodayKey]) return;
+  setDoc(doc(db, "schueler", currentUid, "sprints", lf3TodayKey), sprints[lf3TodayKey]).catch(err => {
+    console.warn("Sprint konnte nicht gespeichert werden:", err.code || err.message);
+    alert("Speichern fehlgeschlagen (" + (err.code || err.message) + "). Bitte Internetverbindung pruefen.");
+  });
+}
+function ensureLf3Sprint() {
+  if (!sprints[lf3TodayKey]) sprints[lf3TodayKey] = { tasks: {} };
+  return sprints;
+}
+function lf3GetTaskById(id) { for (const b of LF3_BLOCKS) for (const t of b.tasks) if (t.id === id) return t; return null; }
+function lf3AddTaskToSprint(taskId) {
+  const sprints = ensureLf3Sprint();
+  if (sprints[lf3TodayKey].tasks[taskId]) return;
+  sprints[lf3TodayKey].tasks[taskId] = { status: "todo", carried: false };
+  saveCurrentSprint();
+  renderLf3AufgabenBrowser();
+}
+
+// ---------------------------------------------------------------------------
+// VERKETTETE LISTE
+// ---------------------------------------------------------------------------
+let llData = ["Frisch", "Schnell", "Günstig"];
+function renderLl() {
+  const cab = document.getElementById('llCabinet');
+  let html = '<div class="ll-node"><span class="ll-anker">Anker</span><span style="color:#CBD5E1;font-size:1.4rem;">↓</span></div>';
+  llData.forEach((v, i) => {
+    html += '<div class="ll-node"><div class="ll-box" id="llBox' + i + '">' + esc(v) + '</div><span class="ll-idx">Knoten ' + (i+1) + '</span></div>';
+    html += '<span class="ll-arrow">→</span>';
+  });
+  html += '<span class="ll-null">NULL</span>';
+  cab.innerHTML = html;
+
+  let darst = "Anker -> Knoten1\n";
+  llData.forEach((v, i) => {
+    darst += "Knoten" + (i+1) + ': Daten="' + v + '"   Zeiger -> ' + (i < llData.length - 1 ? "Knoten" + (i+2) : "NULL") + "\n";
+  });
+  document.getElementById('llDarstellung').textContent = darst.trim();
+}
+function llInsert() {
+  const val = document.getElementById('llValue').value.trim();
+  const posRaw = document.getElementById('llPos').value;
+  const pos = posRaw === '' ? llData.length : parseInt(posRaw);
+  if (!val) { document.getElementById('llStatus').textContent = "Bitte einen Wert eingeben."; return; }
+  if (isNaN(pos) || pos < 0 || pos > llData.length) { document.getElementById('llStatus').textContent = "Ungültige Position."; return; }
+  llData.splice(pos, 0, val);
+  renderLl();
+  document.getElementById('llStatus').innerHTML = '"' + esc(val) + '" wurde an Position ' + pos + ' eingefügt – dafür wurde nur der Zeiger des Vorgänger-Knotens umgebogen, keine anderen Knoten mussten verschoben werden.';
+  document.getElementById('llValue').value = '';
+}
+function llDelete() {
+  const posRaw = document.getElementById('llPos').value;
+  const pos = parseInt(posRaw);
+  if (isNaN(pos) || pos < 0 || pos >= llData.length) { document.getElementById('llStatus').textContent = "Ungültige Position zum Löschen."; return; }
+  const removed = llData.splice(pos, 1)[0];
+  renderLl();
+  document.getElementById('llStatus').innerHTML = 'Knoten "' + esc(removed) + '" wurde entfernt – der Zeiger des Vorgängers wurde direkt auf den Nachfolger umgebogen.';
+}
+function llReset() { llData = ["Frisch", "Schnell", "Günstig"]; renderLl(); document.getElementById('llStatus').textContent = "Zurückgesetzt."; }
+
+// ---------------------------------------------------------------------------
+// STAPELSPEICHER
+// ---------------------------------------------------------------------------
+let stackData = [];
+function renderStack() {
+  const cab = document.getElementById('stackCabinet');
+  if (stackData.length === 0) { cab.innerHTML = '<span class="stack-empty-label">Stapel ist leer</span>'; }
+  else {
+    cab.innerHTML = stackData.map((v, i) =>
+      '<div class="stack-box' + (i === stackData.length - 1 ? ' top' : '') + '">' + esc(v) + (i === stackData.length - 1 ? ' ← oben' : '') + '</div>'
+    ).join("");
+  }
+  document.getElementById('stackCode').textContent = "stapel = " + JSON.stringify(stackData);
+}
+function stackPush() {
+  const val = document.getElementById('stackValue').value.trim();
+  if (!val) { document.getElementById('stackStatus').textContent = "Bitte einen Wert eingeben."; return; }
+  stackData.push(val);
+  renderStack();
+  document.getElementById('stackStatus').innerHTML = '<span class="inline-code">push("' + esc(val) + '")</span> – der Wert liegt jetzt oben auf dem Stapel.';
+  document.getElementById('stackValue').value = '';
+}
+function stackPop() {
+  if (stackData.length === 0) { document.getElementById('stackStatus').textContent = "Stapel ist leer – pop() nicht möglich."; return; }
+  const removed = stackData.pop();
+  renderStack();
+  document.getElementById('stackStatus').innerHTML = '<span class="inline-code">pop()</span> → "' + esc(removed) + '" wurde entfernt (LIFO: zuletzt hinzugefügt, zuerst entfernt).';
+}
+function stackReset() { stackData = []; renderStack(); document.getElementById('stackStatus').textContent = "Stapel ist leer."; }
+
+// ---------------------------------------------------------------------------
+// WARTESCHLANGE
+// ---------------------------------------------------------------------------
+let queueData = [];
+function renderQueue() {
+  const cab = document.getElementById('queueCabinet');
+  if (queueData.length === 0) { cab.innerHTML = '<span class="stack-empty-label">Warteschlange ist leer</span>'; }
+  else {
+    let html = '<span class="queue-front">VORNE →</span>';
+    queueData.forEach((v, i) => { html += '<div class="ll-box" style="margin:0 4px;">' + esc(v) + '</div>'; });
+    html += '<span class="queue-back">→ HINTEN</span>';
+    cab.innerHTML = html;
+  }
+  document.getElementById('queueCode').textContent = "schlange = " + JSON.stringify(queueData);
+}
+function queueEnqueue() {
+  const val = document.getElementById('queueValue').value.trim();
+  if (!val) { document.getElementById('queueStatus').textContent = "Bitte einen Wert eingeben."; return; }
+  queueData.push(val);
+  renderQueue();
+  document.getElementById('queueStatus').innerHTML = '<span class="inline-code">enqueue("' + esc(val) + '")</span> – der Wert reiht sich hinten ein.';
+  document.getElementById('queueValue').value = '';
+}
+function queueDequeue() {
+  if (queueData.length === 0) { document.getElementById('queueStatus').textContent = "Warteschlange ist leer – dequeue() nicht möglich."; return; }
+  const removed = queueData.shift();
+  renderQueue();
+  document.getElementById('queueStatus').innerHTML = '<span class="inline-code">dequeue()</span> → "' + esc(removed) + '" wurde bedient (FIFO: zuerst hinzugefügt, zuerst entfernt).';
+}
+function queueReset() { queueData = []; renderQueue(); document.getElementById('queueStatus').textContent = "Warteschlange ist leer."; }
+
+// ---------------------------------------------------------------------------
+// BAUM (sortierter Binärbaum, SVG-Darstellung)
+// ---------------------------------------------------------------------------
+let treeRoot = null;
+function treeNode(v) { return { value: v, left: null, right: null }; }
+function treeInsertNode(node, v) {
+  if (node === null) return treeNode(v);
+  if (v < node.value) node.left = treeInsertNode(node.left, v);
+  else if (v > node.value) node.right = treeInsertNode(node.right, v);
+  return node;
+}
+function treeBuildDefault() {
+  treeRoot = null;
+  [10, 6, 11].forEach(v => { treeRoot = treeInsertNode(treeRoot, v); });
+}
+treeBuildDefault();
+
+function renderTree() {
+  const wrap = document.getElementById('treeCabinet');
+  const positions = [];
+  let counter = 0;
+  function assignX(node, depth) {
+    if (!node) return;
+    assignX(node.left, depth + 1);
+    node._x = counter * 80 + 50;
+    node._y = depth * 70 + 30;
+    counter++;
+    positions.push(node);
+    assignX(node.right, depth + 1);
+  }
+  counter = 0;
+  if (treeRoot) assignX(treeRoot, 0);
+  const width = Math.max(300, counter * 80 + 50);
+  const height = 260;
+
+  let svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" width="' + width + '" height="' + height + '" xmlns="http://www.w3.org/2000/svg">';
+  function drawEdges(node) {
+    if (!node) return;
+    if (node.left) svg += '<line x1="' + node._x + '" y1="' + node._y + '" x2="' + node.left._x + '" y2="' + node.left._y + '" stroke="#E8963C" stroke-width="2"/>';
+    if (node.right) svg += '<line x1="' + node._x + '" y1="' + node._y + '" x2="' + node.right._x + '" y2="' + node.right._y + '" stroke="#E8963C" stroke-width="2"/>';
+    drawEdges(node.left); drawEdges(node.right);
+  }
+  drawEdges(treeRoot);
+  function drawNodes(node) {
+    if (!node) return;
+    svg += '<circle cx="' + node._x + '" cy="' + node._y + '" r="20" fill="white" stroke="#E8963C" stroke-width="2.5"/>';
+    svg += '<text x="' + node._x + '" y="' + (node._y + 5) + '" text-anchor="middle" font-size="14" font-weight="700" fill="#A2222E">' + node.value + '</text>';
+    drawNodes(node.left); drawNodes(node.right);
+  }
+  drawNodes(treeRoot);
+  svg += '</svg>';
+  wrap.innerHTML = treeRoot ? svg : '<span class="stack-empty-label">Baum ist leer</span>';
+}
+function treeInsert() {
+  const raw = document.getElementById('treeValue').value;
+  const v = parseInt(raw);
+  if (isNaN(v)) { document.getElementById('treeStatus').textContent = "Bitte eine Zahl eingeben."; return; }
+  // Pfad ermitteln fuer Statusmeldung
+  let path = [];
+  let cur = treeRoot;
+  while (cur) {
+    path.push(cur.value);
+    if (v === cur.value) { document.getElementById('treeStatus').textContent = "Der Wert " + v + " ist bereits im Baum enthalten."; return; }
+    cur = v < cur.value ? cur.left : cur.right;
+  }
+  treeRoot = treeInsertNode(treeRoot, v);
+  renderTree();
+  document.getElementById('treeStatus').innerHTML = path.length
+    ? v + " eingefügt: verglichen mit " + path.join(" → ") + ", dann an passender Stelle angehängt."
+    : v + " als neue Wurzel eingefügt (Baum war leer).";
+  document.getElementById('treeValue').value = '';
+}
+function treeReset() { treeBuildDefault(); renderTree(); document.getElementById('treeStatus').textContent = "Startbaum mit 3 Knoten."; }
+
+// ---------------------------------------------------------------------------
+// AUFGABEN-BROWSER
+// ---------------------------------------------------------------------------
+function pointsForLf3Feinziel(block, fz) {
+  const sprintTasks = (sprints[lf3TodayKey] && sprints[lf3TodayKey].tasks) || {};
+  let points = 0;
+  block.tasks.forEach(t => {
+    const m = t.text.match(/^\[([\d.]+)\]/);
+    if (m && m[1] === fz && sprintTasks[t.id] && sprintTasks[t.id].status === "done") points += t.tier;
+  });
+  return points;
+}
+function lf3Ampel(points) { if (points >= 3) return "#2E7D5B"; if (points >= 1) return "#E8963C"; return "#B9B9B9"; }
+
+function renderLf3AufgabenBrowser() {
+  const container = document.getElementById('lf3AufgabenBrowser');
+  if (!container) return;
+  const openState = {};
+  container.querySelectorAll('.lf1-group').forEach(g => openState[g.dataset.blockId] = g.classList.contains('open'));
+  const expandedFz = {};
+  container.querySelectorAll('.lf1-fz-row.expanded').forEach(r => expandedFz[r.dataset.fzkey] = true);
+
+  const sprintTasks = (sprints[lf3TodayKey] && sprints[lf3TodayKey].tasks) || {};
+
+  container.innerHTML = LF3_BLOCKS.map(block => {
+    const feinzielSet = [...new Set(block.tasks.map(t => t.text.match(/^\[([\d.]+)\]/)[1]))];
+    const rows = feinzielSet.map(fz => {
+      const tasksForFz = block.tasks.filter(t => t.text.match(/^\[([\d.]+)\]/)[1] === fz);
+      const points = pointsForLf3Feinziel(block, fz);
+      const isExpanded = !!expandedFz[block.id + "|" + fz];
+      const taskRows = tasksForFz.map(t => {
+        const inSprint = sprintTasks[t.id];
+        const cleanText = t.text.replace(/^\[[\d.]+\]\s*/, "");
+        let statusHtml;
+        if (inSprint) {
+          const labelMap = { todo: "im Sprint: To Do", doing: "im Sprint: Doing", done: "✓ Erledigt" };
+          statusHtml = '<span class="lf1-status-label">' + labelMap[inSprint.status] + '</span>';
+        } else {
+          statusHtml = '<button onclick="event.stopPropagation();lf3AddTaskToSprint(\'' + t.id + '\')">+ In Sprint aufnehmen</button>';
+        }
+        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf3OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text">' + esc(cleanText) + '</span>' + statusHtml + '</div>';
+      }).join("");
+      return '<div class="lf1-fz-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + block.id + '|' + fz + '" onclick="this.classList.toggle(\'expanded\')">' +
+        '<span class="lf1-ampel" style="background:' + lf3Ampel(points) + '"></span>' +
+        '<span class="lf1-fz-text">[' + fz + '] ' + (LF3_FEINZIEL_TITLES[fz] || "") + '</span>' +
+        '<span class="lf1-fz-points">' + points + ' / 3 Pkt.</span>' +
+        '<span class="lf1-fz-chevron">▸</span></div>' +
+        '<div class="lf1-fz-tasks">' + taskRows + '</div>';
+    }).join("");
+    return '<div class="lf1-group' + (openState[block.id] ? ' open' : '') + '" data-block-id="' + block.id + '">' +
+      '<div class="lf1-group-header" onclick="this.parentElement.classList.toggle(\'open\')"><span>' + esc(block.title) + '</span><span class="lf1-chevron">▸</span></div>' +
+      '<div class="lf1-group-body">' + rows + '</div></div>';
+  }).join("");
+}
+
+let lf3InfoModalTaskId = null;
+function lf3IsWissensfrage(task) { return /^LF3_D1\./.test(task.id); }
+function lf3IsSchreibtischtest(task) { return /Schreibtischtest/i.test(task.text) || /Schreibtischtest/i.test(task.problem || ""); }
+function lf3CodeStrukHint(task) {
+  if (lf3IsWissensfrage(task) || lf3IsSchreibtischtest(task)) return null;
+  return "Zu dieser Aufgabe sind sowohl der Python-Code als auch ein passendes Struktogramm zu erstellen.";
+}
+function lf3OpenInfoModal(taskId) {
+  const task = lf3GetTaskById(taskId);
+  if (!task) return;
+  lf3InfoModalTaskId = taskId;
+  const m = task.text.match(/^\[([\d.]+)\]\s*(.*)$/);
+  const fz = m ? m[1] : "";
+  const auftragText = m ? m[2] : task.text;
+  document.getElementById("lf1InfoModalId").textContent = taskId + (fz ? " · Feinziel " + fz : "");
+  const problemEl = document.getElementById("lf1InfoModalProblem");
+  if (task.problem) { problemEl.innerHTML = "<strong>Problemstellung</strong>" + esc(task.problem); problemEl.style.display = "block"; }
+  else problemEl.style.display = "none";
+  document.getElementById("lf1InfoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + esc(auftragText);
+  const hintEl = document.getElementById("lf1InfoModalHint");
+  const hintText = lf3CodeStrukHint(task);
+  if (hintText) { hintEl.textContent = "ℹ️ " + hintText; hintEl.style.display = "block"; }
+  else hintEl.style.display = "none";
+  const ioEl = document.getElementById("lf1InfoModalIo");
+  ioEl.style.display = "none";
+  const darstEl = document.getElementById("lf1InfoModalDarstellung");
+  if (task.darstellung) { darstEl.innerHTML = "<strong>Darstellung (Beispiel)</strong>" + esc(task.darstellung); darstEl.style.display = "block"; }
+  else darstEl.style.display = "none";
+  document.getElementById("lf1InfoModalOverlay").classList.add("open");
+}
+function lf1CloseInfoModal() { document.getElementById("lf1InfoModalOverlay").classList.remove("open"); }
+document.getElementById("lf1InfoModalCloseBtn").addEventListener("click", lf1CloseInfoModal);
+document.getElementById("lf1InfoModalCloseX").addEventListener("click", lf1CloseInfoModal);
+document.getElementById("lf1InfoModalPdfBtn").addEventListener("click", () => {
+  if (!lf3InfoModalTaskId) return;
+  lf3ExportTaskAsPdf(lf3InfoModalTaskId);
+});
+
+// ---------- PDF-Export (Corporate Design, nativer Druckdialog) ----------
+function lf3PrintHeadHtml() {
+  const logoSrc = document.querySelector("header img") ? document.querySelector("header img").src : "";
+  return '<div class="lf1-print-head"><img src="' + logoSrc + '" alt="Logo Friedrich-List-Schule Mannheim">' +
+    '<div class="lf1-print-headtext"><strong>Friedrich-List-Schule Mannheim</strong>Jahrgangsstufe 2 · Informatik · LF3</div></div>';
+}
+function lf3BuildTaskPrintPageHtml(task) {
+  const m = task.text.match(/^\[([\d.]+)\]\s*(.*)$/);
+  const fz = m ? m[1] : "";
+  const auftragText = m ? m[2] : task.text;
+  let html = '<div class="lf1-print-page">' + lf3PrintHeadHtml();
+  html += '<div class="lf1-print-id">' + esc(task.id) + (fz ? " · Feinziel " + esc(fz) : "") + '</div>';
+  if (task.problem) html += '<div class="lf1-print-block"><strong>Problemstellung</strong>' + esc(task.problem) + '</div>';
+  html += '<div class="lf1-print-block"><strong>Arbeitsauftrag</strong>' + esc(auftragText) + '</div>';
+  const hintText = lf3CodeStrukHint(task);
+  if (hintText) html += '<div class="lf1-print-hint">ℹ️ ' + esc(hintText) + '</div>';
+  if (task.darstellung) html += '<div class="lf1-print-block lf1-print-io"><strong>Darstellung (Beispiel)</strong>' + esc(task.darstellung) + '</div>';
+  html += '<div class="lf1-print-solution"><h4>Struktogramm</h4><div class="lf1-print-lines"></div><h4>Code</h4><div class="lf1-print-lines"></div></div>';
+  html += '</div>';
+  return html;
+}
+function lf3ExportTaskAsPdf(taskId) {
+  const task = lf3GetTaskById(taskId);
+  if (!task) return;
+  document.getElementById("lf1PrintArea").innerHTML = lf3BuildTaskPrintPageHtml(task);
+  window.print();
+}
+function lf3ExportAllAsPdf() {
+  let cover = '<div class="lf1-print-page">' + lf3PrintHeadHtml() +
+    '<h1 style="color:#A2222E;font-size:1.4rem;margin-top:40px;">Arbeitsblätter – Lernfeld 3</h1>' +
+    '<p style="color:#67666E;">Alle Aufgaben der LF3-Werkstatt, zum Ausdrucken oder Bearbeiten am Bildschirm.</p></div>';
+  let pages = [];
+  LF3_BLOCKS.forEach(block => { block.tasks.forEach(t => pages.push(lf3BuildTaskPrintPageHtml(t))); });
+  document.getElementById("lf1PrintArea").innerHTML = cover + pages.join("");
+  window.print();
+}
+document.getElementById("lf1InfoModalOverlay").addEventListener("click", (e) => { if (e.target.id === "lf1InfoModalOverlay") lf1CloseInfoModal(); });
+
+// ---------------------------------------------------------------------------
+// Erklaerung-Modal je Tab
+// ---------------------------------------------------------------------------
+const HELP_TEXTS = {
+  liste: "Eine <strong>verkettete Liste</strong> besteht aus Knoten, die jeweils Daten und einen Zeiger auf den nächsten Knoten enthalten. Der <strong>Anker</strong> zeigt auf den ersten Knoten, der letzte zeigt auf <strong>NULL</strong>. Einfügen und Löschen erfordern nur das Umbiegen von Zeigern, kein Verschieben wie beim Array.",
+  stapel: "Ein <strong>Stapelspeicher</strong> arbeitet nach dem <strong>LIFO</strong>-Prinzip (Last In, First Out). Nur das oberste Element ist zugänglich: <span class='inline-code'>push</span> legt einen Wert oben auf, <span class='inline-code'>pop</span> entfernt den obersten Wert.",
+  warteschlange: "Eine <strong>Warteschlange</strong> arbeitet nach dem <strong>FIFO</strong>-Prinzip (First In, First Out). <span class='inline-code'>enqueue</span> reiht hinten ein, <span class='inline-code'>dequeue</span> entfernt vorne – wie an einer Kasse.",
+  baum: "Ein <strong>sortierter Binärbaum</strong> hat je Knoten höchstens zwei Kinder: kleinere Werte stehen links, größere rechts. Neue Werte werden von der Wurzel aus verglichen und an der passenden Stelle eingefügt.",
+  aufgaben: "Wählt Aufgaben aus und zieht sie in euren aktuellen Sprint. Die Aufgaben sind nicht nach Schwierigkeit beschriftet – schätzt selbst ein, ob ihr euch eine Aufgabe zutraut."
+};
+function openHelpModal(key) {
+  document.getElementById("helpModalText").innerHTML = HELP_TEXTS[key] || "";
+  document.getElementById("helpModalOverlay").classList.add("open");
+}
+function closeHelpModal() { document.getElementById("helpModalOverlay").classList.remove("open"); }
+document.getElementById("helpModalCloseBtn").addEventListener("click", closeHelpModal);
+document.getElementById("helpModalCloseX").addEventListener("click", closeHelpModal);
+document.getElementById("helpModalOverlay").addEventListener("click", (e) => { if (e.target.id === "helpModalOverlay") closeHelpModal(); });
+
+// ---------------------------------------------------------------------------
+// HANDBUCH
+// ---------------------------------------------------------------------------
+const HANDBUCH_ENTRIES = [
+  { cat: "Verkettete Liste", title: "Knoten", text: "Ein Element einer verketteten Liste, bestehend aus Daten und einem Zeiger auf den nächsten Knoten." },
+  { cat: "Verkettete Liste", title: "Anker", text: "Verweist auf den ersten Knoten der Liste. Ohne Anker wäre die Liste nicht mehr erreichbar." },
+  { cat: "Verkettete Liste", title: "Zeiger", text: "Verweis eines Knotens auf den nächsten Knoten (oder auf NULL, wenn kein weiterer folgt)." },
+  { cat: "Stapelspeicher", title: "LIFO", text: "Last In, First Out – das zuletzt hinzugefügte Element wird zuerst wieder entfernt." },
+  { cat: "Stapelspeicher", title: "push / pop", text: "push legt ein Element oben auf den Stapel, pop entfernt das oberste Element." },
+  { cat: "Warteschlange", title: "FIFO", text: "First In, First Out – das zuerst hinzugefügte Element wird zuerst wieder entfernt." },
+  { cat: "Warteschlange", title: "enqueue / dequeue", text: "enqueue reiht ein Element hinten ein, dequeue entfernt das vorderste Element." },
+  { cat: "Baum", title: "Wurzel", text: "Der oberste Knoten eines Baumes, der einzige Knoten ohne Eltern-Knoten." },
+  { cat: "Baum", title: "Blatt", text: "Ein Knoten ohne eigene Kind-Knoten." },
+  { cat: "Baum", title: "Binärbaum", text: "Ein Baum, bei dem jeder Knoten höchstens zwei Kind-Knoten hat (links/rechts)." },
+  { cat: "Baum", title: "Sortierter Binärbaum", text: "Ein Binärbaum, bei dem im linken Teilbaum nur kleinere und im rechten Teilbaum nur größere Werte stehen als der jeweilige Knoten." },
+  { cat: "Baum", title: "Voller Binärbaum", text: "Jeder Knoten hat entweder keine oder genau zwei Kind-Knoten." },
+  { cat: "Baum", title: "Vollständiger Binärbaum", text: "Alle Ebenen sind bis auf die letzte vollständig gefüllt, die letzte Ebene ist von links nach rechts aufgefüllt." }
+];
+function renderHandbuchChips() {
+  const cats = [...new Set(HANDBUCH_ENTRIES.map(e => e.cat))];
+  document.getElementById('handbuchChips').innerHTML = cats.map(c =>
+    '<span class="handbuch-chip" onclick="toggleHandbuchChip(this)">' + esc(c) + '</span>'
+  ).join('');
+}
+function toggleHandbuchChip(el) { el.classList.toggle('active'); renderHandbuch(); }
+function renderHandbuch() {
+  const q = (document.getElementById('handbuchSearch').value || '').toLowerCase();
+  const activeCats = [...document.querySelectorAll('.handbuch-chip.active')].map(e => e.textContent);
+  const filtered = HANDBUCH_ENTRIES.filter(e => {
+    const matchesQ = !q || e.title.toLowerCase().includes(q) || e.text.toLowerCase().includes(q);
+    const matchesCat = activeCats.length === 0 || activeCats.includes(e.cat);
+    return matchesQ && matchesCat;
+  });
+  document.getElementById('handbuchList').innerHTML = filtered.map(e =>
+    '<div class="handbuch-entry"><div class="cat">' + esc(e.cat) + '</div><h4>' + esc(e.title) + '</h4><p style="margin:0;font-size:0.9rem;">' + esc(e.text) + '</p></div>'
+  ).join('') || '<p class="desc">Keine Treffer.</p>';
+}
+
+// ---------------------------------------------------------------------------
+// TABS
+// ---------------------------------------------------------------------------
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+    if (tab.dataset.view === 'aufgaben') renderLf3AufgabenBrowser();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// INIT (Struktur-Demos sind unabhaengig vom Login, Aufgaben-Browser braucht Auth)
+// ---------------------------------------------------------------------------
+renderLl();
+renderStack();
+renderQueue();
+renderTree();
+renderHandbuchChips();
+renderHandbuch();
+
 function startHeartbeat() {
   const sessionId = sessionStorage.getItem("ll_sessionId");
-  if (!sessionId) return; // z.B. wenn die Seite direkt ohne Login-Weiterleitung geoeffnet wurde
+  if (!sessionId) return;
   const schreibeHeartbeat = () => {
-    setDoc(doc(db, "schueler", currentUid, "sessions", sessionId), {
-      lastSeen: new Date().toISOString()
-    }, { merge: true }).catch(err => console.warn("Heartbeat fehlgeschlagen:", err.code || err.message));
+    setDoc(doc(db, "schueler", currentUid, "sessions", sessionId), { lastSeen: new Date().toISOString() }, { merge: true })
+      .catch(err => console.warn("Heartbeat fehlgeschlagen:", err.code || err.message));
   };
   schreibeHeartbeat();
   setInterval(schreibeHeartbeat, 30000);
 }
 
-// ---------------------------------------------------------------------------
-// AUTH-GUARD: ohne Login geht es nicht weiter als die Anmeldeseite.
-// ---------------------------------------------------------------------------
 window.__logout = () => { signOut(auth).then(() => window.location.href = "anmeldung.html"); };
 
 onAuthStateChanged(auth, async (user) => {
@@ -1134,9 +917,8 @@ onAuthStateChanged(auth, async (user) => {
             ersterAufruf = false;
             resolve();
           } else {
-            // Freigabe hat sich waehrend der laufenden Sitzung geaendert - Ansicht sofort aktualisieren.
-            renderAll();
-            renderLfNav(null);
+            // Freigabe hat sich waehrend der laufenden Sitzung geaendert - Nav sofort aktualisieren.
+            renderLfNav("LF3");
           }
         }, (err) => {
           console.warn("Freigaben-Live-Update fehlgeschlagen: " + (err.code || err.message));
@@ -1145,24 +927,20 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
     await ladeAlleSprints();
-    await ensureCurrentSprint();
-    renderAll();
-    renderLfNav(null);
+    renderLf3AufgabenBrowser();
+    renderLfNav("LF3");
     startHeartbeat();
   } catch (err) {
     alert("Fehler beim Laden deiner Daten: " + (err.code || err.message) + " - bitte Seite neu laden.");
   }
 });
 
-// Funktionen, die per Inline-onclick aus dem HTML aufgerufen werden, muessen in
-// einem Modul-Script explizit auf window gelegt werden (anders als bei einem
-// klassischen <script>, wo Top-Level-Funktionen automatisch global sind).
-window.addTaskToSprint = addTaskToSprint;
-window.confirmRemoveTask = confirmRemoveTask;
-window.requestStatusChange = requestStatusChange;
-window.toggleFeinziel = toggleFeinziel;
-window.toggleLfGroup = toggleLfGroup;
-window.openTaskInfoModal = openTaskInfoModal;
+[
+  lf3OpenInfoModal, lf3AddTaskToSprint, lf3ExportTaskAsPdf, lf3ExportAllAsPdf,
+  llDelete, llInsert, llReset, openHelpModal, queueDequeue,
+  queueEnqueue, queueReset, stackPop, stackPush, stackReset, toggleHandbuchChip,
+  treeInsert, treeReset
+].forEach(fn => { window[fn.name] = fn; });
 </script>
 </body>
 </html>
