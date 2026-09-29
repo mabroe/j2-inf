@@ -896,20 +896,23 @@ function renderIchKannListe() {
     return;
   }
 
-  // Nur Feinziele anzeigen, fuer die die noetigen Punkte (3/3, gruene Ampel)
-  // bereits erreicht wurden - die Ich-Kann-Liste ist ein Nachweis des
-  // Erreichten, keine Liste aller moeglichen Ziele.
+  // Nur Feinziele anzeigen, fuer die bereits mindestens ein Punkt erreicht
+  // wurde (also mind. eine Aufgabe dazu abgeschlossen ist) - die Ich-Kann-
+  // Liste ist ein Nachweis des Fortschritts, keine Liste aller moeglichen
+  // Ziele. Die Ampel-Farbe (gelb/orange bei 1-2, gruen erst bei 3/3 Punkten)
+  // zeigt dabei weiterhin an, ob das Feinziel schon vollstaendig "erreicht"
+  // ist oder erst angearbeitet wurde.
   const blocksWithReached = visibleBlocks
     .map(block => {
       const feinzielKeys = Object.keys(FEINZIEL_INDEX)
         .filter(k => FEINZIEL_INDEX[k].blockId === block.id)
-        .filter(k => pointsForFeinziel(k) >= 3);
+        .filter(k => pointsForFeinziel(k) >= 1);
       return { block, feinzielKeys };
     })
     .filter(entry => entry.feinzielKeys.length > 0);
 
   if (blocksWithReached.length === 0) {
-    container.innerHTML = '<p style="padding:14px 20px;color:var(--muted);font-style:italic;">Noch keine Feinziele erreicht. Schließt Aufgaben im Sprint-Board ab, um sie hier zu sehen.</p>';
+    container.innerHTML = '<p style="padding:14px 20px;color:var(--muted);font-style:italic;">Noch keine Aufgabe abgeschlossen. Schließt Aufgaben im Sprint-Board ab, um hier euren Fortschritt zu sehen.</p>';
     return;
   }
 
