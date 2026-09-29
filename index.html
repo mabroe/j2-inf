@@ -262,18 +262,8 @@
   <div class="retro-box" id="retroBox"></div>
 
   <div class="ichkann-section">
-    <h2>Aufgaben nach Thema auswählen</h2>
-    <p style="font-size:0.85rem;color:var(--muted);margin:0 0 10px;">Wählt selbst aus, welche Aufgabe ihr als Nächstes bearbeiten wollt. Angezeigt wird nur das betroffene Feinziel – wie viele Punkte eine Aufgabe bringt, seht ihr erst in der Ich-Kann-Übersicht, nachdem ihr sie abgeschlossen habt.</p>
-    <div id="themaGroups"></div>
-  </div>
-
-  <div class="ichkann-section">
     <h2>Ich-Kann-Übersicht</h2>
     <div id="lfGroups"></div>
-  </div>
-
-  <div class="bottom-row">
-    <span style="font-size:0.8rem;color:var(--muted);">Diese Übersicht wird lokal in diesem Browser gespeichert. Ein Zurücksetzen des Fortschritts kann nur die Lehrkraft vornehmen.</span>
   </div>
 
   <footer>
@@ -284,7 +274,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -298,6 +288,10 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
+// Muss zur Persistenz in anmeldung.html passen (browserSessionPersistence),
+// sonst findet diese Seite die dort angelegte Sitzung nicht wieder und wirft
+// direkt nach dem Login zurueck zur Anmeldeseite. Siehe Kommentar dort.
+await setPersistence(auth, browserSessionPersistence);
 let currentUid = null;
 // ---------------------------------------------------------------------------
 // DATEN: Themen-Bloecke (LF/Grobziel) mit allen Aufgaben.
@@ -325,37 +319,37 @@ const BLOCKS = [
     title: "LF1 – Grobziel 2: Arrays anwenden",
     weeks: "ab Woche 1",
     tasks: [
-      { id: "LF1_A2.1a", tier: 1, thema: "T1", text: "[2.1] Erstellen Sie ein Array weltmeister mit den Werten 1954, 1974, 1990 und 2014.", problem: "Fussball-Weltmeisterschaften finden alle vier Jahre statt. Die Jahreszahlen vergangener deutscher Weltmeistertitel sollen in einem Array gespeichert werden." },
+      { id: "LF1_A2.1a", tier: 1, thema: "T1", text: "[2.1] Formulieren Sie den Code, der die folgenden Anweisungen ausfuehrt: (1) Erzeugen Sie ein Array weltmeister mit den Werten 1954, 1974, 1990 und 2014. (2) Erzeugen Sie ein Array wmtrainer mit den Werten \"Sepp Herberger\", \"Helmut Sch\u00f6n\" und \"Franz Beckenbauer\". (3) F\u00fcgen Sie in das Array wmtrainer den Namen \"Joachim L\u00f6w\" am Ende ein. (4) Geben Sie die Anzahl der im Array weltmeister gespeicherten Weltmeistertitel in der Konsole aus. (5) Geben Sie alle im Array wmtrainer gespeicherten Namen einzeln in der Konsole aus.", problem: "Fussball-Weltmeisterschaften finden alle vier Jahre statt. Die Jahreszahlen vergangener deutscher Weltmeistertitel sollen in einem Array gespeichert werden.", io: "Ausgabe: 4 | Ausgabe: Sepp Herberger, Helmut Sch\u00f6n, Franz Beckenbauer, Joachim L\u00f6w" },
       { id: "LF1_A2.1b", tier: 2, thema: "T1", text: "[2.1] Erstellen Sie ein leeres Array namens buchungen.", problem: "Ein Kino moechte fuer die naechste Woche noch keine Buchungen erfasst haben, aber bereits ein Array fuer spaetere Eintraege vorbereiten." },
-      { id: "LF1_A2.1c", tier: 3, thema: "T1", text: "[2.1] Entwerfen Sie zwei parallele Arrays zeitschriften und preise mit je vier zusammengehoerenden Werten und begruenden Sie in einem Satz, warum der gleiche Index in beiden Arrays zusammenpassen muss.", problem: "Ein Kiosk verkauft vier verschiedene Zeitschriften. Zu jeder Zeitschrift gehoert ein Verkaufspreis. Beide Angaben sollen so gespeichert werden, dass gleicher Index in beiden Arrays zusammengehoerende Daten liefert." },
+      { id: "LF1_A2.1c", tier: 3, thema: "T1", text: "[2.1] Entwerfen Sie zwei parallele Arrays zeitschriften und preise mit je vier zusammengehoerenden Werten und begruenden Sie in einem Satz, warum der gleiche Index in beiden Arrays zusammenpassen muss. Beispiel: zeitschriften = [\"Comic\", \"Sport\", \"Ratgeber\", \"Kino\"], preise = [3.50, 4.20, 5.00, 2.90]", problem: "Ein Kiosk verkauft vier verschiedene Zeitschriften. Zu jeder Zeitschrift gehoert ein Verkaufspreis. Beide Angaben sollen so gespeichert werden, dass gleicher Index in beiden Arrays zusammengehoerende Daten liefert." },
       { id: "LF1_A2.2a", tier: 1, thema: "T1", text: "[2.2] Gegeben ist platzierungen = [\"Anna\", \"Ben\", \"Clara\", \"David\"]. Ermitteln Sie den Namen, der auf Platzierung 3 steht (denken Sie an die Indexzaehlung ab 0).", problem: "Bei einem Vereinswettbewerb wurden die Platzierungen in der Reihenfolge ihres Erreichens in einem Array gespeichert.", io: "Ausgabe: Clara" },
-      { id: "LF1_A2.2b", tier: 2, thema: "T1", text: "[2.2] Berechnen Sie den Index des letzten Elements eines Arrays teilnehmer und geben Sie den zugehoerigen Wert aus.", problem: "In einem Array mit einer beliebigen Anzahl an Elementen soll unabhaengig von der genauen Laenge stets das letzte Element ausgegeben werden.", io: "Ausgabe: Ida" },
-      { id: "LF1_A2.2c", tier: 3, thema: "T1", text: "[2.2] Entwickeln Sie einen Algorithmus, der nach Einlesen eines Index prueft, ob dieser gueltig ist (zwischen 0 und der Anzahl der Elemente minus 1), und den Wert ausgibt bzw. sonst eine Fehlermeldung.", problem: "In einer Bibliotheks-Software soll ein Nutzer einen Index eingeben, um sich den Titel des zugehoerigen Buchs anzeigen zu lassen. Nicht jede Eingabe ist dabei ein gueltiger Index.", io: "Eingabe: 5 | Ausgabe: Ungueltiger Index" },
-      { id: "LF1_A2.9a", tier: 1, thema: "T1", text: "[2.9,2.2] Gegeben ist b = [10, 20, 30]. Fuehren Sie einen Schreibtischtest durch: Notieren Sie den Arrayinhalt nach der Zeile b[0] = b[1].", problem: "Ein Array wird durch eine einzelne Zuweisung an einer bestimmten Indexposition veraendert." },
-      { id: "LF1_A2.3a", tier: 1, thema: "T4", text: "[2.3] Erstellen Sie einen Algorithmus, der fuenfmal eine Losnummer einliest, jede an ein Array anhaengt und am Ende alle Losnummern ausgibt.", problem: "Bei einer Tombola sollen fuenf nacheinander gezogene Losnummern erfasst werden, bevor sie am Ende gemeinsam bekanntgegeben werden.", io: "Eingabe: 1254, 2365, 4587, 5698, 3146 | Ausgabe: " },
-      { id: "LF1_A2.3b", tier: 2, thema: "T4", text: "[2.3] Erstellen Sie einen Algorithmus, der dreimal einen Namen einliest, an ein Array anhaengt und danach jeweils die aktuelle Anzahl der Kontakte ausgibt.", problem: "Ein Adressbuch soll drei neue Kontakte nacheinander aufnehmen. Nach jedem Hinzufuegen soll die aktuelle Anzahl der gespeicherten Kontakte ausgegeben werden." },
-      { id: "LF1_A2.4a", tier: 1, thema: "T4", text: "[2.4] Gegeben ist bestand = [12, 20, 8, 0, 5]. Erstellen Sie eine Zuweisung, die den Wert an Index 2 um 15 erhoeht, und geben Sie das aktualisierte Array aus.", problem: "Ein Lager verwaltet den Bestand mehrerer Artikel in einem Array. Nach einer Lieferung erhoeht sich der Bestand eines bestimmten Artikels.", io: "Ausgabe: " },
-      { id: "LF1_A2.4b", tier: 2, thema: "T4", text: "[2.4] Erstellen Sie einen Algorithmus, der jeden Wert eines Arrays preise um 10 Prozent verringert und das Array anschliessend ausgibt.", problem: "In einem Onlineshop sollen an einem Rabatttag alle Preise eines Sortiments um 10 Prozent reduziert werden." },
+      { id: "LF1_A2.2b", tier: 2, thema: "T1", text: "[2.2] Berechnen Sie den Index des letzten Elements eines Arrays teilnehmer und geben Sie den zugehoerigen Wert aus. Beispiel: teilnehmer = [\"Lea\", \"Finn\", \"Mia\", \"Jonas\", \"Ida\"]", problem: "In einem Array mit einer beliebigen Anzahl an Elementen soll unabhaengig von der genauen Laenge stets das letzte Element ausgegeben werden.", io: "Ausgabe: Ida" },
+      { id: "LF1_A2.2c", tier: 3, thema: "T1", text: "[2.2] Entwickeln Sie einen Algorithmus, der nach Einlesen eines Index prueft, ob dieser gueltig ist (zwischen 0 und der Anzahl der Elemente minus 1), und den Wert ausgibt bzw. sonst eine Fehlermeldung. Beispiel: buecher = [\"Momo\", \"Der Prozess\", \"Faust\"]", problem: "In einer Bibliotheks-Software soll ein Nutzer einen Index eingeben, um sich den Titel des zugehoerigen Buchs anzeigen zu lassen. Nicht jede Eingabe ist dabei ein gueltiger Index.", io: "Eingabe: 5 | Ausgabe: Ungueltiger Index" },
+      { id: "LF1_A2.9a", tier: 1, thema: "T1", text: "[2.9,2.2] Gegeben ist b = [10, 20, 30]. Fuehren Sie einen Schreibtischtest durch: Notieren Sie den Arrayinhalt nach der Zeile b[0] = b[1].", problem: "Ein Array wird durch eine einzelne Zuweisung an einer bestimmten Indexposition veraendert.", darstellung: "b = [10, 20, 30]\nb[0] = b[1]\nAusgabe: b" },
+      { id: "LF1_A2.3a", tier: 1, thema: "T4", text: "[2.3] Erstellen Sie einen Algorithmus, der fuenfmal eine Losnummer einliest, jede an ein Array anhaengt und am Ende alle Losnummern ausgibt.", problem: "Bei einer Tombola sollen fuenf nacheinander gezogene Losnummern erfasst werden, bevor sie am Ende gemeinsam bekanntgegeben werden.", io: "Eingabe: 1254, 2365, 4587, 5698, 3146 | Ausgabe: ['1254', '2365', '4587', '5698', '3146']" },
+      { id: "LF1_A2.3b", tier: 2, thema: "T4", text: "[2.3] Erstellen Sie einen Algorithmus, der dreimal einen Namen einliest, an ein Array anhaengt und danach jeweils die aktuelle Anzahl der Kontakte ausgibt. Beispiel: eingelesene Namen Lea, Finn und Mia", problem: "Ein Adressbuch soll drei neue Kontakte nacheinander aufnehmen. Nach jedem Hinzufuegen soll die aktuelle Anzahl der gespeicherten Kontakte ausgegeben werden." },
+      { id: "LF1_A2.4a", tier: 1, thema: "T4", text: "[2.4] Gegeben ist bestand = [12, 20, 8, 0, 5]. Erstellen Sie eine Zuweisung, die den Wert an Index 2 um 15 erhoeht, und geben Sie das aktualisierte Array aus.", problem: "Ein Lager verwaltet den Bestand mehrerer Artikel in einem Array. Nach einer Lieferung erhoeht sich der Bestand eines bestimmten Artikels.", io: "Ausgabe: [12, 20, 23, 0, 5]" },
+      { id: "LF1_A2.4b", tier: 2, thema: "T4", text: "[2.4] Erstellen Sie einen Algorithmus, der jeden Wert eines Arrays preise um 10 Prozent verringert und das Array anschliessend ausgibt. Beispiel: preise = [19.99, 45.00, 8.50]", problem: "In einem Onlineshop sollen an einem Rabatttag alle Preise eines Sortiments um 10 Prozent reduziert werden." },
       { id: "LF1_M_T4", tier: 3, thema: "T4", text: "[2.3,2.4] Entwickeln Sie einen Algorithmus, der (a) ein Array mit der Rundenzahl der ersten 10 Trainingswochen nach der Formel 5 + i*2 befuellt und (b) anschliessend in einem zweiten Durchlauf alle negativen Werte im Array durch 0 ersetzt (falls bei der manuellen Nacherfassung versehentlich negative Werte eingetragen wurden).", problem: "Ein Fitnessstudio bietet einen Lauftreff an. In der ersten Trainingswoche werden 5 Runden gelaufen, in jeder weiteren Woche zwei Runden mehr als in der Vorwoche.", io: "Ausgabe (nach Korrektur): [5, 7, 9, 11, 13, 15, 17, 19, 21, 23]" },
-      { id: "LF1_A2.9b", tier: 2, thema: "T4", text: "[2.9,2.3,2.4] Gegeben ist a = [1, 5, 20, 9, 4, 3, 1]. Fuehren Sie einen Schreibtischtest durch und dokumentieren Sie den Arrayinhalt nach jeder der folgenden Zeilen: a[1]=a[2] / a[5]=a[5]+a[6] / a[6]=4 / a[7]=4 (Anhaengen).", problem: "Ein Array wird durch mehrere aufeinanderfolgende Zuweisungen sowie ein Anhaengen veraendert." },
-      { id: "LF1_A2.5a", tier: 1, thema: "T2", text: "[2.5] Ermitteln und geben Sie aus, wie viele Elemente das Array weltmeister enthaelt.", problem: "Von den deutschen Weltmeistertiteln aus Aufgabe 2.1-a soll die Gesamtanzahl ermittelt werden.", io: "Ausgabe: 4" },
-      { id: "LF1_A2.5b", tier: 2, thema: "T2", text: "[2.5] Erstellen Sie einen Algorithmus, der ermittelt, ob das Array tickets bereits 50 oder mehr Eintraege enthaelt, und eine entsprechende Meldung ausgibt.", problem: "In einem Wartebereich wird bei jedem Einlass ein Ticket in ein Array eingetragen. Es soll geprueft werden, ob die maximale Kapazitaet von 50 Personen erreicht ist." },
-      { id: "LF1_A2.5c", tier: 3, thema: "T2", text: "[2.5] Entwickeln Sie einen Algorithmus, der die Anzahl der Elemente zweier Arrays klasse_a und klasse_b vergleicht und den Namen der groesseren Klasse ausgibt (bei Gleichstand eine entsprechende Meldung).", problem: "Zwei Klassenlisten unterschiedlicher Laenge sollen verglichen werden, um herauszufinden, welche Klasse mehr Schuelerinnen und Schueler hat.", io: "Ausgabe: Klasse B ist groesser" },
-      { id: "LF1_A2.6a", tier: 1, thema: "T2", text: "[2.6] Erstellen Sie einen Algorithmus, der mit einer Schleife jeden Namen des Arrays spieler einzeln in der Konsole ausgibt.", problem: "Die Stammspieler einer Volleyballmannschaft stehen in einem Array. Vor dem Spiel sollen alle Namen einzeln bekanntgegeben werden." },
-      { id: "LF1_A2.6b", tier: 2, thema: "T2", text: "[2.6] Ermitteln Sie mithilfe einer Schleife, wie oft die Note 2 im Array noten vorkommt, und geben Sie die Anzahl aus.", problem: "In einer Klassenarbeit wird gezaehlt, wie viele Schuelerinnen und Schueler eine bestimmte Note erreicht haben.", io: "Ausgabe: 3" },
-      { id: "LF1_A2.6c", tier: 3, thema: "T2", text: "[2.6] Entwickeln Sie einen Algorithmus, der die Anzahl der Frostnaechte einer beliebigen Woche ermittelt und ausgibt.", problem: "Eine Wetterstation warnt vor Frost, wenn die gemessene Bodentemperatur einer Nacht nicht ueber 0 Grad Celsius steigt. Fuer eine Woche liegen die niedrigsten Nachttemperaturen in einem Array vor.", io: "Ausgabe: 3" },
-      { id: "LF1_A2.7a", tier: 1, thema: "T3", text: "[2.7] Ermitteln Sie ohne die Funktion max() den groessten Wert im Array weiten und geben Sie ihn aus.", problem: "Bei einem Sprungwettbewerb wurden vier Weiten gemessen. Es soll herausgefunden werden, wie weit der beste Sprung war.", io: "Ausgabe: 5.1" },
-      { id: "LF1_A2.7b", tier: 2, thema: "T3", text: "[2.7] Ermitteln Sie aus den 6 gespeicherten Wuerfen die hoechste und die niedrigste Punktzahl, ohne dabei die Funktionen max() oder min() zu verwenden.", problem: "Beim Dart-Training wirft jeder Spieler 6 Pfeile. Um die Leistung einzuschaetzen, sollen der beste und der schlechteste Wurf ermittelt werden.", io: "Ausgabe: 60, 3" },
-      { id: "LF1_A2.8a", tier: 1, thema: "T3", text: "[2.8] Berechnen Sie den Durchschnitt der drei Werte im Array punkte und geben Sie ihn aus.", problem: "In einer Bowlingbahn wurden drei Spiele gespielt. Der durchschnittliche Punktestand soll ermittelt werden.", io: "Ausgabe: 121.0" },
-      { id: "LF1_A2.8b", tier: 2, thema: "T3", text: "[2.8] Erstellen Sie einen Algorithmus, der 7 Temperaturen einliest, in einem Array speichert und anschliessend die Durchschnittstemperatur berechnet und ausgibt.", problem: "Eine Wetterstation zeichnet an 7 Tagen jeweils die Hoechsttemperatur auf. Am Ende der Woche soll die Durchschnittstemperatur berechnet werden." },
-      { id: "LF1_M_T3", tier: 3, thema: "T3", text: "[2.7,2.8] Ermitteln Sie ohne die Funktionen max() oder min() die weiteste und kuerzeste Sprungweite im Array weiten, und berechnen Sie zusaetzlich den Durchschnitt aller Sprungweiten ab 90 Metern.", problem: "Bei einem Skisprung-Weltcup wurden mehrere Sprungweiten eines Wettkampfs gemessen.", io: "Ausgabe: 96.0 (weiteste) / 78.0 (kuerzeste) / 93.0 (Durchschnitt ab 90 m)" },
-      { id: "LF1_A2.9c", tier: 3, thema: "T3", text: "[2.9,2.4] Nennen Sie die Ausgabe, die der folgende Algorithmus erzeugt.", problem: "Ein Struktogramm verarbeitet zwei vorgegebene Arrays elementweise und erzeugt daraus zwei neue Arrays sowie eine Summe.", darstellung: "p = [3, 6, 2]\nq = [1, 4, 5]\nr = [0, 0, 0]\ns = [ ]\nt = 0\nfuer i von 0 bis 2:\n  r[i] = 2 * p[i]\n  s[i] = p[i] - q[i]\n  t = t + (p[i] + q[i])\nAusgabe: r, s, t" },
-      { id: "LF1_A2.10a", tier: 1, thema: "T5", text: "[2.10] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays regal vertauscht.", problem: "In einem Regal stehen zwei Buecher an vertauschten Positionen. Sie sollen zurueckgetauscht werden.", io: "Ausgabe: " },
-      { id: "LF1_A2.10b", tier: 2, thema: "T5", text: "[2.10] Erstellen Sie einen Algorithmus, der im Array spieler die Positionen 2 (Batu) und 4 (Sven) vertauscht.", problem: "Ein Trainer moechte kurzfristig zwei Spielerpositionen tauschen, ohne die uebrige Aufstellung zu veraendern." },
-      { id: "LF1_A2.11a", tier: 1, thema: "T5", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Timo an Index 1 des Arrays warteliste einfuegt, wobei der bisherige Eintrag an Index 1 und alle folgenden eine Position nach hinten ruecken.", problem: "In eine kurze Warteliste soll ein Name in der Mitte eingefuegt werden, ohne bestehende Namen zu ueberschreiben.", io: "Ausgabe: " },
-      { id: "LF1_A2.11b", tier: 2, thema: "T5", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Tom an Index 6 in das Array spieler einfuegt. Alle Namen ab dieser Position ruecken eine Stelle nach hinten.", problem: "Ein neuer Spieler soll in die bestehende Aufstellung an einer bestimmten Position eingefuegt werden, ohne dass ein bereits vorhandener Name verloren geht." },
-      { id: "LF1_A2.12a", tier: 1, thema: "T5", text: "[2.12] Erstellen Sie einen Algorithmus, der den Artikel an Index 1 aus dem Array liste entfernt. Alle nachfolgenden Eintraege ruecken eine Position nach vorne.", problem: "Aus einer kurzen Einkaufsliste soll ein bereits gekaufter Artikel entfernt werden.", io: "Ausgabe: " },
-      { id: "LF1_A2.12b", tier: 2, thema: "T5", text: "[2.12] Erstellen Sie einen Algorithmus, der den Spieler an Index 4 (Paul) aus dem Array entfernt. Alle nachfolgenden Namen ruecken dabei eine Position nach vorne.", problem: "Ein Spieler verlaesst die Mannschaft. Sein Eintrag soll aus der Aufstellung entfernt werden, ohne eine Luecke zu hinterlassen." },
+      { id: "LF1_A2.9b", tier: 2, thema: "T4", text: "[2.9,2.3,2.4] Gegeben ist a = [1, 5, 20, 9, 4, 3, 1]. Fuehren Sie einen Schreibtischtest durch und dokumentieren Sie den Arrayinhalt nach jeder der folgenden Zeilen: a[1]=a[2] / a[5]=a[5]+a[6] / a[6]=4 / a.append(4) / i=3 / a[i]=i.", problem: "Ein Array wird durch mehrere aufeinanderfolgende Zuweisungen sowie ein Anhaengen veraendert.", darstellung: "a = [1, 5, 20, 9, 4, 3, 1]\na[1] = a[2]\na[5] = a[5] + a[6]\na[6] = 4\na.append(4)\ni = 3\na[i] = i\nAusgabe: a" },
+      { id: "LF1_A2.5a", tier: 1, thema: "T2", text: "[2.5] Ermitteln und geben Sie aus, wie viele Elemente das Array weltmeister enthaelt. Beispiel: weltmeister = [1954, 1974, 1990, 2014]", problem: "Von den deutschen Weltmeistertiteln aus Aufgabe 2.1-a soll die Gesamtanzahl ermittelt werden.", io: "Ausgabe: 4" },
+      { id: "LF1_A2.5b", tier: 2, thema: "T2", text: "[2.5] Erstellen Sie einen Algorithmus, der ermittelt, ob das Array tickets bereits 50 oder mehr Eintraege enthaelt, und eine entsprechende Meldung ausgibt. Beispiel: tickets enthaelt bereits 47 Eintraege.", problem: "In einem Wartebereich wird bei jedem Einlass ein Ticket in ein Array eingetragen. Es soll geprueft werden, ob die maximale Kapazitaet von 50 Personen erreicht ist." },
+      { id: "LF1_A2.5c", tier: 3, thema: "T2", text: "[2.5] Entwickeln Sie einen Algorithmus, der die Anzahl der Elemente zweier Arrays klasse_a und klasse_b vergleicht und den Namen der groesseren Klasse ausgibt (bei Gleichstand eine entsprechende Meldung). Beispiel: klasse_a = [\"Lea\", \"Finn\", \"Mia\"], klasse_b = [\"Jonas\", \"Ida\", \"Tom\", \"Ella\"]", problem: "Zwei Klassenlisten unterschiedlicher Laenge sollen verglichen werden, um herauszufinden, welche Klasse mehr Schuelerinnen und Schueler hat.", io: "Ausgabe: Klasse B ist groesser" },
+      { id: "LF1_A2.6a", tier: 1, thema: "T2", text: "[2.6] Erstellen Sie einen Algorithmus, der mit einer Schleife jeden Namen des Arrays spieler einzeln in der Konsole ausgibt. Beispiel: spieler = [\"Armin\", \"Batu\", \"Kai\", \"Sven\"]", problem: "Die Stammspieler einer Volleyballmannschaft stehen in einem Array. Vor dem Spiel sollen alle Namen einzeln bekanntgegeben werden." },
+      { id: "LF1_A2.6b", tier: 2, thema: "T2", text: "[2.6] Ermitteln Sie mithilfe einer Schleife, wie oft die Note 2 im Array noten vorkommt, und geben Sie die Anzahl aus. Beispiel: noten = [2, 3, 1, 2, 4, 2, 3]", problem: "In einer Klassenarbeit wird gezaehlt, wie viele Schuelerinnen und Schueler eine bestimmte Note erreicht haben.", io: "Ausgabe: 3" },
+      { id: "LF1_A2.6c", tier: 3, thema: "T2", text: "[2.6] Entwickeln Sie einen Algorithmus, der die Anzahl der Frostnaechte einer beliebigen Woche ermittelt und ausgibt. Beispiel: boden_temp = [-1.2, 0.5, 2.1, -0.3, 1.8, -2.0, 0.1]", problem: "Eine Wetterstation warnt vor Frost, wenn die gemessene Bodentemperatur einer Nacht nicht ueber 0 Grad Celsius steigt. Fuer eine Woche liegen die niedrigsten Nachttemperaturen in einem Array vor.", io: "Ausgabe: 3" },
+      { id: "LF1_A2.7a", tier: 1, thema: "T3", text: "[2.7] Ermitteln Sie ohne die Funktion max() den groessten Wert im Array weiten und geben Sie ihn aus. Beispiel: weiten = [4.2, 5.1, 3.9, 4.8]", problem: "Bei einem Sprungwettbewerb wurden vier Weiten gemessen. Es soll herausgefunden werden, wie weit der beste Sprung war.", io: "Ausgabe: 5.1" },
+      { id: "LF1_A2.7b", tier: 2, thema: "T3", text: "[2.7] Ermitteln Sie aus den 6 gespeicherten Wuerfen die hoechste und die niedrigste Punktzahl, ohne dabei die Funktionen max() oder min() zu verwenden. Beispiel: wuerfe = [5, 40, 3, 60, 20, 16]", problem: "Beim Dart-Training wirft jeder Spieler 6 Pfeile. Um die Leistung einzuschaetzen, sollen der beste und der schlechteste Wurf ermittelt werden.", io: "Ausgabe: 60, 3" },
+      { id: "LF1_A2.8a", tier: 1, thema: "T3", text: "[2.8] Berechnen Sie den Durchschnitt der drei Werte im Array punkte und geben Sie ihn aus. Beispiel: punkte = [120, 145, 98]", problem: "In einer Bowlingbahn wurden drei Spiele gespielt. Der durchschnittliche Punktestand soll ermittelt werden.", io: "Ausgabe: 121.0" },
+      { id: "LF1_A2.8b", tier: 2, thema: "T3", text: "[2.8] Erstellen Sie einen Algorithmus, der 7 Temperaturen einliest, in einem Array speichert und anschliessend die Durchschnittstemperatur berechnet und ausgibt. Beispiel: eingelesene Temperaturen 18, 21, 19, 23, 20, 17, 22", problem: "Eine Wetterstation zeichnet an 7 Tagen jeweils die Hoechsttemperatur auf. Am Ende der Woche soll die Durchschnittstemperatur berechnet werden." },
+      { id: "LF1_M_T3", tier: 3, thema: "T3", text: "[2.7,2.8] Ermitteln Sie ohne die Funktionen max() oder min() die weiteste und kuerzeste Sprungweite im Array weiten, und berechnen Sie zusaetzlich den Durchschnitt aller Sprungweiten ab 90 Metern. Beispiel: weiten = [85.0, 92.5, 78.0, 96.0, 90.5]", problem: "Bei einem Skisprung-Weltcup wurden mehrere Sprungweiten eines Wettkampfs gemessen.", io: "Ausgabe: 96.0 (weiteste) / 78.0 (kuerzeste) / 93.0 (Durchschnitt ab 90 m)" },
+      { id: "LF1_A2.9c", tier: 3, thema: "T3", text: "[2.9,2.4] Nennen Sie die Ausgabe, die der folgende Algorithmus erzeugt. Gegeben sind werte1 = [4, 7, 2, 9] und werte2 = [3, 5, 8, 1].", problem: "Ein Struktogramm verarbeitet zwei vorgegebene Arrays elementweise und erzeugt daraus zwei neue Arrays sowie eine Summe.", darstellung: "werte1 = [4, 7, 2, 9]\nwerte2 = [3, 5, 8, 1]\nsummen = [ ]\ndifferenzen = [ ]\nsumme = 0\nfuer i von 0 bis 3:\n  summen[i] = werte1[i] + werte2[i]\n  differenzen[i] = werte1[i] - werte2[i]\n  summe = summe + summen[i]\nAusgabe: summen\nAusgabe: differenzen\nAusgabe: summe" },
+      { id: "LF1_A2.10a", tier: 1, thema: "T5", text: "[2.10] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays regal vertauscht. Beispiel: regal = [\"Faust\", \"Momo\", \"Emil\"]", problem: "In einem Regal stehen zwei Buecher an vertauschten Positionen. Sie sollen zurueckgetauscht werden.", io: "Ausgabe: ['Momo', 'Faust', 'Emil']" },
+      { id: "LF1_A2.10b", tier: 2, thema: "T5", text: "[2.10] Erstellen Sie einen Algorithmus, der im Array spieler die Positionen 2 (Batu) und 4 (Sven) vertauscht. Beispiel: spieler = [\"Armin\",\"Batu\",\"Kai\",\"Sven\",\"Paul\",\"Milan\"]", problem: "Ein Trainer moechte kurzfristig zwei Spielerpositionen tauschen, ohne die uebrige Aufstellung zu veraendern." },
+      { id: "LF1_A2.11a", tier: 1, thema: "T5", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Timo an Index 1 des Arrays warteliste einfuegt, wobei der bisherige Eintrag an Index 1 und alle folgenden eine Position nach hinten ruecken. Beispiel: warteliste = [\"Nina\", \"Paul\", \"Elif\"]", problem: "In eine kurze Warteliste soll ein Name in der Mitte eingefuegt werden, ohne bestehende Namen zu ueberschreiben.", io: "Ausgabe: ['Nina', 'Timo', 'Paul', 'Elif']" },
+      { id: "LF1_A2.11b", tier: 2, thema: "T5", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Tom an Index 6 in das Array spieler einfuegt. Alle Namen ab dieser Position ruecken eine Stelle nach hinten. Beispiel: spieler = [\"Armin\",\"Batu\",\"Kai\",\"Sven\",\"Paul\",\"Milan\",\"Goran\",\"Chris\"]", problem: "Ein neuer Spieler soll in die bestehende Aufstellung an einer bestimmten Position eingefuegt werden, ohne dass ein bereits vorhandener Name verloren geht." },
+      { id: "LF1_A2.12a", tier: 1, thema: "T5", text: "[2.12] Erstellen Sie einen Algorithmus, der den Artikel an Index 1 aus dem Array liste entfernt. Alle nachfolgenden Eintraege ruecken eine Position nach vorne. Beispiel: liste = [\"Milch\", \"Brot\", \"Butter\"]", problem: "Aus einer kurzen Einkaufsliste soll ein bereits gekaufter Artikel entfernt werden.", io: "Ausgabe: ['Milch', 'Butter']" },
+      { id: "LF1_A2.12b", tier: 2, thema: "T5", text: "[2.12] Erstellen Sie einen Algorithmus, der den Spieler an Index 4 (Paul) aus dem Array entfernt. Alle nachfolgenden Namen ruecken dabei eine Position nach vorne. Beispiel: spieler = [\"Armin\",\"Batu\",\"Kai\",\"Sven\",\"Paul\",\"Milan\"]", problem: "Ein Spieler verlaesst die Mannschaft. Sein Eintrag soll aus der Aufstellung entfernt werden, ohne eine Luecke zu hinterlassen." },
       { id: "LF1_M_T5", tier: 3, thema: "T5", text: "[2.10,2.11,2.12] Gegeben ist die absteigend sortierte Rangliste punkte = [95, 88, 76, 60, 45]. Entwickeln Sie einen Algorithmus, der (a) den Wert 76 sucht und entfernt, (b) den neuen Wert 82 so einsortiert, dass die Liste weiterhin absteigend bleibt, und (c) abschliessend zwei benachbarte Eintraege nur bei Bedarf tauscht, falls die absteigende Reihenfolge verletzt ist.", problem: "Eine Rangliste von Punktzahlen soll gepflegt werden: ein bekannter Eintrag entfernt, ein neuer Wert einsortiert und bei Bedarf zwei benachbarte Eintraege getauscht werden.", io: "Ausgabe: [95, 88, 82, 60, 45]" },
     ]
   },
@@ -542,34 +536,6 @@ function buildFeinzielIndex() {
   return idx;
 }
 const FEINZIEL_INDEX = buildFeinzielIndex();
-
-// Themen-Gruppierung fuer die Aufgaben-Auswahl (nur Aufgaben mit "thema"-Feld).
-// Hier werden bewusst KEINE Niveaustufen (Basis/Normal/Schwer) und KEINE
-// Punktzahlen angezeigt - nur der Aufgabentext und die betroffenen Feinziele.
-// Die Zuordnung nach Niveau/Punkten bleibt der Ich-Kann-Liste vorbehalten.
-const THEMA_META = {
-  T1: "Arrays anlegen & ansprechen",
-  T2: "Arrays durchlaufen",
-  T3: "Werte auswerten",
-  T4: "Arrays veraendern & befuellen",
-  T5: "Reihenfolge gestalten"
-};
-function buildThemaIndex() {
-  const idx = {}; // "LF1G2|T1" -> { blockId, thema, tasks: [...] }
-  BLOCKS.forEach(block => {
-    block.tasks.forEach(task => {
-      if (!task.thema) return;
-      const m = task.text.match(/^\[([\d.,\s]+)\]\s*(.*)$/);
-      const fzList = m ? m[1].split(",").map(s => s.trim()) : [];
-      const text = m ? m[2] : task.text;
-      const key = block.id + "|" + task.thema;
-      if (!idx[key]) idx[key] = { blockId: block.id, thema: task.thema, tasks: [] };
-      idx[key].tasks.push({ id: task.id, fzList, text });
-    });
-  });
-  return idx;
-}
-const THEMA_INDEX = buildThemaIndex();
 
 // ---------------------------------------------------------------------------
 // SPRINT-LOGIK: eine Kalenderwoche (ISO), automatische Berechnung aus dem Datum.
@@ -930,8 +896,24 @@ function renderIchKannListe() {
     return;
   }
 
-  container.innerHTML = visibleBlocks.map(block => {
-    const feinzielKeys = Object.keys(FEINZIEL_INDEX).filter(k => FEINZIEL_INDEX[k].blockId === block.id);
+  // Nur Feinziele anzeigen, fuer die die noetigen Punkte (3/3, gruene Ampel)
+  // bereits erreicht wurden - die Ich-Kann-Liste ist ein Nachweis des
+  // Erreichten, keine Liste aller moeglichen Ziele.
+  const blocksWithReached = visibleBlocks
+    .map(block => {
+      const feinzielKeys = Object.keys(FEINZIEL_INDEX)
+        .filter(k => FEINZIEL_INDEX[k].blockId === block.id)
+        .filter(k => pointsForFeinziel(k) >= 3);
+      return { block, feinzielKeys };
+    })
+    .filter(entry => entry.feinzielKeys.length > 0);
+
+  if (blocksWithReached.length === 0) {
+    container.innerHTML = '<p style="padding:14px 20px;color:var(--muted);font-style:italic;">Noch keine Feinziele erreicht. Schließt Aufgaben im Sprint-Board ab, um sie hier zu sehen.</p>';
+    return;
+  }
+
+  container.innerHTML = blocksWithReached.map(({ block, feinzielKeys }) => {
     const rows = feinzielKeys.map(fzKey => {
       const fzData = FEINZIEL_INDEX[fzKey];
       const points = pointsForFeinziel(fzKey);
@@ -963,57 +945,6 @@ function renderIchKannListe() {
 
 function toggleLfGroup(headerEl) { headerEl.parentElement.classList.toggle("open"); }
 function toggleFeinziel(rowEl) { rowEl.classList.toggle("expanded"); }
-
-// ---------------------------------------------------------------------------
-// RENDER: Aufgaben-Auswahl nach Thema (bewusst OHNE Niveaustufe/Punkte -
-// die Schuelerinnen und Schueler waehlen frei; Punkte sehen sie erst in der
-// Ich-Kann-Uebersicht nach Abschluss einer Aufgabe).
-// ---------------------------------------------------------------------------
-function renderThemaAuswahl() {
-  const container = document.getElementById("themaGroups");
-  if (!container) return;
-  const openState = {};
-  container.querySelectorAll(".lf-group").forEach(g => openState[g.dataset.blockId] = g.classList.contains("open"));
-  const expandedThema = {};
-  container.querySelectorAll(".feinziel-row.expanded").forEach(r => expandedThema[r.dataset.themakey] = true);
-
-  const blockIdsWithThemen = [...new Set(Object.values(THEMA_INDEX).map(t => t.blockId))]
-    .filter(blockId => LF_FREIGABE[LF_META[blockId].lf]);
-
-  if (blockIdsWithThemen.length === 0) {
-    container.innerHTML = '<p style="padding:14px 20px;color:var(--muted);font-style:italic;">Eure Lehrkraft hat noch keinen Lernfortschritt freigegeben.</p>';
-    return;
-  }
-
-  container.innerHTML = blockIdsWithThemen.map(blockId => {
-    const block = BLOCKS.find(b => b.id === blockId);
-    const themaKeys = Object.keys(THEMA_INDEX).filter(k => THEMA_INDEX[k].blockId === blockId);
-    const rows = themaKeys.map(themaKey => {
-      const themaData = THEMA_INDEX[themaKey];
-      const isExpanded = !!expandedThema[themaKey];
-      const sprint = sprints[todayKey];
-      const taskRows = themaData.tasks.map(t => {
-        const inSprint = sprint.tasks[t.id];
-        let statusHtml;
-        if (inSprint) {
-          const labelMap = { todo: "im Sprint: To Do", doing: "im Sprint: Doing", done: "✓ Erledigt" };
-          statusHtml = '<span class="status-label">' + labelMap[inSprint.status] + '</span>';
-        } else {
-          statusHtml = '<button onclick="event.stopPropagation();addTaskToSprint(\'' + esc(t.id) + '\')">+ In Sprint</button>';
-        }
-        const badge = '<span class="fz-badge">' + esc(t.fzList.length > 1 ? "Feinziele " + t.fzList.join(", ") : "Feinziel " + t.fzList[0]) + '</span>';
-        return '<div class="fz-task-row" onclick="openTaskInfoModal(\'' + esc(t.id) + '\')"><span class="fz-task-text">' + esc(t.text) + '</span>' + badge + statusHtml + '</div>';
-      }).join("");
-      return '<div class="feinziel-row' + (isExpanded ? ' expanded' : '') + '" data-themakey="' + themaKey + '" onclick="toggleFeinziel(this)">' +
-        '<span class="feinziel-text">' + esc(THEMA_META[themaData.thema] || themaData.thema) + '</span>' +
-        '<span class="feinziel-chevron">▸</span></div>' +
-        '<div class="feinziel-tasks">' + taskRows + '</div>';
-    }).join("");
-    return '<div class="lf-group' + (openState[blockId] ? ' open' : '') + '" data-block-id="' + blockId + '">' +
-      '<div class="lf-group-header" onclick="toggleLfGroup(this)"><span>' + esc(block.title) + '</span><span class="chevron">▸</span></div>' +
-      '<div class="lf-group-body">' + rows + '</div></div>';
-  }).join("");
-}
 
 // Kurztitel je Feinziel (aus den Aufgabenpool-Dokumenten uebernommen)
 const FEINZIEL_TASK_TITLES = {
@@ -1057,7 +988,6 @@ document.getElementById("retroToggle").addEventListener("click", () => {
 
 function renderAll() {
   renderSprintBoard();
-  renderThemaAuswahl();
   renderIchKannListe();
   renderRetro();
 }

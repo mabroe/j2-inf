@@ -1315,7 +1315,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1329,6 +1329,10 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
+// Muss zur Persistenz in anmeldung.html passen (browserSessionPersistence),
+// sonst findet diese Seite die dort angelegte Sitzung nicht wieder und wirft
+// direkt nach dem Login zurueck zur Anmeldeseite. Siehe Kommentar dort.
+await setPersistence(auth, browserSessionPersistence);
 let currentUid = null;
 
 function esc(s) {

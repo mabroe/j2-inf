@@ -52,7 +52,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   // ---------------------------------------------------------------------------
@@ -71,6 +71,16 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+
+  // Sitzungsbasierte statt dauerhafte Persistenz: schreibt synchron in
+  // sessionStorage statt asynchron in IndexedDB. Das behebt einen Firebase-
+  // Bug, bei dem der direkte Redirect (window.location.href) nach dem Login
+  // schneller sein kann als der asynchrone IndexedDB-Schreibvorgang der
+  // Standard-Persistenz - die Folgeseite findet dann keine Sitzung vor und
+  // wirft die Person sofort wieder zur Anmeldung zurueck, obwohl der Login
+  // erfolgreich war. Nebenbei sinnvoll fuer gemeinsam genutzte Schulrechner:
+  // die Sitzung endet automatisch, sobald der Tab geschlossen wird.
+  await setPersistence(auth, browserSessionPersistence);
 
   function pseudonymToEmail(pseudonym) {
     const clean = pseudonym.trim().toLowerCase().replace(/\s+/g, "");
