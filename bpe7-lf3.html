@@ -111,6 +111,8 @@
   .lf1-task-row:last-child { border-bottom: none; }
   .lf1-task-row:hover { background: var(--empty); }
   .lf1-task-row .lf1-task-text { flex: 1; }
+  .lf1-beispiel { margin-top: 6px; }
+  .lf1-beispiel-k { font-weight: 700; color: #A2222E; }
   .lf1-task-num { font-weight: 700; color: var(--muted, #666); margin-right: 6px; font-variant-numeric: tabular-nums; }
   .lf1-task-row button { border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 6px; padding: 4px 10px; font-size: 0.76rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
   .lf1-task-row button:hover { background: var(--empty); color: var(--navy); }
@@ -188,7 +190,6 @@
     <div class="tab" data-view="warteschlange">Warteschlange</div>
     <div class="tab" data-view="baum">Baum</div>
     <div class="tab" data-view="aufgaben">Aufgaben</div>
-    <div class="tab" data-view="handbuch">Handbuch</div>
   </div>
 
   <!-- VERKETTETE LISTE VIEW -->
@@ -279,14 +280,7 @@
     <div id="lf3AufgabenBrowser"></div>
   </div>
 
-  <!-- HANDBUCH VIEW -->
-  <div class="view" id="view-handbuch">
-    <div class="view-head"><h2>Handbuch</h2></div>
-    <input type="text" id="handbuchSearch" placeholder="Begriff suchen…" style="width:100%;margin-bottom:10px;" oninput="renderHandbuch()">
-    <div id="handbuchChips" style="margin-bottom:14px;"></div>
-    <div id="handbuchList"></div>
-  </div>
-
+  
   <div class="lf1-modal-overlay" id="lf1InfoModalOverlay">
     <div class="lf1-info-box">
       <div class="lf1-info-header">
@@ -439,15 +433,16 @@ try {
 
 function renderLfNav(currentPage) {
   const items = [
-    { href: "index.html", label: "Sprint-Board", id: null },
+    { href: "index.html#board", label: "Sprint-Board", id: null },
     { href: "bpe7-lf1.html", label: "LF1 · Arrays", id: "LF1" },
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
-    { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" }
+    { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
+    { href: "index.html#handbuch", label: "Handbuch", id: "HB" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && !LF_FREIGABE[item.id];
+    const locked = item.id && item.id !== "HB" && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
@@ -721,7 +716,7 @@ function renderLf3AufgabenBrowser() {
         } else {
           statusHtml = '<button onclick="event.stopPropagation();lf3AddTaskToSprint(\'' + t.id + '\')">+ In Sprint aufnehmen</button>';
         }
-        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf3OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text"><span class="lf1-task-num">' + esc(t.id.replace(/^LF3_/, "")) + '</span> ' + esc(t.kurz || cleanText) + '</span>' + statusHtml + '</div>';
+        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf3OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text"><span class="lf1-task-num">' + esc(t.id) + '</span> ' + esc(t.kurz || cleanText) + '</span>' + statusHtml + '</div>';
       }).join("");
       return '<div class="lf1-fz-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + block.id + '|' + fz + '" onclick="this.classList.toggle(\'expanded\')">' +
         '<span class="lf1-ampel" style="background:' + lf3Ampel(points) + '"></span>' +
@@ -743,6 +738,12 @@ function lf3CodeStrukHint(task) {
   if (lf3IsWissensfrage(task) || lf3IsSchreibtischtest(task)) return null;
   return "Zu dieser Aufgabe sind sowohl der Python-Code als auch ein passendes Struktogramm zu erstellen.";
 }
+// Arbeitsauftrag mit "Beispiel:" in eigener Zeile (Schlagwort hervorgehoben).
+function lfAuftragHtml(text, escFn) {
+  const m = text.match(/^([\s\S]*?)\s*Beispiel:\s*([\s\S]*)$/);
+  if (!m) return escFn(text);
+  return escFn(m[1]) + '<div class="lf1-beispiel"><span class="lf1-beispiel-k">Beispiel:</span> ' + escFn(m[2]) + '</div>';
+}
 function lf3OpenInfoModal(taskId) {
   const task = lf3GetTaskById(taskId);
   if (!task) return;
@@ -754,7 +755,7 @@ function lf3OpenInfoModal(taskId) {
   const problemEl = document.getElementById("lf1InfoModalProblem");
   if (task.problem) { problemEl.innerHTML = "<strong>Problemstellung</strong>" + esc(task.problem); problemEl.style.display = "block"; }
   else problemEl.style.display = "none";
-  document.getElementById("lf1InfoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + esc(auftragText);
+  document.getElementById("lf1InfoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + lfAuftragHtml(auftragText, esc);
   const hintEl = document.getElementById("lf1InfoModalHint");
   const hintText = lf3CodeStrukHint(task);
   if (hintText) { hintEl.textContent = "ℹ️ " + hintText; hintEl.style.display = "block"; }
@@ -787,7 +788,7 @@ function lf3BuildTaskPrintPageHtml(task) {
   let html = '<div class="lf1-print-page">' + lf3PrintHeadHtml();
   html += '<div class="lf1-print-id">' + esc(task.id) + (fz ? " · Feinziel " + esc(fz) : "") + '</div>';
   if (task.problem) html += '<div class="lf1-print-block"><strong>Problemstellung</strong>' + esc(task.problem) + '</div>';
-  html += '<div class="lf1-print-block"><strong>Arbeitsauftrag</strong>' + esc(auftragText) + '</div>';
+  html += '<div class="lf1-print-block"><strong>Arbeitsauftrag</strong>' + lfAuftragHtml(auftragText, esc) + '</div>';
   const hintText = lf3CodeStrukHint(task);
   if (hintText) html += '<div class="lf1-print-hint">ℹ️ ' + esc(hintText) + '</div>';
   if (task.darstellung) html += '<div class="lf1-print-block lf1-print-io"><strong>Darstellung (Beispiel)</strong>' + esc(task.darstellung) + '</div>';
@@ -832,44 +833,6 @@ document.getElementById("helpModalCloseX").addEventListener("click", closeHelpMo
 document.getElementById("helpModalOverlay").addEventListener("click", (e) => { if (e.target.id === "helpModalOverlay") closeHelpModal(); });
 
 // ---------------------------------------------------------------------------
-// HANDBUCH
-// ---------------------------------------------------------------------------
-const HANDBUCH_ENTRIES = [
-  { cat: "Verkettete Liste", title: "Knoten", text: "Ein Element einer verketteten Liste, bestehend aus Daten und einem Zeiger auf den nächsten Knoten." },
-  { cat: "Verkettete Liste", title: "Anker", text: "Verweist auf den ersten Knoten der Liste. Ohne Anker wäre die Liste nicht mehr erreichbar." },
-  { cat: "Verkettete Liste", title: "Zeiger", text: "Verweis eines Knotens auf den nächsten Knoten (oder auf NULL, wenn kein weiterer folgt)." },
-  { cat: "Stapelspeicher", title: "LIFO", text: "Last In, First Out – das zuletzt hinzugefügte Element wird zuerst wieder entfernt." },
-  { cat: "Stapelspeicher", title: "push / pop", text: "push legt ein Element oben auf den Stapel, pop entfernt das oberste Element." },
-  { cat: "Warteschlange", title: "FIFO", text: "First In, First Out – das zuerst hinzugefügte Element wird zuerst wieder entfernt." },
-  { cat: "Warteschlange", title: "enqueue / dequeue", text: "enqueue reiht ein Element hinten ein, dequeue entfernt das vorderste Element." },
-  { cat: "Baum", title: "Wurzel", text: "Der oberste Knoten eines Baumes, der einzige Knoten ohne Eltern-Knoten." },
-  { cat: "Baum", title: "Blatt", text: "Ein Knoten ohne eigene Kind-Knoten." },
-  { cat: "Baum", title: "Binärbaum", text: "Ein Baum, bei dem jeder Knoten höchstens zwei Kind-Knoten hat (links/rechts)." },
-  { cat: "Baum", title: "Sortierter Binärbaum", text: "Ein Binärbaum, bei dem im linken Teilbaum nur kleinere und im rechten Teilbaum nur größere Werte stehen als der jeweilige Knoten." },
-  { cat: "Baum", title: "Voller Binärbaum", text: "Jeder Knoten hat entweder keine oder genau zwei Kind-Knoten." },
-  { cat: "Baum", title: "Vollständiger Binärbaum", text: "Alle Ebenen sind bis auf die letzte vollständig gefüllt, die letzte Ebene ist von links nach rechts aufgefüllt." }
-];
-function renderHandbuchChips() {
-  const cats = [...new Set(HANDBUCH_ENTRIES.map(e => e.cat))];
-  document.getElementById('handbuchChips').innerHTML = cats.map(c =>
-    '<span class="handbuch-chip" onclick="toggleHandbuchChip(this)">' + esc(c) + '</span>'
-  ).join('');
-}
-function toggleHandbuchChip(el) { el.classList.toggle('active'); renderHandbuch(); }
-function renderHandbuch() {
-  const q = (document.getElementById('handbuchSearch').value || '').toLowerCase();
-  const activeCats = [...document.querySelectorAll('.handbuch-chip.active')].map(e => e.textContent);
-  const filtered = HANDBUCH_ENTRIES.filter(e => {
-    const matchesQ = !q || e.title.toLowerCase().includes(q) || e.text.toLowerCase().includes(q);
-    const matchesCat = activeCats.length === 0 || activeCats.includes(e.cat);
-    return matchesQ && matchesCat;
-  });
-  document.getElementById('handbuchList').innerHTML = filtered.map(e =>
-    '<div class="handbuch-entry"><div class="cat">' + esc(e.cat) + '</div><h4>' + esc(e.title) + '</h4><p style="margin:0;font-size:0.9rem;">' + esc(e.text) + '</p></div>'
-  ).join('') || '<p class="desc">Keine Treffer.</p>';
-}
-
-// ---------------------------------------------------------------------------
 // TABS
 // ---------------------------------------------------------------------------
 document.querySelectorAll('.tab').forEach(tab => {
@@ -889,8 +852,6 @@ renderLl();
 renderStack();
 renderQueue();
 renderTree();
-renderHandbuchChips();
-renderHandbuch();
 
 function startHeartbeat() {
   const sessionId = sessionStorage.getItem("ll_sessionId");
@@ -949,7 +910,7 @@ onAuthStateChanged(auth, async (user) => {
 [
   lf3OpenInfoModal, lf3AddTaskToSprint, lf3ExportTaskAsPdf, lf3ExportAllAsPdf,
   llDelete, llInsert, llReset, openHelpModal, queueDequeue,
-  queueEnqueue, queueReset, stackPop, stackPush, stackReset, toggleHandbuchChip,
+  queueEnqueue, queueReset, stackPop, stackPush, stackReset,
   treeInsert, treeReset
 ].forEach(fn => { window[fn.name] = fn; });
 </script>

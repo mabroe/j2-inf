@@ -100,6 +100,24 @@
   .info-id { font-weight: 700; color: var(--navy); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
   .info-close { border: none; background: none; color: var(--muted); font-size: 1rem; cursor: pointer; line-height: 1; padding: 2px 4px; }
   .info-close:hover { color: var(--navy); }
+  .lf1-beispiel { margin-top: 6px; }
+  .lf1-beispiel-k { font-weight: 700; color: #A2222E; }
+  .info-box.wide { max-width: 780px; }
+  .hb-intro { font-size: 0.88rem; color: var(--muted); margin: 0 0 12px; }
+  .hb-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .hb-controls input { flex: 1; min-width: 220px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+  .hb-controls select { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; max-width: 100%; }
+  .hb-section { border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; background: var(--paper); }
+  .hb-section h3 { font-size: 1rem; color: var(--navy); margin: 0 0 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .hb-tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; background: var(--empty); color: var(--muted); padding: 2px 8px; border-radius: 10px; }
+  .hb-tag.lf { background: var(--navy); color: white; }
+  .hb-section .content { font-size: 0.92rem; line-height: 1.6; }
+  .hb-section .content code { font-family: "SF Mono", Menlo, monospace; background: var(--empty); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  .hb-fz { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+  .hb-empty { color: var(--muted); font-style: italic; padding: 20px 0; text-align: center; }
+  .teile { margin-top: 6px; }
+  .teil { display: flex; gap: 8px; margin: 3px 0; }
+  .teil-k { font-weight: 700; min-width: 1.6em; }
   .info-block { font-size: 0.9rem; margin-bottom: 12px; }
   .info-block strong { color: var(--navy); display: block; margin-bottom: 3px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; }
   .info-console { white-space: pre-wrap !important; }
@@ -200,6 +218,7 @@
   <div class="lf-nav" id="lfNav"></div>
 
 
+  <div id="viewBoard">
   <div class="instructions">
     Aufgaben wählt ihr in den jeweiligen Lernfortschritts-Werkstätten aus der dortigen Aufgabenliste aus und zieht sie
     von dort in euren Sprint. Hier auf dieser Seite seht ihr nur euer <strong>aktuelles Sprint-Board</strong> und eure
@@ -252,8 +271,10 @@
       <div id="infoModalProblem" class="info-block"></div>
       <div id="infoModalAuftrag" class="info-block info-auftrag"></div>
       <div id="infoModalHint" class="info-hint" style="display:none;"></div>
+      <div id="infoModalDaten" class="info-block info-io info-console"></div>
       <div id="infoModalEingabe" class="info-block info-io info-console"></div>
       <div id="infoModalIo" class="info-block info-io info-console"></div>
+      <div id="infoModalTeileIo"></div>
       <div id="infoModalDarstellung" class="info-block info-io"></div>
       <div class="modal-buttons">
         <span id="infoModalStatusLabel" class="status-label" style="display:none;margin-right:auto;align-self:center;"></span>
@@ -263,12 +284,26 @@
     </div>
   </div>
 
-  <span class="retro-toggle" id="retroToggle">▸ Ergebnisübersicht des letzten aktiven Sprints anzeigen</span>
+  <span class="retro-toggle" id="retroToggle">▸ Ergebnisübersicht aller vergangenen Sprints anzeigen</span>
   <div class="retro-box" id="retroBox"></div>
 
   <div class="ichkann-section">
     <h2>Ich-Kann-Übersicht</h2>
     <div id="lfGroups"></div>
+  </div>
+
+  </div><!-- /viewBoard -->
+
+  <div id="viewHandbuch" style="display:none;">
+    <div class="ichkann-section">
+      <h2>Handbuch</h2>
+      <p class="hb-intro">Nachschlagewerk zu allem, was ihr bisher behandelt habt – über alle freigeschalteten Lernfelder hinweg. Es wächst mit jedem Lernfeld, das eure Lehrkraft freischaltet.</p>
+      <div class="hb-controls">
+        <input type="search" id="hbSearch" placeholder="Begriff oder Thema suchen (z. B. „Index“, „push“, „Bubble“)…">
+        <select id="hbFz"></select>
+      </div>
+      <div id="hbList"></div>
+    </div>
   </div>
 
   <footer>
@@ -315,7 +350,7 @@ const BLOCKS = [
       { id: "LF1_A1.2b", tier: 2,  kurz: "Array-Merkmale erklären",text: "[1.2] Erklären Sie die Datenstruktur Array anhand ihrer charakteristischen Merkmale." },
       { id: "LF1_A1.2c", tier: 3,  kurz: "Array vs. Warteschlange",text: "[1.2] Erläutern Sie den Unterschied zwischen den Datenstrukturen Array und Warteschlange hinsichtlich des Zugriffs auf ihre Elemente." },
       { id: "LF1_A1.3a", tier: 1,  kurz: "Datenstruktur für Sitzplatzliste",text: "[1.3] Nennen Sie die Datenstruktur, die sich am besten für eine Sitzplatzliste mit 30 fest nummerierten, unveränderlichen Plätzen eignet." },
-      { id: "LF1_A1.3b", tier: 2,  kurz: "Alltagssituationen zuordnen",text: "[1.3] Ordnen Sie den folgenden Alltagssituationen jeweils die passende Datenstruktur ein und begründen Sie kurz: (a) Warteschlange an der Fahrkartenausgabe, (b) ein Stapel frisch gewaschener Handtücher." },
+      { id: "LF1_A1.3b", tier: 2,  kurz: "Alltagssituationen zuordnen",text: "[1.3] Ordnen Sie den folgenden Alltagssituationen jeweils die passende Datenstruktur zu und begründen Sie kurz:", teile: [{"k": "a)", "text": "Warteschlange an der Fahrkartenausgabe"}, {"k": "b)", "text": "Ein Stapel frisch gewaschener Handtücher"}] },
       { id: "LF1_A1.3c", tier: 3,  kurz: "Array vs. verkettete Liste",text: "[1.3] Beurteilen Sie, ob sich ein Array oder eine verkettete Liste besser eignet, um die Teilnehmerliste eines Wettbewerbs zu verwalten, bei dem sich laufend neue Personen anmelden und wieder abmelden. Begründen Sie." },
     ]
   },
@@ -324,38 +359,38 @@ const BLOCKS = [
     title: "LF1 – Grobziel 2: Arrays anwenden",
     weeks: "ab Woche 1",
     tasks: [
-      { id: "LF1_A2.1a", tier: 1, thema: "T1", kurz: "Arrays anlegen und befüllen", text: "[2.1] Formulieren Sie den Code, der die folgenden Anweisungen ausführt: (1) Erzeugen Sie ein Array weltmeister mit den Werten 1954, 1974, 1990 und 2014. (2) Erzeugen Sie ein Array bundestrainer mit den Werten \"Sepp Herberger\", \"Helmut Schön\" und \"Franz Beckenbauer\". (3) Fügen Sie in das Array bundestrainer nacheinander die Namen \"Joachim Löw\", \"Hansi Flick\", \"Julian Nagelsmann\" und \"Jürgen Klopp\" am Ende ein. (4) Geben Sie die Anzahl der im Array weltmeister gespeicherten Weltmeistertitel in der Konsole aus. (5) Geben Sie alle im Array bundestrainer gespeicherten Namen einzeln in der Konsole aus.", problem: "Der DFB führt eine Übersicht über die deutschen Weltmeistertitel der Männer und über die Bundestrainer. Beide Listen sollen in Arrays gespeichert und fortgeschrieben werden – zuletzt hat Jürgen Klopp im Juli 2026 das Amt übernommen.", ausgabe: "Anzahl Weltmeistertitel: 4\nBundestrainer:\n------------------\nSepp Herberger\nHelmut Schön\nFranz Beckenbauer\nJoachim Löw\nHansi Flick\nJulian Nagelsmann\nJürgen Klopp" },
+      { id: "LF1_A2.1a", tier: 1, thema: "T1", kurz: "Arrays anlegen und befüllen", text: "[2.1] Formulieren Sie den Code, der die folgenden Anweisungen ausführt:", problem: "Der DFB führt eine Übersicht über die deutschen Weltmeistertitel der Männer und über die Bundestrainer. Beide Listen sollen in Arrays gespeichert und fortgeschrieben werden – zuletzt hat Jürgen Klopp im Juli 2026 das Amt übernommen.", teile: [{"k": "1)", "text": "Erzeugen Sie ein Array weltmeister mit den Werten 1954, 1974, 1990 und 2014."}, {"k": "2)", "text": "Erzeugen Sie ein Array bundestrainer mit den Werten \"Sepp Herberger\", \"Helmut Schön\" und \"Franz Beckenbauer\"."}, {"k": "3)", "text": "Fügen Sie in das Array bundestrainer nacheinander die Namen \"Joachim Löw\", \"Hansi Flick\", \"Julian Nagelsmann\" und \"Jürgen Klopp\" am Ende ein."}, {"k": "4)", "text": "Geben Sie die Anzahl der im Array weltmeister gespeicherten Weltmeistertitel in der Konsole aus.", "ausgabe": "Anzahl Weltmeistertitel: 4"}, {"k": "5)", "text": "Geben Sie alle im Array bundestrainer gespeicherten Namen einzeln in der Konsole aus.", "ausgabe": "Bundestrainer:\n------------------\nSepp Herberger\nHelmut Schön\nFranz Beckenbauer\nJoachim Löw\nHansi Flick\nJulian Nagelsmann\nJürgen Klopp"}] },
       { id: "LF1_A2.1b", tier: 2, thema: "T1", kurz: "Leeres Array erstellen", text: "[2.1] Erstellen Sie ein leeres Array namens buchungen.", problem: "Ein Kino möchte für die nächste Woche noch keine Buchungen erfasst haben, aber bereits ein Array für spätere Einträge vorbereiten." },
-      { id: "LF1_A2.1c", tier: 3, thema: "T1", kurz: "Parallele Arrays entwerfen", text: "[2.1] Entwerfen Sie zwei parallele Arrays zeitschriften und preise mit je vier zusammengehörenden Werten und begründen Sie in einem Satz, warum der gleiche Index in beiden Arrays zusammenpassen muss. Beispiel: zeitschriften = [\"Comic\", \"Sport\", \"Ratgeber\", \"Kino\"], preise = [3.50, 4.20, 5.00, 2.90]", problem: "Ein Kiosk verkauft vier verschiedene Zeitschriften. Zu jeder Zeitschrift gehört ein Verkaufspreis. Beide Angaben sollen so gespeichert werden, dass gleicher Index in beiden Arrays zusammengehörende Daten liefert." },
-      { id: "LF1_A2.2a", tier: 1, thema: "T1", kurz: "Zugriff per Index", text: "[2.2] Gegeben ist platzierungen = [\"Anna\", \"Ben\", \"Clara\", \"David\"]. Ermitteln Sie den Namen, der auf Platzierung 3 steht (denken Sie an die Indexzählung ab 0).", problem: "Bei einem Vereinswettbewerb wurden die Platzierungen in der Reihenfolge ihres Erreichens in einem Array gespeichert.", ausgabe: "Platzierung 3: Clara" },
+      { id: "LF1_A2.1c", tier: 3, thema: "T1", kurz: "Parallele Arrays entwerfen", text: "[2.1] Entwerfen Sie zwei parallele Arrays zeitschriften und preise mit je vier zusammengehörenden Werten. Beispiel: zeitschriften = [\"Comic\", \"Sport\", \"Ratgeber\", \"Kino\"], preise = [3.50, 4.20, 5.00, 2.90]", problem: "Ein Kiosk verkauft vier verschiedene Zeitschriften. Zu jeder Zeitschrift gehört ein Verkaufspreis. Beide Angaben sollen so gespeichert werden, dass gleicher Index in beiden Arrays zusammengehörende Daten liefert.", teile: [{"k": "a)", "text": "Legen Sie beide Arrays mit je vier zusammengehörenden Werten an."}, {"k": "b)", "text": "Geben Sie beide Arrays aus.", "ausgabe": "Zeitschriften: ['Comic', 'Sport', 'Ratgeber', 'Kino']\nPreise: [3.5, 4.2, 5.0, 2.9]"}, {"k": "c)", "text": "Begründen Sie in einem Satz, warum der gleiche Index in beiden Arrays zusammenpassen muss."}] },
+      { id: "LF1_A2.2a", tier: 1, thema: "T1", kurz: "Zugriff per Index", text: "[2.2] Gegeben ist platzierungen = [\"Anna\", \"Ben\", \"Clara\", \"David\"]. Lesen Sie eine Platzierung ein und ermitteln Sie den Namen, der auf dieser Platzierung steht (denken Sie an die Indexzählung ab 0).", problem: "Bei einem Vereinswettbewerb wurden die Platzierungen in der Reihenfolge ihres Erreichens in einem Array gespeichert.", eingabe: "Bitte geben Sie die Platzierung ein: 3", ausgabe: "Platzierung 3: Clara" },
       { id: "LF1_A2.2b", tier: 2, thema: "T1", kurz: "Letztes Element ermitteln", text: "[2.2] Berechnen Sie den Index des letzten Elements eines Arrays teilnehmer und geben Sie den zugehörigen Wert aus. Beispiel: teilnehmer = [\"Lea\", \"Finn\", \"Mia\", \"Jonas\", \"Ida\"]", problem: "In einem Array mit einer beliebigen Anzahl an Elementen soll unabhängig von der genauen Länge stets das letzte Element ausgegeben werden.", ausgabe: "Letzter Teilnehmer: Ida" },
       { id: "LF1_A2.2c", tier: 3, thema: "T1", kurz: "Gültigen Index prüfen", text: "[2.2] Entwickeln Sie einen Algorithmus, der nach Einlesen eines Index prüft, ob dieser gültig ist (zwischen 0 und der Anzahl der Elemente minus 1), und den Wert ausgibt bzw. sonst eine Fehlermeldung. Beispiel: buecher = [\"Momo\", \"Der Prozess\", \"Faust\"]", problem: "In einer Bibliotheks-Software soll ein Nutzer einen Index eingeben, um sich den Titel des zugehörigen Buchs anzeigen zu lassen. Nicht jede Eingabe ist dabei ein gültiger Index.", eingabe: "Bitte geben Sie einen Index ein: 5", ausgabe: "Ungültiger Index" },
       { id: "LF1_A2.9a", tier: 1, thema: "T1", kurz: "Schreibtischtest: Zuweisung", text: "[2.9,2.2] Gegeben ist b = [10, 20, 30]. Führen Sie einen Schreibtischtest durch und dokumentieren Sie den Arrayinhalt nach jeder Zeile.", problem: "Ein Array wird durch eine einzelne Zuweisung an einer bestimmten Indexposition verändert.", darstellung: "Deklaration und Initialisierung: b = [10, 20, 30]\nZuweisung: b[0] = b[1]\nAusgabe: b" },
       { id: "LF1_A2.3a", tier: 1, thema: "T4", kurz: "Werte einlesen und anhängen", text: "[2.3] Erstellen Sie einen Algorithmus, der fünfmal eine Losnummer einliest, jede Losnummer an ein Array anhängt und am Ende alle Losnummern ausgibt.", problem: "Bei einer Tombola werden fünf Losnummern nacheinander gezogen. Die Nummern sollen erfasst und am Ende gemeinsam als Gewinnerlose bekanntgegeben werden.", eingabe: "Bitte geben Sie die Losnummer ein: 1254\nBitte geben Sie die Losnummer ein: 2365\nBitte geben Sie die Losnummer ein: 4587\nBitte geben Sie die Losnummer ein: 5698\nBitte geben Sie die Losnummer ein: 3146", ausgabe: "Gewinnerlose:\n------------------\nLos: 1254\nLos: 2365\nLos: 4587\nLos: 5698\nLos: 3146" },
       { id: "LF1_A2.3b", tier: 2, thema: "T4", kurz: "Namen anhängen und zählen", text: "[2.3] Erstellen Sie einen Algorithmus, der dreimal einen Namen einliest, an ein Array anhängt und danach jeweils die aktuelle Anzahl der Kontakte ausgibt. Beispiel: eingelesene Namen Lea, Finn und Mia", problem: "Ein Adressbuch soll drei neue Kontakte nacheinander aufnehmen. Nach jedem Hinzufügen soll die aktuelle Anzahl der gespeicherten Kontakte ausgegeben werden.", eingabe: "Bitte geben Sie einen Namen ein: Lea\nBitte geben Sie einen Namen ein: Finn\nBitte geben Sie einen Namen ein: Mia", ausgabe: "Anzahl Kontakte: 1\nAnzahl Kontakte: 2\nAnzahl Kontakte: 3" },
-      { id: "LF1_A2.4a", tier: 1, thema: "T4", kurz: "Arraywert erhöhen", text: "[2.4] Gegeben ist bestand = [12, 20, 8, 0, 5]. Erstellen Sie eine Zuweisung, die den Wert an Index 2 um 15 erhöht, und geben Sie das aktualisierte Array aus.", problem: "Ein Lager verwaltet den Bestand mehrerer Artikel in einem Array. Nach einer Lieferung erhöht sich der Bestand eines bestimmten Artikels.", ausgabe: "Bestand: [12, 20, 23, 0, 5]" },
-      { id: "LF1_A2.4b", tier: 2, thema: "T4", kurz: "Alle Werte verändern", text: "[2.4] Erstellen Sie einen Algorithmus, der jeden Wert eines Arrays preise um 10 Prozent verringert und das Array anschließend ausgibt. Beispiel: preise = [20.00, 45.00, 8.50]", problem: "In einem Onlineshop sollen an einem Rabatttag alle Preise eines Sortiments um 10 Prozent reduziert werden.", ausgabe: "Reduzierte Preise: [18.0, 40.5, 7.65]" },
-      { id: "LF1_M_T4", tier: 3, thema: "T4", kurz: "Array befüllen und korrigieren", text: "[2.3,2.4] Entwickeln Sie einen Algorithmus, der (a) ein Array mit der Rundenzahl der ersten 10 Trainingswochen nach der Formel 5 + i*2 befüllt und (b) anschließend in einem zweiten Durchlauf alle negativen Werte im Array durch 0 ersetzt (falls bei der manuellen Nacherfassung versehentlich negative Werte eingetragen wurden).", problem: "Ein Fitnessstudio bietet einen Lauftreff an. In der ersten Trainingswoche werden 5 Runden gelaufen, in jeder weiteren Woche zwei Runden mehr als in der Vorwoche.", ausgabe: "Runden pro Woche (nach Korrektur): [5, 7, 9, 11, 13, 15, 17, 19, 21, 23]" },
+      { id: "LF1_A2.4a", tier: 1, thema: "T4", kurz: "Arraywert erhöhen", text: "[2.4] Gegeben ist bestand = [12, 20, 8, 0, 5]. Erstellen Sie eine Zuweisung, die den Wert an Index 2 um 15 erhöht, und geben Sie das Array vor und nach der Änderung aus.", problem: "Ein Lager verwaltet den Bestand mehrerer Artikel in einem Array. Nach einer Lieferung erhöht sich der Bestand eines bestimmten Artikels.", ausgabe: "Alter Bestand: [12, 20, 8, 0, 5]\nNeuer Bestand: [12, 20, 23, 0, 5]" },
+      { id: "LF1_A2.4b", tier: 2, thema: "T4", kurz: "Alle Werte verändern", text: "[2.4] Erstellen Sie einen Algorithmus, der jeden Wert eines Arrays preise um 10 Prozent verringert und das Array vor und nach der Änderung ausgibt. Beispiel: preise = [20.00, 45.00, 8.50]", problem: "In einem Onlineshop sollen an einem Rabatttag alle Preise eines Sortiments um 10 Prozent reduziert werden.", ausgabe: "Alte Preise: [20.0, 45.0, 8.5]\nReduzierte Preise: [18.0, 40.5, 7.65]" },
+      { id: "LF1_M_T4", tier: 3, thema: "T4", kurz: "Array befüllen und korrigieren", text: "[2.3,2.4] Entwickeln Sie einen Algorithmus für die Rundenzahlen der ersten 10 Trainingswochen:", problem: "Ein Fitnessstudio bietet einen Lauftreff an. Als Trainingsziel sollen in der ersten Trainingswoche 5 Runden gelaufen werden, in jeder weiteren Woche zwei Runden mehr als in der Vorwoche. Die tatsächlich gelaufenen Runden werden manuell erfasst.", teile: [{"k": "a)", "text": "Lesen Sie die tatsächlich gelaufenen Runden der 10 Trainingswochen ein, speichern Sie sie in einem Array runden und geben Sie das Array aus.", "eingabe": "Bitte geben Sie die gelaufenen Runden ein: 6\nBitte geben Sie die gelaufenen Runden ein: 7\nBitte geben Sie die gelaufenen Runden ein: 9\nBitte geben Sie die gelaufenen Runden ein: 10\nBitte geben Sie die gelaufenen Runden ein: 13\nBitte geben Sie die gelaufenen Runden ein: 14\nBitte geben Sie die gelaufenen Runden ein: 17\nBitte geben Sie die gelaufenen Runden ein: 18\nBitte geben Sie die gelaufenen Runden ein: 22\nBitte geben Sie die gelaufenen Runden ein: 23", "ausgabe": "Gelaufene Runden: [6, 7, 9, 10, 13, 14, 17, 18, 22, 23]"}, {"k": "b)", "text": "Erzeugen Sie ein neues Array trainingsziel, das Sie mit der Formel 5 + i*2 befüllen, und geben Sie es aus.", "ausgabe": "Trainingsziel: [5, 7, 9, 11, 13, 15, 17, 19, 21, 23]"}, {"k": "c)", "text": "Setzen Sie im Array runden jeden Wert, der unter dem Trainingsziel der jeweiligen Woche liegt, auf den Zielwert und geben Sie runden erneut aus.", "ausgabe": "Angepasste Runden: [6, 7, 9, 11, 13, 15, 17, 19, 22, 23]"}] },
       { id: "LF1_A2.9b", tier: 2, thema: "T4", kurz: "Schreibtischtest: Zuweisungen und Anhängen", text: "[2.9,2.3,2.4] Gegeben ist a = [1, 5, 20, 9, 4, 3, 1]. Führen Sie einen Schreibtischtest durch und dokumentieren Sie den Arrayinhalt nach jeder Zeile.", problem: "Ein Array wird durch mehrere aufeinanderfolgende Zuweisungen verändert.", darstellung: "Deklaration und Initialisierung: a = [1, 5, 20, 9, 4, 3, 1]\nZuweisung: a[1] = a[2]\nZuweisung: a[5] = a[5] + a[6]\nZuweisung: a[6] = 4\nZuweisung: a[7] = 4\nDeklaration und Initialisierung: i = 3\nZuweisung: a[i] = i\nAusgabe: a" },
       { id: "LF1_A2.5a", tier: 1, thema: "T2", kurz: "Länge ermitteln", text: "[2.5] Ermitteln und geben Sie aus, wie viele Elemente das Array weltmeister enthält. Beispiel: weltmeister = [1954, 1974, 1990, 2014]", problem: "Von den deutschen Weltmeistertiteln aus Aufgabe 2.1-a soll die Gesamtanzahl ermittelt werden.", ausgabe: "Anzahl Weltmeistertitel: 4" },
-      { id: "LF1_A2.5b", tier: 2, thema: "T2", kurz: "Kapazität prüfen", text: "[2.5] Erstellen Sie einen Algorithmus, der ermittelt, ob das Array tickets bereits 50 oder mehr Einträge enthält, und eine entsprechende Meldung ausgibt. Beispiel: tickets enthält 47 Einträge.", problem: "In einem Wartebereich wird bei jedem Einlass ein Ticket in ein Array eingetragen. Es soll geprüft werden, ob die maximale Kapazität von 50 Personen erreicht ist.", ausgabe: "Kapazität noch nicht erreicht." },
-      { id: "LF1_A2.5c", tier: 3, thema: "T2", kurz: "Array-Längen vergleichen", text: "[2.5] Entwickeln Sie einen Algorithmus, der die Anzahl der Elemente zweier Arrays klasse_a und klasse_b vergleicht und den Namen der größeren Klasse ausgibt (bei Gleichstand eine entsprechende Meldung). Beispiel: klasse_a = [\"Lea\", \"Finn\", \"Mia\"], klasse_b = [\"Jonas\", \"Ida\", \"Tom\", \"Ella\"]", problem: "Zwei Klassenlisten unterschiedlicher Länge sollen verglichen werden, um herauszufinden, welche Klasse mehr Schülerinnen und Schüler hat.", ausgabe: "Klasse B ist größer" },
+      { id: "LF1_A2.5b", tier: 2, thema: "T2", kurz: "Kapazität prüfen", text: "[2.5] Erstellen Sie einen Algorithmus, der ermittelt, ob das Array tickets bereits 50 oder mehr Einträge enthält, und eine entsprechende Meldung ausgibt.", problem: "In einem Wartebereich wird bei jedem Einlass ein Ticket in ein Array eingetragen. Es soll geprüft werden, ob die maximale Kapazität von 50 Personen erreicht ist.", daten: "tickets = [432, 255, 505, 767, 150, 175, 941, 649, 197, 475, 697, 160, 620, 320, 139, 189, 545, 529, 172, 347, 193, 665, 535, 161, 947, 680, 227, 329, 746, 743, 164, 691, 700, 507, 151, 327, 148, 671, 980, 237, 397, 530, 248, 654, 221, 685, 416]", ausgabe: "Kapazität noch nicht erreicht." },
+      { id: "LF1_A2.5c", tier: 3, thema: "T2", kurz: "Array-Längen vergleichen", text: "[2.5] Entwickeln Sie einen Algorithmus, der die Anzahl der Elemente zweier Arrays klasse_a und klasse_b vergleicht und den Namen der größeren Klasse sowie deren Schülerzahl ausgibt (bei Gleichstand eine entsprechende Meldung). Beispiel: klasse_a = [\"Lea\", \"Finn\", \"Mia\"], klasse_b = [\"Jonas\", \"Ida\", \"Tom\", \"Ella\"]", problem: "Zwei Klassenlisten unterschiedlicher Länge sollen verglichen werden, um herauszufinden, welche Klasse mehr Schülerinnen und Schüler hat.", ausgabe: "Klasse B ist größer.\nAnzahl Schüler in Klasse B: 4" },
       { id: "LF1_A2.6a", tier: 1, thema: "T2", kurz: "Array mit Schleife ausgeben", text: "[2.6] Erstellen Sie einen Algorithmus, der mit einer Schleife jeden Namen des Arrays spieler einzeln in der Konsole ausgibt. Beispiel: spieler = [\"Armin\", \"Batu\", \"Kai\", \"Sven\"]", problem: "Die Stammspieler einer Volleyballmannschaft stehen in einem Array. Vor dem Spiel sollen alle Namen einzeln bekanntgegeben werden.", ausgabe: "Aufstellung:\n------------------\nArmin\nBatu\nKai\nSven" },
       { id: "LF1_A2.6b", tier: 2, thema: "T2", kurz: "Vorkommen zählen", text: "[2.6] Ermitteln Sie mithilfe einer Schleife, wie oft die Note 2 im Array noten vorkommt, und geben Sie die Anzahl aus. Beispiel: noten = [2, 3, 1, 2, 4, 2, 3]", problem: "In einer Klassenarbeit wird gezählt, wie viele Schülerinnen und Schüler eine bestimmte Note erreicht haben.", ausgabe: "Anzahl der Note 2: 3" },
-      { id: "LF1_A2.6c", tier: 3, thema: "T2", kurz: "Bedingung zählen", text: "[2.6] Entwickeln Sie einen Algorithmus, der die Anzahl der Frostnächte einer beliebigen Woche ermittelt und ausgibt. Beispiel: boden_temp = [-1.2, 0.5, 2.1, -0.3, 1.8, -2.0, 0.1]", problem: "Eine Wetterstation warnt vor Frost, wenn die gemessene Bodentemperatur einer Nacht nicht über 0 Grad Celsius steigt. Für eine Woche liegen die niedrigsten Nachttemperaturen in einem Array vor.", ausgabe: "Frostnächte: 3" },
-      { id: "LF1_A2.7a", tier: 1, thema: "T3", kurz: "Größten Wert bestimmen", text: "[2.7] Ermitteln Sie ohne die Funktion max() den größten Wert im Array weiten und geben Sie ihn aus. Beispiel: weiten = [4.2, 5.1, 3.9, 4.8]", problem: "Bei einem Sprungwettbewerb wurden vier Weiten gemessen. Es soll herausgefunden werden, wie weit der beste Sprung war.", ausgabe: "Größte Weite: 5.1" },
-      { id: "LF1_A2.7b", tier: 2, thema: "T3", kurz: "Größten und kleinsten Wert bestimmen", text: "[2.7] Ermitteln Sie aus den 6 gespeicherten Würfen die höchste und die niedrigste Punktzahl, ohne dabei die Funktionen max() oder min() zu verwenden. Beispiel: wuerfe = [5, 40, 3, 60, 20, 16]", problem: "Beim Dart-Training wirft jeder Spieler 6 Pfeile. Um die Leistung einzuschätzen, sollen der beste und der schlechteste Wurf ermittelt werden.", ausgabe: "Höchste Punktzahl: 60\nNiedrigste Punktzahl: 3" },
-      { id: "LF1_A2.8a", tier: 1, thema: "T3", kurz: "Durchschnitt berechnen", text: "[2.8] Berechnen Sie den Durchschnitt der drei Werte im Array punkte und geben Sie ihn aus. Beispiel: punkte = [120, 145, 98]", problem: "In einer Bowlingbahn wurden drei Spiele gespielt. Der durchschnittliche Punktestand soll ermittelt werden.", ausgabe: "Durchschnitt: 121.0" },
+      { id: "LF1_A2.6c", tier: 3, thema: "T2", kurz: "Bedingung zählen", text: "[2.6] Entwickeln Sie einen Algorithmus, der die Bodentemperaturen der 7 Nächte einer Woche einliest, in einem Array speichert und die Anzahl der Frostnächte ermittelt und ausgibt. Beispiel: eingelesene Temperaturen -1.2, 0.5, 2.1, -0.3, 1.8, -2.0, 0.1", problem: "Eine Wetterstation warnt vor Frost, wenn die gemessene Bodentemperatur einer Nacht nicht über 0 Grad Celsius steigt. Für eine Woche werden die niedrigsten Nachttemperaturen erfasst.", eingabe: "Bitte geben Sie die Bodentemperatur ein: -1.2\nBitte geben Sie die Bodentemperatur ein: 0.5\nBitte geben Sie die Bodentemperatur ein: 2.1\nBitte geben Sie die Bodentemperatur ein: -0.3\nBitte geben Sie die Bodentemperatur ein: 1.8\nBitte geben Sie die Bodentemperatur ein: -2.0\nBitte geben Sie die Bodentemperatur ein: 0.1", ausgabe: "Frostnächte: 3" },
+      { id: "LF1_A2.7a", tier: 1, thema: "T3", kurz: "Größten Wert bestimmen", text: "[2.7] Erstellen Sie einen Algorithmus, der 4 Sprungweiten einliest, in einem Array speichert und ohne die Funktion max() den größten Wert ermittelt und ausgibt. Beispiel: eingelesene Weiten 4.2, 5.1, 3.9, 4.8", problem: "Bei einem Sprungwettbewerb wurden vier Weiten gemessen. Es soll herausgefunden werden, wie weit der beste Sprung war.", eingabe: "Bitte geben Sie die Sprungweite ein: 4.2\nBitte geben Sie die Sprungweite ein: 5.1\nBitte geben Sie die Sprungweite ein: 3.9\nBitte geben Sie die Sprungweite ein: 4.8", ausgabe: "Größte Weite: 5.1" },
+      { id: "LF1_A2.7b", tier: 2, thema: "T3", kurz: "Größten und kleinsten Wert bestimmen", text: "[2.7] Erstellen Sie einen Algorithmus, der 6 Wurfpunktzahlen einliest, in einem Array speichert und ohne die Funktionen max() oder min() die höchste und die niedrigste Punktzahl ermittelt und ausgibt. Beispiel: eingelesene Punktzahlen 5, 40, 3, 60, 20, 16", problem: "Beim Dart-Training wirft jeder Spieler 6 Pfeile. Um die Leistung einzuschätzen, sollen der beste und der schlechteste Wurf ermittelt werden.", eingabe: "Bitte geben Sie die Punktzahl des Wurfs ein: 5\nBitte geben Sie die Punktzahl des Wurfs ein: 40\nBitte geben Sie die Punktzahl des Wurfs ein: 3\nBitte geben Sie die Punktzahl des Wurfs ein: 60\nBitte geben Sie die Punktzahl des Wurfs ein: 20\nBitte geben Sie die Punktzahl des Wurfs ein: 16", ausgabe: "Höchste Punktzahl: 60\nNiedrigste Punktzahl: 3" },
+      { id: "LF1_A2.8a", tier: 1, thema: "T3", kurz: "Durchschnitt berechnen", text: "[2.8] Erstellen Sie einen Algorithmus, der die Punktzahlen von drei Bowlingspielen einliest, in einem Array speichert und den Durchschnitt berechnet und ausgibt. Beispiel: eingelesene Punktzahlen 120, 145, 98", problem: "In einer Bowlingbahn wurden drei Spiele gespielt. Der durchschnittliche Punktestand soll ermittelt werden.", eingabe: "Bitte geben Sie die Punktzahl des Spiels ein: 120\nBitte geben Sie die Punktzahl des Spiels ein: 145\nBitte geben Sie die Punktzahl des Spiels ein: 98", ausgabe: "Durchschnitt: 121.0" },
       { id: "LF1_A2.8b", tier: 2, thema: "T3", kurz: "Einlesen und Durchschnitt berechnen", text: "[2.8] Erstellen Sie einen Algorithmus, der 7 Temperaturen einliest, in einem Array speichert und anschließend die Durchschnittstemperatur berechnet und ausgibt. Beispiel: eingelesene Temperaturen 18, 21, 19, 23, 20, 17, 22", problem: "Eine Wetterstation zeichnet an 7 Tagen jeweils die Höchsttemperatur auf. Am Ende der Woche soll die Durchschnittstemperatur berechnet werden.", eingabe: "Bitte geben Sie die Temperatur ein: 18\nBitte geben Sie die Temperatur ein: 21\nBitte geben Sie die Temperatur ein: 19\nBitte geben Sie die Temperatur ein: 23\nBitte geben Sie die Temperatur ein: 20\nBitte geben Sie die Temperatur ein: 17\nBitte geben Sie die Temperatur ein: 22", ausgabe: "Durchschnittstemperatur: 20.0" },
-      { id: "LF1_M_T3", tier: 3, thema: "T3", kurz: "Extremwerte und gefilterter Durchschnitt", text: "[2.7,2.8] Ermitteln Sie ohne die Funktionen max() oder min() die weiteste und kürzeste Sprungweite im Array weiten, und berechnen Sie zusätzlich den Durchschnitt aller Sprungweiten ab 90 Metern. Beispiel: weiten = [85.0, 92.5, 78.0, 96.0, 90.5]", problem: "Bei einem Skisprung-Weltcup wurden mehrere Sprungweiten eines Wettkampfs gemessen.", ausgabe: "Weiteste Sprungweite: 96.0\nKürzeste Sprungweite: 78.0\nDurchschnitt ab 90 m: 93.0" },
+      { id: "LF1_M_T3", tier: 3, thema: "T3", kurz: "Extremwerte und gefilterter Durchschnitt", text: "[2.7,2.8] Erstellen Sie einen Algorithmus, der 5 Sprungweiten einliest und in einem Array speichert. Ermitteln Sie ohne die Funktionen max() oder min() die weiteste und kürzeste Sprungweite und berechnen Sie zusätzlich den Durchschnitt aller Sprungweiten ab 90 Metern. Beispiel: eingelesene Weiten 85.0, 92.5, 78.0, 96.0, 90.5", problem: "Bei einem Skisprung-Weltcup wurden mehrere Sprungweiten eines Wettkampfs gemessen.", eingabe: "Bitte geben Sie die Sprungweite ein: 85.0\nBitte geben Sie die Sprungweite ein: 92.5\nBitte geben Sie die Sprungweite ein: 78.0\nBitte geben Sie die Sprungweite ein: 96.0\nBitte geben Sie die Sprungweite ein: 90.5", ausgabe: "Weiteste Sprungweite: 96.0\nKürzeste Sprungweite: 78.0\nDurchschnitt ab 90 m: 93.0" },
       { id: "LF1_A2.9c", tier: 3, thema: "T3", kurz: "Schreibtischtest: Schleife mit zwei Arrays", text: "[2.9,2.4] Gegeben sind werte1 = [4, 7, 2, 9] und werte2 = [3, 5, 8, 1]. Führen Sie einen Schreibtischtest durch, dokumentieren Sie den Arrayinhalt nach jeder Zeile und nennen Sie anschließend die Ausgabe.", problem: "Ein Struktogramm verarbeitet zwei vorgegebene Arrays elementweise und erzeugt daraus zwei neue Arrays sowie eine Summe.", darstellung: "Deklaration und Initialisierung: werte1 = [4, 7, 2, 9]\nDeklaration und Initialisierung: werte2 = [3, 5, 8, 1]\nDeklaration und Initialisierung: summen = [ ]\nDeklaration und Initialisierung: differenzen = [ ]\nDeklaration und Initialisierung: summe = 0\nWiederhole von i = 0 solange i < len(werte1), Schrittweite 1:\n  Zuweisung: summen[i] = werte1[i] + werte2[i]\n  Zuweisung: differenzen[i] = werte1[i] - werte2[i]\n  Zuweisung: summe = summe + summen[i]\nAusgabe: summen\nAusgabe: differenzen\nAusgabe: summe" },
-      { id: "LF1_A2.10a", tier: 1, thema: "T5", kurz: "Arraywerte tauschen", text: "[2.10] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays regal mithilfe einer Hilfsvariablen vertauscht und das Array anschließend ausgibt. Beispiel: regal = [\"Faust\", \"Momo\", \"Emil\"]", problem: "In einem Regal stehen die Bücher „Faust“ und „Momo“ auf den falschen Plätzen. Ihre Positionen sollen getauscht werden, das dritte Buch bleibt unverändert.", ausgabe: "Regal: ['Momo', 'Faust', 'Emil']" },
-      { id: "LF1_A2.10b", tier: 2, thema: "T5", kurz: "Spielerpositionen tauschen", text: "[2.10] Erstellen Sie einen Algorithmus, der im Array spieler die Einträge an Index 1 (Batu) und Index 3 (Sven) vertauscht und das Array anschließend ausgibt. Beispiel: spieler = [\"Armin\", \"Batu\", \"Kai\", \"Sven\", \"Paul\", \"Milan\"]", problem: "Ein Trainer möchte kurzfristig zwei Spielerpositionen tauschen, ohne die übrige Aufstellung zu verändern.", ausgabe: "Aufstellung: ['Armin', 'Sven', 'Kai', 'Batu', 'Paul', 'Milan']" },
-      { id: "LF1_A2.11a", tier: 1, thema: "T5", kurz: "Wert einfügen", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Timo an Index 1 des Arrays warteliste einfügt, wobei der bisherige Eintrag an Index 1 und alle folgenden eine Position nach hinten rücken. Beispiel: warteliste = [\"Nina\", \"Paul\", \"Elif\"]", problem: "In eine kurze Warteliste soll ein Name in der Mitte eingefügt werden, ohne bestehende Namen zu überschreiben.", ausgabe: "Warteliste: ['Nina', 'Timo', 'Paul', 'Elif']" },
-      { id: "LF1_A2.11b", tier: 2, thema: "T5", kurz: "Wert an Position einfügen", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Tom an Index 6 in das Array spieler einfügt. Alle Namen ab dieser Position rücken eine Stelle nach hinten. Beispiel: spieler = [\"Armin\",\"Batu\",\"Kai\",\"Sven\",\"Paul\",\"Milan\",\"Goran\",\"Chris\"]", problem: "Ein neuer Spieler soll in die bestehende Aufstellung an einer bestimmten Position eingefügt werden, ohne dass ein bereits vorhandener Name verloren geht.", ausgabe: "Aufstellung: ['Armin', 'Batu', 'Kai', 'Sven', 'Paul', 'Milan', 'Tom', 'Goran', 'Chris']" },
-      { id: "LF1_A2.12a", tier: 1, thema: "T5", kurz: "Wert entfernen", text: "[2.12] Erstellen Sie einen Algorithmus, der den Artikel an Index 1 aus dem Array liste entfernt. Alle nachfolgenden Einträge rücken eine Position nach vorne. Beispiel: liste = [\"Milch\", \"Brot\", \"Butter\"]", problem: "Aus einer kurzen Einkaufsliste soll ein bereits gekaufter Artikel entfernt werden.", ausgabe: "Einkaufsliste: ['Milch', 'Butter']" },
-      { id: "LF1_A2.12b", tier: 2, thema: "T5", kurz: "Spieler entfernen", text: "[2.12] Erstellen Sie einen Algorithmus, der den Spieler an Index 4 (Paul) aus dem Array entfernt. Alle nachfolgenden Namen rücken dabei eine Position nach vorne. Beispiel: spieler = [\"Armin\",\"Batu\",\"Kai\",\"Sven\",\"Paul\",\"Milan\"]", problem: "Ein Spieler verlässt die Mannschaft. Sein Eintrag soll aus der Aufstellung entfernt werden, ohne eine Lücke zu hinterlassen.", ausgabe: "Aufstellung: ['Armin', 'Batu', 'Kai', 'Sven', 'Milan']" },
-      { id: "LF1_M_T5", tier: 3, thema: "T5", kurz: "Entfernen, einsortieren, tauschen", text: "[2.10,2.11,2.12] Gegeben ist die absteigend sortierte Rangliste punkte = [95, 88, 76, 60, 45]. Entwickeln Sie einen Algorithmus, der (a) den Wert 76 sucht und entfernt, (b) den neuen Wert 82 so einsortiert, dass die Liste weiterhin absteigend bleibt, und (c) abschließend zwei benachbarte Einträge nur bei Bedarf tauscht, falls die absteigende Reihenfolge verletzt ist.", problem: "Eine Rangliste von Punktzahlen soll gepflegt werden: ein bekannter Eintrag entfernt, ein neuer Wert einsortiert und bei Bedarf zwei benachbarte Einträge getauscht werden.", ausgabe: "Rangliste: [95, 88, 82, 60, 45]" },
+      { id: "LF1_A2.10a", tier: 1, thema: "T5", kurz: "Arraywerte tauschen", text: "[2.10] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays regal mithilfe einer Hilfsvariablen vertauscht und das Array vor und nach dem Tauschen ausgibt. Beispiel: regal = [\"Faust\", \"Momo\", \"Emil\"]", problem: "In einem Regal stehen die Bücher „Faust“ und „Momo“ auf den falschen Plätzen. Ihre Positionen sollen getauscht werden, das dritte Buch bleibt unverändert.", ausgabe: "Ursprüngliche Reihenfolge: ['Faust', 'Momo', 'Emil']\nNeue Reihenfolge: ['Momo', 'Faust', 'Emil']" },
+      { id: "LF1_A2.10b", tier: 2, thema: "T5", kurz: "Spielerpositionen tauschen", text: "[2.10] Erstellen Sie einen Algorithmus, der im Array spieler die Einträge an Index 1 (Batu) und Index 3 (Sven) vertauscht und das Array vor und nach dem Tauschen ausgibt. Beispiel: spieler = [\"Armin\", \"Batu\", \"Kai\", \"Sven\", \"Paul\", \"Milan\"]", problem: "Ein Trainer möchte kurzfristig zwei Spielerpositionen tauschen, ohne die übrige Aufstellung zu verändern.", ausgabe: "Ursprüngliche Reihenfolge: ['Armin', 'Batu', 'Kai', 'Sven', 'Paul', 'Milan']\nNeue Reihenfolge: ['Armin', 'Sven', 'Kai', 'Batu', 'Paul', 'Milan']" },
+      { id: "LF1_A2.11a", tier: 1, thema: "T5", kurz: "Wert einfügen", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Timo an Index 1 des Arrays warteliste einfügt, wobei der bisherige Eintrag an Index 1 und alle folgenden eine Position nach hinten rücken, und das Array vor und nach dem Einfügen ausgibt. Beispiel: warteliste = [\"Nina\", \"Paul\", \"Elif\"]", problem: "In eine kurze Warteliste soll ein Name in der Mitte eingefügt werden, ohne bestehende Namen zu überschreiben.", ausgabe: "Ursprüngliche Reihenfolge: ['Nina', 'Paul', 'Elif']\nNeue Reihenfolge: ['Nina', 'Timo', 'Paul', 'Elif']" },
+      { id: "LF1_A2.11b", tier: 2, thema: "T5", kurz: "Wert an Position einfügen", text: "[2.11] Erstellen Sie einen Algorithmus, der den Namen Tom an Index 6 in das Array spieler einfügt. Alle Namen ab dieser Position rücken eine Stelle nach hinten. Geben Sie das Array vor und nach dem Einfügen aus. Beispiel: spieler = [\"Armin\", \"Batu\", \"Kai\", \"Sven\", \"Paul\", \"Milan\", \"Goran\", \"Chris\"]", problem: "Ein neuer Spieler soll in die bestehende Aufstellung an einer bestimmten Position eingefügt werden, ohne dass ein bereits vorhandener Name verloren geht.", ausgabe: "Ursprüngliche Reihenfolge: ['Armin', 'Batu', 'Kai', 'Sven', 'Paul', 'Milan', 'Goran', 'Chris']\nNeue Reihenfolge: ['Armin', 'Batu', 'Kai', 'Sven', 'Paul', 'Milan', 'Tom', 'Goran', 'Chris']" },
+      { id: "LF1_A2.12a", tier: 1, thema: "T5", kurz: "Wert entfernen", text: "[2.12] Erstellen Sie einen Algorithmus, der den Artikel an Index 1 aus dem Array liste entfernt. Alle nachfolgenden Einträge rücken eine Position nach vorne. Geben Sie das Array vor und nach dem Entfernen aus. Beispiel: liste = [\"Milch\", \"Brot\", \"Butter\"]", problem: "Aus einer kurzen Einkaufsliste soll ein bereits gekaufter Artikel entfernt werden.", ausgabe: "Ursprüngliche Reihenfolge: ['Milch', 'Brot', 'Butter']\nNeue Reihenfolge: ['Milch', 'Butter']" },
+      { id: "LF1_A2.12b", tier: 2, thema: "T5", kurz: "Spieler entfernen", text: "[2.12] Erstellen Sie einen Algorithmus, der den Spieler an Index 4 (Paul) aus dem Array entfernt. Alle nachfolgenden Namen rücken dabei eine Position nach vorne. Geben Sie das Array vor und nach dem Entfernen aus. Beispiel: spieler = [\"Armin\", \"Batu\", \"Kai\", \"Sven\", \"Paul\", \"Milan\"]", problem: "Ein Spieler verlässt die Mannschaft. Sein Eintrag soll aus der Aufstellung entfernt werden, ohne eine Lücke zu hinterlassen.", ausgabe: "Ursprüngliche Reihenfolge: ['Armin', 'Batu', 'Kai', 'Sven', 'Paul', 'Milan']\nNeue Reihenfolge: ['Armin', 'Batu', 'Kai', 'Sven', 'Milan']" },
+      { id: "LF1_M_T5", tier: 3, thema: "T5", kurz: "Entfernen, einsortieren, tauschen", text: "[2.10,2.11,2.12] Erstellen Sie einen Algorithmus, der zunächst einmalig 5 Punktzahlen einer absteigend sortierten Rangliste einliest und in einem Array speichert. Führen Sie danach nacheinander aus:", problem: "Eine Rangliste von Punktzahlen soll gepflegt werden: ein bekannter Eintrag entfernt, ein neuer Wert einsortiert und bei Bedarf zwei benachbarte Einträge getauscht werden.", eingabe: "Bitte geben Sie die Punktzahl ein: 95\nBitte geben Sie die Punktzahl ein: 88\nBitte geben Sie die Punktzahl ein: 76\nBitte geben Sie die Punktzahl ein: 60\nBitte geben Sie die Punktzahl ein: 45", teile: [{"k": "a)", "text": "Lesen Sie den Index des Eintrags ein, der entfernt werden soll, und entfernen Sie ihn. Geben Sie den Index mit dem gelöschten Wert und die Rangliste aus.", "eingabe": "Bitte geben Sie den zu entfernenden Index ein: 2", "ausgabe": "Gelöscht: Index 2, Wert 76\nRangliste: [95, 88, 60, 45]"}, {"k": "b)", "text": "Lesen Sie den Index, an dem ein neuer Wert eingefügt werden soll, sowie den Wert ein und fügen Sie ihn ein. Geben Sie die Rangliste aus.", "eingabe": "Bitte geben Sie den Index zum Einfügen ein: 1\nBitte geben Sie den neuen Wert ein: 82", "ausgabe": "Eingefügt: Index 1, Wert 82\nRangliste: [95, 82, 88, 60, 45]"}, {"k": "c)", "text": "Prüfen Sie, ob die absteigende Reihenfolge verletzt ist. Tauschen Sie zwei benachbarte Einträge nur bei Bedarf, sodass die Rangliste wieder absteigend sortiert ist, und geben Sie die Rangliste aus.", "ausgabe": "Reihenfolge verletzt: Index 1 und Index 2 getauscht\nRangliste: [95, 88, 82, 60, 45]"}] },
     ]
   },
   {
@@ -697,6 +732,26 @@ function requestStatusChange(taskId, newStatus) {
 // keine Musterloesung/kein Struktogramm, das bleibt Lehrkraft-Material.
 // ---------------------------------------------------------------------------
 let infoModalTaskId = null;
+// Arbeitsauftrag mit "Beispiel:" in eigener Zeile (Schlagwort hervorgehoben).
+function lfAuftragHtml(text, escFn) {
+  const m = text.match(/^([\s\S]*?)\s*Beispiel:\s*([\s\S]*)$/);
+  if (!m) return escFn(text);
+  return escFn(m[1]) + '<div class="lf1-beispiel"><span class="lf1-beispiel-k">Beispiel:</span> ' + escFn(m[2]) + '</div>';
+}
+function teileAuftragHtml(task) {
+  if (!task.teile || !task.teile.length) return "";
+  return '<div class="teile">' + task.teile.map(t =>
+    '<div class="teil"><span class="teil-k">' + esc(t.k) + '</span><span class="teil-t">' + esc(t.text) + '</span></div>').join("") + '</div>';
+}
+function teileIoHtml(task) {
+  if (!task.teile) return "";
+  let h = "";
+  task.teile.forEach(t => {
+    if (t.eingabe) h += '<div class="info-block info-io info-console"><strong>' + esc(t.k) + ' Gewünschte Eingabe (Beispiel)</strong>' + esc(t.eingabe) + '</div>';
+    if (t.ausgabe) h += '<div class="info-block info-io info-console"><strong>' + esc(t.k) + ' Gewünschte Ausgabe (Beispiel)</strong>' + esc(t.ausgabe) + '</div>';
+  });
+  return h;
+}
 function openTaskInfoModal(taskId) {
   const task = getTaskById(taskId);
   if (!task) return;
@@ -718,7 +773,7 @@ function openTaskInfoModal(taskId) {
     problemEl.style.display = "none";
   }
 
-  document.getElementById("infoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + esc(auftragText);
+  document.getElementById("infoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + lfAuftragHtml(auftragText, esc) + teileAuftragHtml(task);
 
   const hintEl = document.getElementById("infoModalHint");
   const hintText = codeStrukHint(task);
@@ -729,6 +784,12 @@ function openTaskInfoModal(taskId) {
     hintEl.style.display = "none";
   }
 
+  const datenEl = document.getElementById("infoModalDaten");
+  if (task.daten) {
+    datenEl.innerHTML = "<strong>Vorgegebene Daten (zum Kopieren)</strong>" + esc(task.daten);
+    datenEl.style.display = "block";
+  } else { datenEl.style.display = "none"; }
+  document.getElementById("infoModalTeileIo").innerHTML = teileIoHtml(task);
   const einEl = document.getElementById("infoModalEingabe");
   if (task.eingabe) {
     einEl.innerHTML = "<strong>Gewünschte Eingabe (Beispiel)</strong>" + esc(task.eingabe);
@@ -747,6 +808,7 @@ function openTaskInfoModal(taskId) {
   }
 
   const darstEl = document.getElementById("infoModalDarstellung");
+  darstEl.closest(".info-box").classList.toggle("wide", !!task.darstellung);
   if (darstEl) {
     if (task.darstellung) {
       darstEl.innerHTML = /^LF1_/.test(task.id)
@@ -883,11 +945,11 @@ function RenderStruktogrammNodes(nodes, x, y, width, rowH, out) {
   let curY = y;
   nodes.forEach(n => {
     if (n.type === "stmt") {
-      const fill = n.isOutput ? "#FBEFE0" : "#FFFFFF";
+      const fill = "#FFFFFF";
       out.push('<rect x="' + x + '" y="' + curY + '" width="' + width + '" height="' + rowH +
-        '" fill="' + fill + '" stroke="#A2222E" stroke-width="1"/>');
+        '" fill="' + fill + '" stroke="#1C1F26" stroke-width="1"/>');
       out.push('<text x="' + (x + width / 2) + '" y="' + (curY + rowH / 2 + 5) +
-        '" text-anchor="middle" font-size="15" font-family="Segoe UI, Arial, sans-serif" fill="#2b2b33">' +
+        '" text-anchor="middle" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#1C1F26">' +
         esc(n.text) + '</text>');
       curY += rowH;
     } else {
@@ -895,14 +957,14 @@ function RenderStruktogrammNodes(nodes, x, y, width, rowH, out) {
       const stripW = 26;
       const totalH = rowH + bodyHeight;
       out.push('<rect x="' + x + '" y="' + curY + '" width="' + width + '" height="' + totalH +
-        '" fill="none" stroke="#A2222E" stroke-width="1.5"/>');
+        '" fill="none" stroke="#1C1F26" stroke-width="1.5"/>');
       out.push('<rect x="' + x + '" y="' + curY + '" width="' + width + '" height="' + rowH +
-        '" fill="#E8963C" stroke="#A2222E" stroke-width="1"/>');
+        '" fill="#FFFFFF" stroke="#1C1F26" stroke-width="1"/>');
       out.push('<text x="' + (x + 10) + '" y="' + (curY + rowH / 2 + 5) +
-        '" text-anchor="start" font-size="15" font-weight="700" font-family="Segoe UI, Arial, sans-serif" fill="#3a2200">' +
+        '" text-anchor="start" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#1C1F26">' +
         esc(n.header) + '</text>');
       out.push('<line x1="' + (x + stripW) + '" y1="' + (curY + rowH) + '" x2="' + (x + stripW) + '" y2="' + (curY + totalH) +
-        '" stroke="#A2222E" stroke-width="1.5"/>');
+        '" stroke="#1C1F26" stroke-width="1.5"/>');
       RenderStruktogrammNodes(n.body, x + stripW, curY + rowH, width - stripW, rowH, out);
       curY += totalH;
     }
@@ -910,13 +972,13 @@ function RenderStruktogrammNodes(nodes, x, y, width, rowH, out) {
   return curY - y;
 }
 function BuildStruktogrammSvg(darstText) {
-  const rowH = 34;
+  const rowH = 40;
   const width = 640;
   const nodes = ParseStruktogramm(darstText);
   const totalHeight = StruktogrammHeight(nodes, rowH) || rowH;
   const out = [];
   RenderStruktogrammNodes(nodes, 1, 1, width - 2, rowH, out);
-  return '<svg viewBox="0 0 ' + width + ' ' + (totalHeight + 2) + '" width="100%" style="max-width:640px;height:auto;display:block;margin:6px 0;" xmlns="http://www.w3.org/2000/svg">' +
+  return '<svg viewBox="0 0 ' + width + ' ' + (totalHeight + 2) + '" width="100%" style="max-width:760px;height:auto;display:block;margin:6px 0;" xmlns="http://www.w3.org/2000/svg">' +
     out.join("") + '</svg>';
 }
 
@@ -1039,7 +1101,7 @@ function renderIchKannListe() {
         } else {
           statusHtml = '<button onclick="event.stopPropagation();addTaskToSprint(\'' + esc(t.id) + '\')">+ In Sprint</button>';
         }
-        return '<div class="fz-task-row" onclick="openTaskInfoModal(\'' + esc(t.id) + '\')"><span class="fz-task-text"><span class="task-num">' + esc(t.id.replace(/^LF\d_/, "").replace(/_/g, "-")) + '</span> ' + esc(t.kurz || t.text) + '</span>' + statusHtml + '</div>';
+        return '<div class="fz-task-row" onclick="openTaskInfoModal(\'' + esc(t.id) + '\')"><span class="fz-task-text"><span class="task-num">' + esc(t.id) + '</span> ' + esc(t.kurz || t.text) + '</span>' + statusHtml + '</div>';
       }).join("");
       return '<div class="feinziel-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + fzKey + '" onclick="toggleFeinziel(this)">' +
         '<span class="ampel-dot" style="background:' + ampelColor(points) + '"></span>' +
@@ -1075,48 +1137,168 @@ const FEINZIEL_TASK_TITLES = {
 };
 
 // ---------------------------------------------------------------------------
-// Ergebnisuebersicht des letzten AKTIVEN Sprints (nicht zwingend die Vorwoche)
+// Ergebnisuebersicht aller vergangenen aktiven Sprints
 // ---------------------------------------------------------------------------
-function renderRetro() {
-  const keys = Object.keys(sprints).filter(k => k !== todayKey).sort();
+const HANDBUCH = [{"lf": "LF1", "fz": ["1.1", "1.2"], "cat": "Grundlagen", "title": "Was ist ein Array?", "html": "Ein Array speichert mehrere Werte gleichen Typs unter einem gemeinsamen Namen, direkt hintereinander im Speicher. Statt vieler einzelner Variablen gibt es einen Namen, über den man mit einer Positionsangabe (dem <code>Index</code>) auf jeden einzelnen Wert zugreifen kann."}, {"lf": "LF1", "fz": ["2.2"], "cat": "Grundlagen", "title": "Index – Zählung ab 0", "html": "Die Positionen in einem Array werden von 0 an durchnummeriert, nicht von 1. Bei einem Array mit 5 Elementen sind die gültigen Indizes also 0, 1, 2, 3 und 4 – der Index 5 existiert nicht."}, {"lf": "LF1", "fz": ["2.2"], "cat": "Zugriff", "title": "Wert auslesen: array[i]", "html": "<code>print(array[i])</code> gibt den Wert an Position <code>i</code> aus. Dies ist ein echter <code>print()</code>-Aufruf und erzeugt daher eine sichtbare Ausgabe in der Konsole."}, {"lf": "LF1", "fz": ["2.4"], "cat": "Zugriff", "title": "Wert überschreiben: Zuweisung", "html": "<code>array[i] = wert</code> überschreibt den bestehenden Wert an Position <code>i</code>. Das ist eine reine Zuweisung – sie verändert das Array im Speicher, gibt aber selbst nichts auf dem Bildschirm aus."}, {"lf": "LF1", "fz": ["2.3"], "cat": "Verändern", "title": "Element anhängen: append()", "html": "<code>array.append(wert)</code> fügt einen neuen Wert immer ganz hinten an, niemals mittendrin. Der neue Wert bekommt automatisch den nächsten freien Index (bisherige Länge des Arrays)."}, {"lf": "LF1", "fz": ["2.4"], "cat": "Verändern", "title": "Array leeren", "html": "<code>array = []</code> setzt das Array auf eine leere Liste zurück. Alle bisherigen Elemente gehen dabei verloren."}, {"lf": "LF1", "fz": ["2.5"], "cat": "Referenz", "title": "Länge ermitteln: len(array)", "html": "<code>len(array)</code> gibt die Anzahl der gespeicherten Elemente zurück. Achtung: Der höchste gültige Index ist nicht <code>len(array)</code>, sondern <code>len(array) - 1</code> – weil die Zählung bei 0 beginnt."}, {"lf": "LF1", "fz": ["2.6"], "cat": "Schleifen", "title": "Alle Elemente durchlaufen", "html": "<code>for i in range(len(array)):</code> lässt <code>i</code> automatisch jeden gültigen Index einmal annehmen (0 bis len(array) - 1). Im Schleifenrumpf greift man dann z. B. mit <code>print(array[i])</code> auf das jeweilige Element zu."}, {"lf": "LF1", "fz": ["2.2"], "cat": "Referenz", "title": "Einzelnes Element vs. ganzes Array ausgeben", "html": "<code>print(array[i])</code> gibt nur den einzelnen Wert ohne Anführungszeichen aus. <code>print(array)</code> gibt das gesamte Array im Python-typischen Format mit einfachen Anführungszeichen aus, z. B. <code>['Nord', 'Ost', 'Süd']</code>."}, {"lf": "LF1", "fz": ["2.1"], "cat": "Struktogramm", "title": "Deklaration und Initialisierung", "html": "Im Struktogramm: <code>Deklaration und Initialisierung: array = [\"Nord\", \"Ost\", \"Süd\"]</code>. Ein leeres Array wird als <code>array als Array = [ ]</code> notiert."}, {"lf": "LF1", "fz": ["2.4"], "cat": "Struktogramm", "title": "Zuweisung an ein Arrayelement", "html": "Im Struktogramm: <code>Zuweisung: array[feldindex] = wert</code>. Diese Notation gilt sowohl für das Ändern eines bestehenden Werts als auch für das Anhängen (wenn der Index noch nicht existiert)."}, {"lf": "LF1", "fz": ["2.3"], "cat": "Struktogramm", "title": "Anhängen – Struktogramm vs. Python", "html": "Wichtiger Unterschied: Im Struktogramm wird Anhängen als Zuweisung an einen neuen, bisher nicht existierenden Index dargestellt (<code>array[3] = wert</code>, wenn das Array vorher 3 Elemente hatte). In Python nutzen wir dafür stattdessen die bequemere Methode <code>array.append(wert)</code>."}, {"lf": "LF1", "fz": ["2.6"], "cat": "Struktogramm", "title": "Schleife im Struktogramm", "html": "Für eine zählergesteuerte Schleife: <code>Wiederhole von i = 0 solange i &lt; len(array), Schrittweite 1</code> mit dem Schleifenrumpf eingerückt darunter. Diese Notation ist in der Abiturprüfung verbindlich."}, {"lf": "LF1", "fz": ["2.2"], "cat": "Fehler & Debugging", "title": "IndexError verstehen", "html": "<code>IndexError: list index out of range</code> bedeutet: Der verwendete Index zeigt auf keine vorhandene Position. Prüft: Wie viele Elemente hat das Array (<code>len(array)</code>)? Der gültige Bereich ist 0 bis <code>len(array) - 1</code>."}, {"lf": "LF1", "fz": ["2.9"], "cat": "Fehler & Debugging", "title": "Zustand vs. Ausgabe nicht verwechseln", "html": "Eine Zeile wie <code>array.append(wert)</code> oder <code>array[i] = wert</code> verändert nur den Speicher – sie erzeugt für sich genommen keine Ausgabe. Sichtbar wird das Ergebnis erst durch einen eigenen <code>print(...)</code>-Aufruf."}, {"lf": "LF1", "fz": ["2.10"], "cat": "Fehler & Debugging", "title": "Werte beim Tauschen nicht überschreiben", "html": "Wer zwei Arrayelemente vertauschen will, darf nicht einfach <code>array[a] = array[b]</code> gefolgt von <code>array[b] = array[a]</code> schreiben – der erste Wert ist dann bereits verloren. Man braucht eine Zwischenspeicher-Variable: <code>temp = array[a]</code>, dann <code>array[a] = array[b]</code>, dann <code>array[b] = temp</code>."}, {"lf": "LF1", "fz": ["2.9"], "cat": "Schreibtischtest", "title": "Schreibtischtest – Vorgehen", "html": "Legt eine Tabelle mit allen Variablen an. Tragt die Startwerte ein. Geht den Algorithmus Zeile für Zeile gedanklich durch und tragt bei jeder Wertänderung eine neue Zeile ein. So lässt sich die Ausgabe eines Programms ohne Computer nachvollziehen – das wird auch im Abitur verlangt."}, {"lf": "LF1", "fz": ["2.10"], "cat": "Verändern", "title": "Werte tauschen – die Zwischenspeicher-Falle", "html": "<code>array[a] = array[b]</code> gefolgt von <code>array[b] = array[a]</code> funktioniert NICHT: Der ursprüngliche Wert von <code>array[a]</code> ist nach der ersten Zeile bereits überschrieben und für immer verloren. Richtig: <code>temp = array[a]</code>, dann <code>array[a] = array[b]</code>, dann <code>array[b] = temp</code>."}, {"lf": "LF1", "fz": ["2.11"], "cat": "Verändern", "title": "Element mitten im Array einfügen", "html": "Um einen Wert an Index i einzufügen, ohne etwas zu überschreiben, müssen zuerst alle Werte ab i einen Platz nach hinten rücken (beginnend am Ende, damit nichts überschrieben wird), bevor der neue Wert an Index i eingetragen wird. Das Array wird dabei um genau ein Element länger."}, {"lf": "LF1", "fz": ["2.12"], "cat": "Verändern", "title": "Element mitten im Array entfernen", "html": "Um den Wert an Index i zu entfernen, rücken alle nachfolgenden Werte einen Platz nach vorne (beginnend bei i). Danach ist der letzte Platz doppelt belegt und wird entfernt. Das Array wird dabei um genau ein Element kürzer."}, {"lf": "LF1", "fz": ["2.8"], "cat": "Auswerten", "title": "Summe und Durchschnitt bilden", "html": "Grundmuster: eine Variable (z. B. <code>summe</code>) wird vor der Schleife auf 0 gesetzt und in jedem Durchlauf um <code>array[i]</code> erhöht. Für den Durchschnitt wird die Summe am Ende durch <code>len(array)</code> geteilt."}, {"lf": "LF1", "fz": ["2.7"], "cat": "Auswerten", "title": "Maximum und Minimum finden", "html": "Grundmuster: eine Variable wird vor der Schleife auf <code>array[0]</code> gesetzt (nicht auf 0!). Die Schleife beginnt daher erst bei Index 1 und vergleicht jeden weiteren Wert – ist er größer (bzw. kleiner), wird die Variable aktualisiert."}, {"lf": "LF2", "fz": ["1.1"], "cat": "Grundlagen", "title": "Was ist ein Algorithmus?", "html": "Ein Algorithmus besteht aus präzise formulierten Anweisungen, die einen eindeutigen und vollständigen Lösungsweg aufzeigen. In eine Programmiersprache übersetzt wird daraus ein Programm."}, {"lf": "LF2", "fz": ["1.1", "1.2"], "cat": "Grundlagen", "title": "Eigenschaften eines Algorithmus", "html": "Allgemeingültigkeit (löst eine ganze Klasse von Problemen), Eindeutigkeit/Widerspruchsfreiheit, Ausführbarkeit, Finitheit (endliche Anzahl an Schritten), Terminiertheit (kommt nach endlich vielen Schritten zu einem Ergebnis), Determiniertheit (gleiche Voraussetzungen → gleiches Ergebnis) und Determinismus (der Folgeschritt ist immer eindeutig)."}, {"lf": "LF2", "fz": ["2.1"], "cat": "Bubble Sort", "title": "Prinzip", "html": "Benachbarte Elemente werden paarweise verglichen und bei falscher Reihenfolge vertauscht. Nach jedem vollständigen Durchgang (einer „Bubble-Phase“) steht das größte noch unsortierte Element an seiner endgültigen Position."}, {"lf": "LF2", "fz": ["2.2"], "cat": "Bubble Sort", "title": "Tauschen mit Zwischenspeicher", "html": "Auch beim Sortieren gilt: <code>array[j] = array[j+1]</code> gefolgt von <code>array[j+1] = array[j]</code> funktioniert nicht. Man braucht <code>temp = array[j]</code>, dann die beiden Zuweisungen."}, {"lf": "LF2", "fz": ["2.6"], "cat": "Selection Sort", "title": "Prinzip", "html": "In jedem Durchgang wird das kleinste Element im noch unsortierten Bereich gesucht und an die richtige Position getauscht. Nach dem i-ten Durchgang stehen die ersten i+1 Elemente endgültig fest."}, {"lf": "LF2", "fz": ["2.7"], "cat": "Selection Sort", "title": "Warum kein min()?", "html": "Im Unterricht wird die Suche nach dem kleinsten Element bewusst selbst programmiert (Variable <code>kleinsterIndex</code>, die bei jedem Vergleich ggf. aktualisiert wird), weil genau das der Lerninhalt ist. In der Prüfung ist ein Shortcut wie <code>min(array)</code> nicht zulässig."}, {"lf": "LF2", "fz": ["3.1", "3.2"], "cat": "Lineare Suche", "title": "Prinzip", "html": "Die Elemente werden der Reihe nach von vorne mit dem gesuchten Wert verglichen, bis eine Übereinstimmung gefunden wird oder das Array endet. Funktioniert auf jedem Array, auch unsortiert."}, {"lf": "LF2", "fz": ["3.3"], "cat": "Binäre Suche", "title": "Prinzip", "html": "Der mittlere Wert des aktuellen Suchbereichs wird geprüft. Ist er zu klein, wird nur noch in der rechten Hälfte weitergesucht, ist er zu groß, nur noch in der linken Hälfte – der Suchbereich halbiert sich mit jedem Schritt."}, {"lf": "LF2", "fz": ["3.3", "3.4"], "cat": "Binäre Suche", "title": "Voraussetzung: sortiert!", "html": "Die binäre Suche funktioniert nur auf einem bereits sortierten Array. Auf einem unsortierten Array liefert sie falsche oder zufällige Ergebnisse."}, {"lf": "LF2", "fz": ["3.1", "3.3"], "cat": "Vergleich", "title": "Aufwand: linear vs. binär", "html": "Lineare Suche braucht im ungünstigsten Fall n Vergleiche bei n Elementen. Binäre Suche braucht nur etwa log₂(n) Vergleiche – bei 1000 Elementen also höchstens ca. 10 statt bis zu 1000."}, {"lf": "LF2", "fz": ["2.4", "3.1"], "cat": "Laufzeit", "title": "Was bedeutet O(n)?", "html": "Die <strong>O-Notation</strong> beschreibt, wie stark der Aufwand eines Algorithmus wächst, wenn die Datenmenge n größer wird – nicht die genaue Anzahl der Schritte, sondern das <em>Wachstumsverhalten</em>. O(n) heißt: verdoppelt sich n, verdoppelt sich (ungefähr) auch der Aufwand."}, {"lf": "LF2", "fz": ["2.4"], "cat": "Laufzeit", "title": "Bubble Sort und Selection Sort: O(n²)", "html": "Beide Algorithmen haben <strong>zwei verschachtelte Schleifen</strong> und brauchen deshalb immer etwa n·(n-1)/2 Vergleiche. Das nennt man <strong>quadratischen Aufwand</strong>: Verdoppelt sich die Anzahl der Elemente, <em>vervierfacht</em> sich der Aufwand. Bei kleinen Arrays kein Problem, bei großen Datenmengen aber sehr langsam."}, {"lf": "LF2", "fz": ["3.1"], "cat": "Laufzeit", "title": "Lineare Suche: O(n)", "html": "Eine einzige Schleife reicht, aber im schlechtesten Fall muss sie komplett durchlaufen werden. Der Aufwand wächst <strong>proportional</strong> zur Datenmenge: doppelt so viele Elemente bedeuten höchstens doppelt so viele Vergleiche."}, {"lf": "LF2", "fz": ["3.3"], "cat": "Laufzeit", "title": "Binäre Suche: O(log n)", "html": "Weil sich der Suchbereich mit jedem Vergleich halbiert, wächst der Aufwand nur <strong>logarithmisch</strong>. Doppelt so viele Elemente bedeuten nur einen einzigen zusätzlichen Vergleich – deshalb bleibt die binäre Suche auch bei riesigen sortierten Datenmengen extrem schnell."}, {"lf": "LF2", "fz": ["2.3", "2.7"], "cat": "Struktogramm", "title": "Verschachtelte Schleifen", "html": "Bubble Sort und Selection Sort nutzen zwei ineinander verschachtelte Zählschleifen. Im Struktogramm steht die innere Schleife eingerückt innerhalb der äußeren – genau wie im Python-Code die doppelte Einrückung."}, {"lf": "LF2", "fz": ["2.3", "2.7"], "cat": "Fehler & Debugging", "title": "Off-by-one bei der inneren Schleife", "html": "Bei Bubble Sort muss die innere Schleife bei <code>range(n - 1 - i)</code> enden, sonst wird auf ein nicht existierendes Element <code>array[j+1]</code> zugegriffen (IndexError) oder es werden unnötige Vergleiche gemacht."}, {"lf": "LF2", "fz": ["2.7"], "cat": "Fehler & Debugging", "title": "kleinsterIndex vs. kleinster Wert", "html": "Ein häufiger Fehler bei Selection Sort: Man muss den <strong>Index</strong> des kleinsten Werts mitführen, nicht den Wert selbst – sonst weiß man am Ende nicht, welche Position man tauschen muss."}, {"lf": "LF3", "fz": ["1.1"], "cat": "Verkettete Liste", "title": "Knoten", "html": "Ein Element einer verketteten Liste, bestehend aus Daten und einem Zeiger auf den nächsten Knoten."}, {"lf": "LF3", "fz": ["1.1"], "cat": "Verkettete Liste", "title": "Anker", "html": "Verweist auf den ersten Knoten der Liste. Ohne Anker wäre die Liste nicht mehr erreichbar."}, {"lf": "LF3", "fz": ["1.1"], "cat": "Verkettete Liste", "title": "Zeiger", "html": "Verweis eines Knotens auf den nächsten Knoten (oder auf NULL, wenn kein weiterer folgt)."}, {"lf": "LF3", "fz": ["2.1"], "cat": "Stapelspeicher", "title": "LIFO", "html": "Last In, First Out – das zuletzt hinzugefügte Element wird zuerst wieder entfernt."}, {"lf": "LF3", "fz": ["2.2"], "cat": "Stapelspeicher", "title": "push / pop", "html": "push legt ein Element oben auf den Stapel, pop entfernt das oberste Element."}, {"lf": "LF3", "fz": ["3.1"], "cat": "Warteschlange", "title": "FIFO", "html": "First In, First Out – das zuerst hinzugefügte Element wird zuerst wieder entfernt."}, {"lf": "LF3", "fz": ["3.2"], "cat": "Warteschlange", "title": "enqueue / dequeue", "html": "enqueue reiht ein Element hinten ein, dequeue entfernt das vorderste Element."}, {"lf": "LF3", "fz": ["4.1"], "cat": "Baum", "title": "Wurzel", "html": "Der oberste Knoten eines Baumes, der einzige Knoten ohne Eltern-Knoten."}, {"lf": "LF3", "fz": ["4.1"], "cat": "Baum", "title": "Blatt", "html": "Ein Knoten ohne eigene Kind-Knoten."}, {"lf": "LF3", "fz": ["4.2"], "cat": "Baum", "title": "Binärbaum", "html": "Ein Baum, bei dem jeder Knoten höchstens zwei Kind-Knoten hat (links/rechts)."}, {"lf": "LF3", "fz": ["4.2"], "cat": "Baum", "title": "Sortierter Binärbaum", "html": "Ein Binärbaum, bei dem im linken Teilbaum nur kleinere und im rechten Teilbaum nur größere Werte stehen als der jeweilige Knoten."}, {"lf": "LF3", "fz": ["4.3"], "cat": "Baum", "title": "Voller Binärbaum", "html": "Jeder Knoten hat entweder keine oder genau zwei Kind-Knoten."}, {"lf": "LF3", "fz": ["4.3"], "cat": "Baum", "title": "Vollständiger Binärbaum", "html": "Alle Ebenen sind bis auf die letzte vollständig gefüllt, die letzte Ebene ist von links nach rechts aufgefüllt."}];
+
+function fzSortKey(fz) { return fz.split(".").map(n => String(n).padStart(3, "0")).join("."); }
+// Feinziele (Schluessel "LF1|2.1") der bereits freigeschalteten Lernfelder, sortiert.
+function freigegebeneFeinziele() {
+  return Object.keys(FEINZIEL_INDEX)
+    .filter(k => LF_FREIGABE[FEINZIEL_INDEX[k].lf])
+    .sort((a, b) => {
+      const A = FEINZIEL_INDEX[a], B = FEINZIEL_INDEX[b];
+      return A.lf.localeCompare(B.lf) || fzSortKey(A.fz).localeCompare(fzSortKey(B.fz));
+    });
+}
+function feinzielLabel(key) {
+  const d = FEINZIEL_INDEX[key];
+  return d.lf + " · [" + d.fz + "] " + (FEINZIEL_TASK_TITLES[d.blockId + "|" + d.fz] || "");
+}
+// Befuellt eine Feinziel-Auswahl nur mit freigeschalteten Feinzielen; behaelt die Auswahl, falls sie noch gueltig ist.
+function fillFeinzielSelect(sel) {
+  const prev = sel.value;
+  const keys = freigegebeneFeinziele();
+  let html = '<option value="">Alle Feinziele</option>', lf = null;
+  keys.forEach(k => {
+    const d = FEINZIEL_INDEX[k];
+    if (d.lf !== lf) { if (lf) html += '</optgroup>'; html += '<optgroup label="' + esc(d.lf) + '">'; lf = d.lf; }
+    html += '<option value="' + esc(k) + '">' + esc(feinzielLabel(k)) + '</option>';
+  });
+  if (lf) html += '</optgroup>';
+  sel.innerHTML = html;
+  sel.value = keys.includes(prev) ? prev : "";
+}
+function renderHandbuch() {
+  const sel = document.getElementById("hbFz");
+  fillFeinzielSelect(sel);
+  const out = document.getElementById("hbList");
+  const freigegeben = HANDBUCH.filter(e => LF_FREIGABE[e.lf]);
+  if (!freigegeben.length) { out.innerHTML = '<div class="hb-empty">Eure Lehrkraft hat noch kein Lernfeld freigeschaltet – das Handbuch füllt sich mit jeder Freigabe.</div>'; return; }
+  const q = document.getElementById("hbSearch").value.trim().toLowerCase();
+  const fzKey = sel.value;
+  const fzSel = fzKey ? { lf: FEINZIEL_INDEX[fzKey].lf, fz: FEINZIEL_INDEX[fzKey].fz } : null;
+  const list = freigegeben.filter(e => {
+    if (fzSel && !(e.lf === fzSel.lf && e.fz.includes(fzSel.fz))) return false;
+    if (q && !(e.title + " " + e.cat + " " + e.html.replace(/<[^>]*>/g, " ")).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!list.length) { out.innerHTML = '<div class="hb-empty">Kein Treffer. Versucht einen anderen Suchbegriff oder ein anderes Feinziel.</div>'; return; }
+  out.innerHTML = list.map(e => {
+    const fzTxt = e.fz.map(f => { const k = e.lf + "|" + f; return FEINZIEL_INDEX[k] ? "[" + f + "] " + (FEINZIEL_TASK_TITLES[FEINZIEL_INDEX[k].blockId + "|" + f] || "") : "[" + f + "]"; }).join(" · ");
+    return '<div class="hb-section"><h3>' + esc(e.title) + '<span class="hb-tag lf">' + esc(e.lf) + '</span><span class="hb-tag">' + esc(e.cat) + '</span></h3>' +
+      '<div class="content">' + e.html + '</div><div class="hb-fz">Feinziel ' + esc(fzTxt) + '</div></div>';
+  }).join("");
+}
+document.getElementById("hbSearch").addEventListener("input", renderHandbuch);
+document.getElementById("hbFz").addEventListener("change", renderHandbuch);
+
+function showView() {
+  const hb = location.hash === "#handbuch";
+  document.getElementById("viewBoard").style.display = hb ? "none" : "";
+  document.getElementById("viewHandbuch").style.display = hb ? "" : "none";
+  currentNavId = hb ? "HB" : null;
+  renderLfNav();
+  if (hb) renderHandbuch();
+}
+window.addEventListener("hashchange", showView);
+
+function sprintKeyRange(key) {
+  const m = key.match(/^(\d{4})-W(\d{2})$/);
+  if (!m) return "";
+  const jan4 = new Date(Date.UTC(+m[1], 0, 4));
+  const monday = new Date(jan4);
+  monday.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() + 6) % 7) + (+m[2] - 1) * 7);
+  const sunday = new Date(monday); sunday.setUTCDate(monday.getUTCDate() + 6);
+  const fmt = x => x.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", timeZone: "UTC" });
+  return "KW " + (+m[2]) + " (" + fmt(monday) + " – " + fmt(sunday) + ")";
+}
+function retroEnsureControls() {
   const box = document.getElementById("retroBox");
-  if (!keys.length) { box.innerHTML = '<p>Noch kein abgeschlossener Sprint vorhanden.</p>'; return; }
-  const lastKey = keys[keys.length - 1];
-  const sprint = sprints[lastKey];
-  const total = Object.keys(sprint.tasks).length;
-  const done = Object.values(sprint.tasks).filter(t => t.status === "done").length;
-  const doneList = Object.keys(sprint.tasks).filter(id => sprint.tasks[id].status === "done")
-    .map(id => { const t = getTaskById(id); return t ? esc(t.id) : id; }).join(", ") || "keine";
-  box.innerHTML = '<p><strong>Letzter aktiver Sprint: ' + lastKey + '</strong></p>' +
-    '<p>' + done + ' von ' + total + ' Aufgaben erledigt.</p>' +
-    '<p>Erledigt: ' + doneList + '</p>';
+  if (!box.querySelector("#retroSearch")) {
+    box.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center;">' +
+      '<input type="search" id="retroSearch" placeholder="Aufgabe suchen (Nummer oder Stichwort)…" style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;">' +
+      '<select id="retroFz" style="padding:6px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;max-width:100%;"></select>' +
+      '<label style="font-size:0.85rem;white-space:nowrap;"><input type="checkbox" id="retroDoneOnly"> nur erledigte</label></div>' +
+      '<div id="retroResults"></div>';
+    ["input", "change"].forEach(ev => {
+      box.querySelector("#retroSearch").addEventListener(ev, renderRetro);
+      box.querySelector("#retroFz").addEventListener(ev, renderRetro);
+      box.querySelector("#retroDoneOnly").addEventListener(ev, renderRetro);
+    });
+  }
+  fillFeinzielSelect(box.querySelector("#retroFz")); // nur freigeschaltete Feinziele
+}
+function renderRetro() {
+  retroEnsureControls();
+  const out = document.getElementById("retroResults");
+  const q = document.getElementById("retroSearch").value.trim().toLowerCase();
+  const fzKey = document.getElementById("retroFz").value;
+  const doneOnly = document.getElementById("retroDoneOnly").checked;
+  const fzIds = fzKey ? new Set(FEINZIEL_INDEX[fzKey].tasks.map(t => t.id)) : null;
+  const statusLabel = { todo: "To Do", doing: "Doing", done: "erledigt" };
+  // Alle vergangenen Sprints, in denen Aufgaben im Sprint lagen (neueste zuerst).
+  const keys = Object.keys(sprints)
+    .filter(k => k !== todayKey && sprints[k] && sprints[k].tasks && Object.keys(sprints[k].tasks).length > 0)
+    .sort().reverse();
+  if (!keys.length) { out.innerHTML = '<p>Noch kein abgeschlossener Sprint vorhanden.</p>'; return; }
+  const html = keys.map(key => {
+    const tasks = sprints[key].tasks;
+    const allIds = Object.keys(tasks);
+    const doneCount = allIds.filter(id => tasks[id].status === "done").length;
+    const shown = allIds.filter(id => {
+      if (doneOnly && tasks[id].status !== "done") return false;
+      if (fzIds && !fzIds.has(id)) return false;
+      if (q) {
+        const t = getTaskById(id);
+        const hay = (id + " " + (t ? (t.kurz || "") + " " + t.text : "")).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    if (!shown.length) return "";
+    const rows = shown.map(id => {
+      const t = getTaskById(id);
+      const st = tasks[id].status;
+      return '<li>' + (st === "done" ? "✓ " : "○ ") + (t ? esc(t.id) + (t.kurz ? " – " + esc(t.kurz) : "") : esc(id)) +
+        ' <span style="color:var(--muted);">(' + (statusLabel[st] || esc(st)) + ')</span></li>';
+    }).join("");
+    return '<div class="retro-sprint" style="margin-bottom:14px;">' +
+      '<p><strong>Sprint ' + esc(sprintKeyRange(key) || key) + '</strong> · ' + doneCount + ' von ' + allIds.length + ' Aufgaben erledigt</p>' +
+      '<ul style="margin:4px 0 0 18px;padding:0;list-style:none;">' + rows + '</ul></div>';
+  }).join("");
+  out.innerHTML = html || '<p>Keine Aufgaben für diese Suche/Filter gefunden.</p>';
 }
 document.getElementById("retroToggle").addEventListener("click", () => {
   const box = document.getElementById("retroBox");
   const open = box.classList.toggle("open");
-  document.getElementById("retroToggle").textContent = (open ? "▾" : "▸") + " Ergebnisübersicht des letzten aktiven Sprints anzeigen";
+  document.getElementById("retroToggle").textContent = (open ? "▾" : "▸") + " Ergebnisübersicht aller vergangenen Sprints anzeigen";
 });
 
 function renderAll() {
   renderSprintBoard();
   renderIchKannListe();
   renderRetro();
+  if (location.hash === "#handbuch") renderHandbuch();
 }
 
 // ---------------------------------------------------------------------------
 // Gemeinsame Navigation ueber alle Seiten (Sprint-Board + je LF-Werkstatt)
 // ---------------------------------------------------------------------------
-function renderLfNav(currentPage) {
+let currentNavId = null;
+function renderLfNav() {
+  const currentPage = currentNavId;
   const items = [
-    { href: "index.html", label: "Sprint-Board", id: null },
+    { href: "index.html#board", label: "Sprint-Board", id: null },
     { href: "bpe7-lf1.html", label: "LF1 · Arrays", id: "LF1" },
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
-    { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" }
+    { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
+    { href: "index.html#handbuch", label: "Handbuch", id: "HB" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && !LF_FREIGABE[item.id];
+    const locked = item.id && item.id !== "HB" && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
@@ -1128,7 +1310,7 @@ function renderLfNav(currentPage) {
 // Sofort mit dem zwischengespeicherten (oder Default-) Freigabe-Stand rendern,
 // statt erst auf den Firestore-Roundtrip zu warten - vermeidet das kurze
 // Aufblitzen einer leeren Navigationsleiste beim Laden der Seite.
-renderLfNav(null);
+renderLfNav();
 
 // ---------------------------------------------------------------------------
 // Anwesenheits-Heartbeat: aktualisiert regelmaessig lastSeen der Sitzung, die
@@ -1177,7 +1359,7 @@ onAuthStateChanged(auth, async (user) => {
           } else {
             // Freigabe hat sich waehrend der laufenden Sitzung geaendert - Ansicht sofort aktualisieren.
             renderAll();
-            renderLfNav(null);
+            renderLfNav();
           }
         }, (err) => {
           console.warn("Freigaben-Live-Update fehlgeschlagen: " + (err.code || err.message));
@@ -1188,7 +1370,7 @@ onAuthStateChanged(auth, async (user) => {
     await ladeAlleSprints();
     await ensureCurrentSprint();
     renderAll();
-    renderLfNav(null);
+    showView();
     startHeartbeat();
   } catch (err) {
     alert("Fehler beim Laden deiner Daten: " + (err.code || err.message) + " - bitte Seite neu laden.");
