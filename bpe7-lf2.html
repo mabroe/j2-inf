@@ -907,6 +907,7 @@
   .lf1-task-row:last-child { border-bottom: none; }
   .lf1-task-row:hover { background: var(--empty); }
   .lf1-task-row .lf1-task-text { flex: 1; }
+  .lf1-task-num { font-weight: 700; color: var(--muted, #666); margin-right: 6px; font-variant-numeric: tabular-nums; }
   .lf1-task-row button { border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 6px; padding: 4px 10px; font-size: 0.76rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
   .lf1-task-row button:hover { background: var(--empty); color: var(--navy); }
   .lf1-status-label { font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
@@ -2586,15 +2587,15 @@ const LF2_BLOCKS = [
     title: "LF2 – Grobziel 1: Algorithmus-Begriff",
     weeks: "ab Woche 5",
     tasks: [
-      { id: "LF2_L1.1a", tier: 1, text: "[1.1] Nennen Sie zwei Eigenschaften, die ein Algorithmus erfuellen muss." },
-      { id: "LF2_L1.1b", tier: 2, text: "[1.1] Definieren Sie den Begriff Algorithmus." },
-      { id: "LF2_L1.1c", tier: 3, text: "[1.1] Beurteilen Sie, ob die Anweisung \"Ruehren Sie den Teig, bis er gut aussieht\" die Anforderungen an einen Algorithmus erfuellt." },
-      { id: "LF2_L1.2a", tier: 1, text: "[1.2] Beschreiben Sie in einem Satz, was mit der Eigenschaft Terminiertheit eines Algorithmus gemeint ist." },
-      { id: "LF2_L1.2b", tier: 2, text: "[1.2] Erklaeren Sie die Eigenschaften Eindeutigkeit und Determiniertheit jeweils anhand eines selbst gewaehlten Beispiels." },
-      { id: "LF2_L1.2c", tier: 3, text: "[1.2] Erlaeutern Sie, warum eine Kochanleitung, die \"nach Belieben Salz hinzufuegen\" verlangt, nicht die Eigenschaft der Eindeutigkeit erfuellt." },
-      { id: "LF2_L1.3a", tier: 1, text: "[1.3] Stellen Sie die Schritte, die noetig sind, um ein Ei hart zu kochen, als nummerierte Liste von Anweisungen dar." },
-      { id: "LF2_L1.3b", tier: 2, text: "[1.3] Entwickeln Sie einen Algorithmus in Alltagssprache, der beschreibt, wie man mit einer Filtermaschine Kaffee aufbrueht." },
-      { id: "LF2_L1.3c", tier: 3, text: "[1.3] Entwerfen Sie einen Algorithmus in Alltagssprache fuer das Sortieren von Waesche vor dem Waschen, der eine Fallunterscheidung nach Farbe (hell/dunkel) enthaelt." },
+      { id: "LF2_L1.1a", tier: 1,  kurz: "Eigenschaften eines Algorithmus",text: "[1.1] Nennen Sie zwei Eigenschaften, die ein Algorithmus erfuellen muss." },
+      { id: "LF2_L1.1b", tier: 2,  kurz: "Begriff Algorithmus",text: "[1.1] Definieren Sie den Begriff Algorithmus." },
+      { id: "LF2_L1.1c", tier: 3,  kurz: "Anweisung beurteilen",text: "[1.1] Beurteilen Sie, ob die Anweisung \"Ruehren Sie den Teig, bis er gut aussieht\" die Anforderungen an einen Algorithmus erfuellt." },
+      { id: "LF2_L1.2a", tier: 1,  kurz: "Terminiertheit",text: "[1.2] Beschreiben Sie in einem Satz, was mit der Eigenschaft Terminiertheit eines Algorithmus gemeint ist." },
+      { id: "LF2_L1.2b", tier: 2,  kurz: "Eindeutigkeit und Determiniertheit",text: "[1.2] Erklaeren Sie die Eigenschaften Eindeutigkeit und Determiniertheit jeweils anhand eines selbst gewaehlten Beispiels." },
+      { id: "LF2_L1.2c", tier: 3,  kurz: "Eindeutigkeit beurteilen",text: "[1.2] Erlaeutern Sie, warum eine Kochanleitung, die \"nach Belieben Salz hinzufuegen\" verlangt, nicht die Eigenschaft der Eindeutigkeit erfuellt." },
+      { id: "LF2_L1.3a", tier: 1,  kurz: "Algorithmus: Ei kochen",text: "[1.3] Stellen Sie die Schritte, die noetig sind, um ein Ei hart zu kochen, als nummerierte Liste von Anweisungen dar." },
+      { id: "LF2_L1.3b", tier: 2,  kurz: "Algorithmus: Kaffee kochen",text: "[1.3] Entwickeln Sie einen Algorithmus in Alltagssprache, der beschreibt, wie man mit einer Filtermaschine Kaffee aufbrueht." },
+      { id: "LF2_L1.3c", tier: 3,  kurz: "Algorithmus mit Fallunterscheidung",text: "[1.3] Entwerfen Sie einen Algorithmus in Alltagssprache fuer das Sortieren von Waesche vor dem Waschen, der eine Fallunterscheidung nach Farbe (hell/dunkel) enthaelt." },
     ]
   },
   {
@@ -2602,27 +2603,27 @@ const LF2_BLOCKS = [
     title: "LF2 – Grobziel 2: Sortieren",
     weeks: "ab Woche 5",
     tasks: [
-      { id: "LF2_L2.1a", tier: 1, text: "[2.1] Beschreiben Sie in einem Satz, was bei Bubble Sort mit zwei benachbarten Arrayelementen passiert, wenn das linke groesser ist als das rechte." },
-      { id: "LF2_L2.1b", tier: 2, text: "[2.1] Erklaeren Sie die Funktionsweise von Bubble Sort anhand des Arrays [5, 2, 8, 1]: Wie veraendert sich das Array im ersten Durchgang?" },
-      { id: "LF2_L2.1c", tier: 3, text: "[2.1] Erlaeutern Sie, warum bei Bubble Sort nach jedem vollstaendigen Durchgang mindestens ein weiteres Element an seiner endgueltigen Position steht, und warum die innere Schleife deshalb bei jedem Durchgang um ein Element verkuerzt werden kann." },
-      { id: "LF2_L2.2a", tier: 1, text: "[2.2] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays werte vertauscht.", problem: "Beim Sortieren muessen wiederholt zwei benachbarte Werte eines Arrays ihre Position tauschen.", io: "Ausgabe: " },
-      { id: "LF2_L2.2b", tier: 2, text: "[2.2] Erstellen Sie einen Algorithmus, der die Werte an Index j und j+1 des Arrays werte nur bei Bedarf vertauscht.", problem: "Zwei benachbarte Werte sollen nur dann vertauscht werden, wenn der linke Wert groesser ist als der rechte - das ist genau der Kernschritt von Bubble Sort.", io: "Ausgabe: " },
-      { id: "LF2_L2.2c", tier: 3, text: "[2.2] Beurteilen Sie, ob dieser Ansatz funktioniert, und begruenden Sie Ihre Antwort mit einem Schreibtischtest fuer werte = [9, 4].", problem: "Ein Mitschueler behauptet, man koenne zwei Arrayelemente auch ohne eine Zwischenspeicher-Variable vertauschen, indem man einfach werte[j] = werte[j+1] und danach werte[j+1] = werte[j] schreibt." },
-      { id: "LF2_L2.3a", tier: 1, text: "[2.3] Erstellen Sie einen Algorithmus, der das Array zahlen mit Bubble Sort aufsteigend sortiert und ausgibt.", problem: "Ein kurzes Array mit vier Zahlen soll aufsteigend sortiert werden.", io: "Ausgabe: " },
-      { id: "LF2_L2.3b", tier: 2, text: "[2.3] Erweitern Sie die Bubble-Sort-Implementierung so, dass am Ende die Anzahl der Tauschvorgaenge ausgegeben wird.", problem: "Zusaetzlich zum Sortieren soll mitgezaehlt werden, wie viele Tauschvorgaenge insgesamt noetig waren.", io: "Ausgabe: " },
-      { id: "LF2_L2.3c", tier: 3, text: "[2.3] Ueberpruefen Sie den folgenden Code auf einen Fehler, erlaeutern Sie die Ursache und entwickeln Sie eine korrigierte Fassung.", problem: "Ein Mitschueler hat Bubble Sort implementiert, das Array wird jedoch nicht korrekt sortiert." },
-      { id: "LF2_L2.4a", tier: 1, text: "[2.4] Nennen Sie, wie viele Bubble-Phasen (Durchgaenge) Bubble Sort bei einem Array mit 5 Elementen im schlechtesten Fall benoetigt." },
-      { id: "LF2_L2.4b", tier: 2, text: "[2.4] Ermitteln Sie, wie viele Vergleiche insgesamt bei einem Array mit 6 Elementen durchgefuehrt werden, wenn alle Durchgaenge vollstaendig ablaufen." },
-      { id: "LF2_L2.4c", tier: 3, text: "[2.4] Begruenden Sie, warum die Anzahl der Bubble-Phasen unabhaengig von der Ausgangsreihenfolge des Arrays immer gleich bleibt, obwohl die Anzahl der tatsaechlichen Tauschvorgaenge variieren kann." },
-      { id: "LF2_L2.5a", tier: 1, text: "[2.5] Fuehren Sie fuer zahlen = [3, 1, 2] einen Schreibtischtest des ersten Bubble-Sort-Durchgangs durch. Dokumentieren Sie das Array nach jedem Vergleich." },
-      { id: "LF2_L2.5b", tier: 2, text: "[2.5] Fuehren Sie fuer zahlen = [5, 2, 8, 1] einen vollstaendigen Schreibtischtest von Bubble Sort durch. Dokumentieren Sie das Array nach jedem Durchgang und geben Sie die Gesamtzahl der Tauschvorgaenge an." },
-      { id: "LF2_L2.5c", tier: 3, text: "[2.5] Fuehren Sie fuer zahlen = [4, 1, 3, 2, 5] einen Schreibtischtest durch und geben Sie an, nach wie vielen Durchgaengen keine Vertauschung mehr stattfindet, obwohl die aeussere Schleife noch nicht beendet ist. Erlaeutern Sie, wie man diesen Umstand zur vorzeitigen Beendigung nutzen koennte." },
-      { id: "LF2_L2.6a", tier: 1, text: "[2.6] Beschreiben Sie in einem Satz, wonach bei Selection Sort in jedem Durchgang gesucht wird." },
-      { id: "LF2_L2.6b", tier: 2, text: "[2.6] Erklaeren Sie die Funktionsweise von Selection Sort anhand des Arrays [7, 2, 6, 3]: Was passiert im ersten Durchgang?" },
-      { id: "LF2_L2.6c", tier: 3, text: "[2.6] Erlaeutern Sie den zentralen Unterschied zwischen Bubble Sort und Selection Sort bezueglich der Anzahl der Tauschvorgaenge." },
-      { id: "LF2_L2.7a", tier: 1, text: "[2.7] Erstellen Sie einen Algorithmus, der das Array zahlen mit Selection Sort sortiert. Die Funktion min() darf nicht verwendet werden.", problem: "Ein kurzes Array mit vier Zahlen soll mit Selection Sort aufsteigend sortiert werden.", io: "Ausgabe: " },
-      { id: "LF2_L2.7b", tier: 2, text: "[2.7] Erweitern Sie die Selection-Sort-Implementierung um eine Zaehlvariable fuer die Vergleiche und geben Sie diese am Ende aus.", problem: "Zusaetzlich zur Sortierung soll gezaehlt werden, wie viele Vergleiche innerhalb der inneren Schleife insgesamt stattgefunden haben.", io: "Ausgabe: " },
-      { id: "LF2_L2.7c", tier: 3, text: "[2.7] Entwickeln Sie eine Variante von Selection Sort, die in jedem Durchgang das groesste (statt kleinste) Element des unsortierten Bereichs sucht und an die naechste freie Position von vorne einsortiert.", problem: "Statt aufsteigend soll ein Array mit Selection Sort absteigend sortiert werden.", io: "Ausgabe: " },
+      { id: "LF2_L2.1a", tier: 1,  kurz: "Bubble Sort: Vergleich benachbarter Elemente",text: "[2.1] Beschreiben Sie in einem Satz, was bei Bubble Sort mit zwei benachbarten Arrayelementen passiert, wenn das linke groesser ist als das rechte." },
+      { id: "LF2_L2.1b", tier: 2,  kurz: "Bubble Sort: erster Durchgang",text: "[2.1] Erklaeren Sie die Funktionsweise von Bubble Sort anhand des Arrays [5, 2, 8, 1]: Wie veraendert sich das Array im ersten Durchgang?" },
+      { id: "LF2_L2.1c", tier: 3,  kurz: "Bubble Sort: Position nach Durchgang",text: "[2.1] Erlaeutern Sie, warum bei Bubble Sort nach jedem vollstaendigen Durchgang mindestens ein weiteres Element an seiner endgueltigen Position steht, und warum die innere Schleife deshalb bei jedem Durchgang um ein Element verkuerzt werden kann." },
+      { id: "LF2_L2.2a", tier: 1,  kurz: "Zwei Werte tauschen",text: "[2.2] Erstellen Sie einen Algorithmus, der die Werte an Index 0 und Index 1 des Arrays werte vertauscht.", problem: "Beim Sortieren muessen wiederholt zwei benachbarte Werte eines Arrays ihre Position tauschen.", io: "Ausgabe: " },
+      { id: "LF2_L2.2b", tier: 2,  kurz: "Bedingt tauschen",text: "[2.2] Erstellen Sie einen Algorithmus, der die Werte an Index j und j+1 des Arrays werte nur bei Bedarf vertauscht.", problem: "Zwei benachbarte Werte sollen nur dann vertauscht werden, wenn der linke Wert groesser ist als der rechte - das ist genau der Kernschritt von Bubble Sort.", io: "Ausgabe: " },
+      { id: "LF2_L2.2c", tier: 3,  kurz: "Tauschen ohne Hilfsvariable beurteilen",text: "[2.2] Beurteilen Sie, ob dieser Ansatz funktioniert, und begruenden Sie Ihre Antwort mit einem Schreibtischtest fuer werte = [9, 4].", problem: "Ein Mitschueler behauptet, man koenne zwei Arrayelemente auch ohne eine Zwischenspeicher-Variable vertauschen, indem man einfach werte[j] = werte[j+1] und danach werte[j+1] = werte[j] schreibt." },
+      { id: "LF2_L2.3a", tier: 1,  kurz: "Bubble Sort implementieren",text: "[2.3] Erstellen Sie einen Algorithmus, der das Array zahlen mit Bubble Sort aufsteigend sortiert und ausgibt.", problem: "Ein kurzes Array mit vier Zahlen soll aufsteigend sortiert werden.", io: "Ausgabe: " },
+      { id: "LF2_L2.3b", tier: 2,  kurz: "Bubble Sort: Tauschvorgänge zählen",text: "[2.3] Erweitern Sie die Bubble-Sort-Implementierung so, dass am Ende die Anzahl der Tauschvorgaenge ausgegeben wird.", problem: "Zusaetzlich zum Sortieren soll mitgezaehlt werden, wie viele Tauschvorgaenge insgesamt noetig waren.", io: "Ausgabe: " },
+      { id: "LF2_L2.3c", tier: 3,  kurz: "Fehler im Bubble Sort finden",text: "[2.3] Ueberpruefen Sie den folgenden Code auf einen Fehler, erlaeutern Sie die Ursache und entwickeln Sie eine korrigierte Fassung.", problem: "Ein Mitschueler hat Bubble Sort implementiert, das Array wird jedoch nicht korrekt sortiert." },
+      { id: "LF2_L2.4a", tier: 1,  kurz: "Bubble Sort: Anzahl Durchgänge",text: "[2.4] Nennen Sie, wie viele Bubble-Phasen (Durchgaenge) Bubble Sort bei einem Array mit 5 Elementen im schlechtesten Fall benoetigt." },
+      { id: "LF2_L2.4b", tier: 2,  kurz: "Bubble Sort: Anzahl Vergleiche",text: "[2.4] Ermitteln Sie, wie viele Vergleiche insgesamt bei einem Array mit 6 Elementen durchgefuehrt werden, wenn alle Durchgaenge vollstaendig ablaufen." },
+      { id: "LF2_L2.4c", tier: 3,  kurz: "Durchgänge unabhängig von Reihenfolge",text: "[2.4] Begruenden Sie, warum die Anzahl der Bubble-Phasen unabhaengig von der Ausgangsreihenfolge des Arrays immer gleich bleibt, obwohl die Anzahl der tatsaechlichen Tauschvorgaenge variieren kann." },
+      { id: "LF2_L2.5a", tier: 1,  kurz: "Schreibtischtest: erster Durchgang",text: "[2.5] Fuehren Sie fuer zahlen = [3, 1, 2] einen Schreibtischtest des ersten Bubble-Sort-Durchgangs durch. Dokumentieren Sie das Array nach jedem Vergleich." },
+      { id: "LF2_L2.5b", tier: 2,  kurz: "Schreibtischtest: Bubble Sort komplett",text: "[2.5] Fuehren Sie fuer zahlen = [5, 2, 8, 1] einen vollstaendigen Schreibtischtest von Bubble Sort durch. Dokumentieren Sie das Array nach jedem Durchgang und geben Sie die Gesamtzahl der Tauschvorgaenge an." },
+      { id: "LF2_L2.5c", tier: 3,  kurz: "Schreibtischtest: vorzeitiges Ende",text: "[2.5] Fuehren Sie fuer zahlen = [4, 1, 3, 2, 5] einen Schreibtischtest durch und geben Sie an, nach wie vielen Durchgaengen keine Vertauschung mehr stattfindet, obwohl die aeussere Schleife noch nicht beendet ist. Erlaeutern Sie, wie man diesen Umstand zur vorzeitigen Beendigung nutzen koennte." },
+      { id: "LF2_L2.6a", tier: 1,  kurz: "Selection Sort: Suche im Durchgang",text: "[2.6] Beschreiben Sie in einem Satz, wonach bei Selection Sort in jedem Durchgang gesucht wird." },
+      { id: "LF2_L2.6b", tier: 2,  kurz: "Selection Sort: erster Durchgang",text: "[2.6] Erklaeren Sie die Funktionsweise von Selection Sort anhand des Arrays [7, 2, 6, 3]: Was passiert im ersten Durchgang?" },
+      { id: "LF2_L2.6c", tier: 3,  kurz: "Bubble Sort vs. Selection Sort",text: "[2.6] Erlaeutern Sie den zentralen Unterschied zwischen Bubble Sort und Selection Sort bezueglich der Anzahl der Tauschvorgaenge." },
+      { id: "LF2_L2.7a", tier: 1,  kurz: "Selection Sort implementieren",text: "[2.7] Erstellen Sie einen Algorithmus, der das Array zahlen mit Selection Sort sortiert. Die Funktion min() darf nicht verwendet werden.", problem: "Ein kurzes Array mit vier Zahlen soll mit Selection Sort aufsteigend sortiert werden.", io: "Ausgabe: " },
+      { id: "LF2_L2.7b", tier: 2,  kurz: "Selection Sort: Vergleiche zählen",text: "[2.7] Erweitern Sie die Selection-Sort-Implementierung um eine Zaehlvariable fuer die Vergleiche und geben Sie diese am Ende aus.", problem: "Zusaetzlich zur Sortierung soll gezaehlt werden, wie viele Vergleiche innerhalb der inneren Schleife insgesamt stattgefunden haben.", io: "Ausgabe: " },
+      { id: "LF2_L2.7c", tier: 3,  kurz: "Selection Sort: absteigend",text: "[2.7] Entwickeln Sie eine Variante von Selection Sort, die in jedem Durchgang das groesste (statt kleinste) Element des unsortierten Bereichs sucht und an die naechste freie Position von vorne einsortiert.", problem: "Statt aufsteigend soll ein Array mit Selection Sort absteigend sortiert werden.", io: "Ausgabe: " },
     ]
   },
   {
@@ -2630,18 +2631,18 @@ const LF2_BLOCKS = [
     title: "LF2 – Grobziel 3: Suchen",
     weeks: "ab Woche 5",
     tasks: [
-      { id: "LF2_L3.1a", tier: 1, text: "[3.1] Beschreiben Sie in einem Satz, wie die lineare Suche in einem Array vorgeht." },
-      { id: "LF2_L3.1b", tier: 2, text: "[3.1] Erklaeren Sie anhand von zahlen = [10, 5, 18, 50, 42, 25] und dem gesuchten Wert 50, wie viele Vergleiche die lineare Suche benoetigt und warum." },
-      { id: "LF2_L3.1c", tier: 3, text: "[3.1] Beurteilen Sie, wie viele Vergleiche die lineare Suche im ungueststigsten Fall bei einem Array mit n Elementen benoetigt, und nennen Sie ein Beispiel fuer einen solchen Fall." },
-      { id: "LF2_L3.2a", tier: 1, text: "[3.2] Erstellen Sie einen Algorithmus, der im Array namen nach dem Wert \"Mia\" sucht und den gefundenen Index ausgibt.", problem: "In einem Array mit Namen soll geprueft werden, ob ein bestimmter Name enthalten ist.", io: "Ausgabe: 1" },
-      { id: "LF2_L3.2b", tier: 2, text: "[3.2] Erweitern Sie die lineare Suche so, dass nach der Schleife geprueft wird, ob das Element tatsaechlich gefunden wurde, und andernfalls eine Fehlermeldung ausgegeben wird.", problem: "Falls der gesuchte Wert nicht im Array enthalten ist, soll statt eines Index eine Fehlermeldung ausgegeben werden.", io: "Ausgabe: Nicht gefunden" },
-      { id: "LF2_L3.2c", tier: 3, text: "[3.2] Entwickeln Sie einen Algorithmus, der alle Indizes ermittelt, an denen der Wert 3 im Array zahlen vorkommt, und diese in einem Array treffer sammelt.", problem: "Statt nur das erste Vorkommen zu finden, sollen bei der linearen Suche alle Indizes ausgegeben werden, an denen der gesuchte Wert im Array vorkommt.", io: "Ausgabe: " },
-      { id: "LF2_L3.3a", tier: 1, text: "[3.3] Beschreiben Sie in einem Satz, welche Voraussetzung ein Array erfuellen muss, damit binaere Suche angewendet werden kann." },
-      { id: "LF2_L3.3b", tier: 2, text: "[3.3] Erklaeren Sie anhand von zahlen = [5, 10, 11, 18, 20, 25, 39, 42, 50] und dem gesuchten Wert 42, wie die binaere Suche in den ersten beiden Schritten vorgeht." },
-      { id: "LF2_L3.3c", tier: 3, text: "[3.3] Erlaeutern Sie, warum die binaere Suche bei 1000 sortierten Elementen im ungueststigsten Fall nur etwa 10 statt bis zu 1000 Vergleiche benoetigt." },
-      { id: "LF2_L3.4a", tier: 1, text: "[3.4] Erstellen Sie einen Algorithmus, der im sortierten Array zahlen mit binaerer Suche nach dem Wert 18 sucht und den gefundenen Index ausgibt.", problem: "In einem bereits sortierten Array soll ein Wert mithilfe der binaeren Suche gefunden werden.", io: "Ausgabe: 4" },
-      { id: "LF2_L3.4b", tier: 2, text: "[3.4] Erweitern Sie die binaere Suche aus Aufgabe 3.4-a um eine Zaehlvariable fuer die Anzahl der Vergleiche.", problem: "Zusaetzlich soll mitgezaehlt werden, wie viele Vergleiche die binaere Suche bis zum Auffinden des Werts benoetigt hat.", io: "Ausgabe: 2" },
-      { id: "LF2_L3.4c", tier: 3, text: "[3.4] Entwickeln Sie einen Algorithmus, der zunaechst prueft, ob das Array zahlen aufsteigend sortiert ist, und nur dann die binaere Suche nach einem eingelesenen Wert durchfuehrt (sonst eine Fehlermeldung ausgibt).", problem: "Ein Programm soll vor der eigentlichen binaeren Suche selbst pruefen, ob das uebergebene Array ueberhaupt sortiert ist, da die binaere Suche sonst falsche Ergebnisse liefern kann." },
+      { id: "LF2_L3.1a", tier: 1,  kurz: "Lineare Suche beschreiben",text: "[3.1] Beschreiben Sie in einem Satz, wie die lineare Suche in einem Array vorgeht." },
+      { id: "LF2_L3.1b", tier: 2,  kurz: "Lineare Suche: Vergleiche zählen",text: "[3.1] Erklaeren Sie anhand von zahlen = [10, 5, 18, 50, 42, 25] und dem gesuchten Wert 50, wie viele Vergleiche die lineare Suche benoetigt und warum." },
+      { id: "LF2_L3.1c", tier: 3,  kurz: "Lineare Suche: schlechtester Fall",text: "[3.1] Beurteilen Sie, wie viele Vergleiche die lineare Suche im ungueststigsten Fall bei einem Array mit n Elementen benoetigt, und nennen Sie ein Beispiel fuer einen solchen Fall." },
+      { id: "LF2_L3.2a", tier: 1,  kurz: "Lineare Suche implementieren",text: "[3.2] Erstellen Sie einen Algorithmus, der im Array namen nach dem Wert \"Mia\" sucht und den gefundenen Index ausgibt.", problem: "In einem Array mit Namen soll geprueft werden, ob ein bestimmter Name enthalten ist.", io: "Ausgabe: 1" },
+      { id: "LF2_L3.2b", tier: 2,  kurz: "Lineare Suche: Nicht gefunden",text: "[3.2] Erweitern Sie die lineare Suche so, dass nach der Schleife geprueft wird, ob das Element tatsaechlich gefunden wurde, und andernfalls eine Fehlermeldung ausgegeben wird.", problem: "Falls der gesuchte Wert nicht im Array enthalten ist, soll statt eines Index eine Fehlermeldung ausgegeben werden.", io: "Ausgabe: Nicht gefunden" },
+      { id: "LF2_L3.2c", tier: 3,  kurz: "Lineare Suche: alle Treffer",text: "[3.2] Entwickeln Sie einen Algorithmus, der alle Indizes ermittelt, an denen der Wert 3 im Array zahlen vorkommt, und diese in einem Array treffer sammelt.", problem: "Statt nur das erste Vorkommen zu finden, sollen bei der linearen Suche alle Indizes ausgegeben werden, an denen der gesuchte Wert im Array vorkommt.", io: "Ausgabe: " },
+      { id: "LF2_L3.3a", tier: 1,  kurz: "Binäre Suche: Voraussetzung",text: "[3.3] Beschreiben Sie in einem Satz, welche Voraussetzung ein Array erfuellen muss, damit binaere Suche angewendet werden kann." },
+      { id: "LF2_L3.3b", tier: 2,  kurz: "Binäre Suche: erste Schritte",text: "[3.3] Erklaeren Sie anhand von zahlen = [5, 10, 11, 18, 20, 25, 39, 42, 50] und dem gesuchten Wert 42, wie die binaere Suche in den ersten beiden Schritten vorgeht." },
+      { id: "LF2_L3.3c", tier: 3,  kurz: "Binäre Suche: Effizienz",text: "[3.3] Erlaeutern Sie, warum die binaere Suche bei 1000 sortierten Elementen im ungueststigsten Fall nur etwa 10 statt bis zu 1000 Vergleiche benoetigt." },
+      { id: "LF2_L3.4a", tier: 1,  kurz: "Binäre Suche implementieren",text: "[3.4] Erstellen Sie einen Algorithmus, der im sortierten Array zahlen mit binaerer Suche nach dem Wert 18 sucht und den gefundenen Index ausgibt.", problem: "In einem bereits sortierten Array soll ein Wert mithilfe der binaeren Suche gefunden werden.", io: "Ausgabe: 4" },
+      { id: "LF2_L3.4b", tier: 2,  kurz: "Binäre Suche: Vergleiche zählen",text: "[3.4] Erweitern Sie die binaere Suche aus Aufgabe 3.4-a um eine Zaehlvariable fuer die Anzahl der Vergleiche.", problem: "Zusaetzlich soll mitgezaehlt werden, wie viele Vergleiche die binaere Suche bis zum Auffinden des Werts benoetigt hat.", io: "Ausgabe: 2" },
+      { id: "LF2_L3.4c", tier: 3,  kurz: "Binäre Suche mit Sortierprüfung",text: "[3.4] Entwickeln Sie einen Algorithmus, der zunaechst prueft, ob das Array zahlen aufsteigend sortiert ist, und nur dann die binaere Suche nach einem eingelesenen Wert durchfuehrt (sonst eine Fehlermeldung ausgibt).", problem: "Ein Programm soll vor der eigentlichen binaeren Suche selbst pruefen, ob das uebergebene Array ueberhaupt sortiert ist, da die binaere Suche sonst falsche Ergebnisse liefern kann." },
     ]
   },
 ];
@@ -2692,12 +2693,16 @@ function lf2AddTaskToSprint(taskId) {
 }
 function lf2Esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
+function lf2DoneEver(taskId) {
+  // Eine Aufgabe zaehlt dauerhaft als erledigt, sobald sie in IRGENDEINEM Sprint (auch einem frueheren) auf "done" stand.
+  return Object.values(sprints).some(sp => sp && sp.tasks && sp.tasks[taskId] && sp.tasks[taskId].status === "done");
+}
 function pointsForLf2Feinziel(block, fz) {
   const sprintTasks = (sprints[lf2TodayKey] && sprints[lf2TodayKey].tasks) || {};
   let points = 0;
   block.tasks.forEach(t => {
     const m = t.text.match(/^\[([\d.]+)\]/);
-    if (m && m[1] === fz && sprintTasks[t.id] && sprintTasks[t.id].status === "done") points += t.tier;
+    if (m && m[1] === fz && lf2DoneEver(t.id)) points += t.tier;
   });
   return points;
 }
@@ -2730,10 +2735,12 @@ function renderLf2AufgabenBrowser() {
         if (inSprint) {
           const labelMap = { todo: "im Sprint: To Do", doing: "im Sprint: Doing", done: "✓ Erledigt" };
           statusHtml = '<span class="lf1-status-label">' + labelMap[inSprint.status] + '</span>';
+        } else if (lf2DoneEver(t.id)) {
+          statusHtml = '<span class="lf1-status-label">✓ Erledigt</span>';
         } else {
           statusHtml = '<button onclick="event.stopPropagation();lf2AddTaskToSprint(\'' + t.id + '\')">+ In Sprint aufnehmen</button>';
         }
-        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf2OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text">' + lf2Esc(cleanText) + '</span>' + statusHtml + '</div>';
+        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf2OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text"><span class="lf1-task-num">' + lf2Esc(t.id.replace(/^LF2_/, "")) + '</span> ' + lf2Esc(t.kurz || cleanText) + '</span>' + statusHtml + '</div>';
       }).join("");
       return '<div class="lf1-fz-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + block.id + '|' + fz + '" onclick="this.classList.toggle(\'expanded\')">' +
         '<span class="lf1-ampel" style="background:' + lf2Ampel(points) + '"></span>' +
@@ -2928,8 +2935,18 @@ const modalTexts = {
     'ihr auf „Auswertung starten“ klickt.',
   aufgaben:
     '<strong>Worum geht\'s hier?</strong><br><br>' +
-    'Arbeitsaufträge zu Bubble Sort, Selection Sort, linearer und binärer Suche (L2_1 – L2_3), plus 10 freiwillige ' +
-    'Zusatzaufgaben im Abitur-Stil mit mehreren Schreibtischtests.',
+    'Hier findet ihr alle Arbeitsaufträge zu Bubble Sort, Selection Sort, linearer und binärer Suche an einem ' +
+    'Ort, gruppiert nach Feinziel. Die Ampel und die Punktanzeige neben jedem Feinziel zeigen direkt, wie viele ' +
+    'Punkte ihr dort schon erreicht habt. Klickt auf eine Aufgabe, um Problemstellung, Arbeitsauftrag und – ' +
+    'falls vorhanden – Beispiel-Ausgabe zu sehen. Eine Musterlösung gibt es bewusst nicht.<br><br>' +
+    'Über <strong>„+ In Sprint aufnehmen“</strong> zieht ihr eine Aufgabe in euren aktuellen Sprint – sie ' +
+    'erscheint danach auf dem <a href="index.html">Sprint-Board</a> und ihr seht direkt hier, in welchem ' +
+    'Status sie ist (To Do, Doing, Erledigt).<br><br>' +
+    'Code wird hier <strong>nicht</strong> eingegeben oder ausgeführt – das macht ihr wie gewohnt in Thonny. ' +
+    'Bei manchen Aufgaben ist zusätzlich zum Code ein passendes Struktogramm zu erstellen; bei Wissensfragen ' +
+    'und Schreibtischtests entfällt dieser Hinweis, da dort keine eigene Umsetzung gefordert ist.<br><br>' +
+    'Über <strong>„Alle Aufgaben (LF2) als PDF“</strong> könnt ihr euch sämtliche Aufgaben zum Ausdrucken oder ' +
+    'Offline-Bearbeiten herunterladen.',
   handbuch:
     '<strong>Worum geht\'s hier?</strong><br><br>' +
     'Nachschlagewerk zu allem, was wir zu Sortier- und Suchalgorithmen besprochen haben – durchsuchbar über Suchfeld und ' +
