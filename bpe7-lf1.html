@@ -209,6 +209,7 @@
   .ref-tip.b { background: #1D6F96; }
   .ref-tip.n { background: #444; }
   /* Tausch-Simulation: Zustand des Arrays nach jeder Zeile */
+  .cab-ghost { position: absolute; top: -24px; left: 0; background: #C62828; color: #fff; font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 0.7rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; text-decoration: line-through; white-space: nowrap; z-index: 2; }
   .sim-cab { background: var(--navy-dark); border-radius: 10px; padding: 10px 14px; margin: 12px 0; }
   .sim-title { color: #FFD9A8; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
   .sim-row { display: flex; align-items: flex-end; gap: 8px; margin: 20px 0 8px; flex-wrap: wrap; }
@@ -1576,7 +1577,7 @@ function codeLinesHtml(annotatedLines) {
   ).join('');
 }
 
-function renderCabinet(targetId, data, highlight, highlight2) {
+function renderCabinet(targetId, data, highlight, highlight2, ghost) {
   const cab = document.getElementById(targetId);
   const toast = targetId === 'cabinet' ? document.getElementById('toast') : null;
   cab.innerHTML = '';
@@ -1586,6 +1587,13 @@ function renderCabinet(targetId, data, highlight, highlight2) {
     data.forEach((val, i) => {
       const slot = document.createElement('div');
       slot.className = 'slot';
+      if (ghost && ghost[i] !== undefined) {
+        slot.style.position = 'relative';
+        const g = document.createElement('span');
+        g.className = 'cab-ghost';
+        g.textContent = '✕ ' + ghost[i] + ' überschrieben';
+        slot.appendChild(g);
+      }
       const drawer = document.createElement('div');
       drawer.className = 'drawer filled' + (i === highlight ? ' active' : (i === highlight2 ? ' active2' : ''));
       drawer.textContent = val;
@@ -2024,6 +2032,12 @@ function explainLoopStep() {
 // ---------- VERAENDERN: Tauschen ----------
 // Zeigt den Zustand des Arrays nach jeder Zeile (Vorher / nach Zeile 1 / ...) mit markierten Aenderungen.
 // states: [{label, data, marks:{idx:'new'|'same'}, ghost:{idx:'Wert'}, temp:null|'Wert'|false}]
+let swapActive = false;
+function showSwapDefault() {
+  document.getElementById('swapCode').innerHTML = codeLinesHtml([annotateCode(esc('array = ' + arrLiteral(arr)))]);
+  document.getElementById('swapStruk').innerHTML =
+    '<div class="struk-band-mini">' + annotateCode(esc('Deklaration und Initialisierung: array = ' + arrLiteral(arr))) + '</div>';
+}
 function renderSwapSim(states, title) {
   const box = document.getElementById('swapSim');
   const esc2 = v => esc(String(v));
@@ -2042,22 +2056,35 @@ function renderSwapSim(states, title) {
   box.style.display = 'block';
 }
 
+function swapRestoreView() {
+  clearTimeout(window.__swapTimer);
+  renderMainCabinet(-1);
+  document.getElementById('swapErrorPanel').style.display = 'none';
+  document.getElementById('swapSim').style.display = 'none';
+  swapActive = false;
+  showSwapDefault();
+}
+
+window.swapRestoreView = swapRestoreView;
+
 function doSwap(safe) {
   const a = parseInt(document.getElementById('swapIndexA').value);
   const b = parseInt(document.getElementById('swapIndexB').value);
   const panel = document.getElementById('swapErrorPanel');
   panel.style.display = 'none';
   panel.innerHTML = '';
+  clearTimeout(window.__swapTimer);
 
   if (isNaN(a) || isNaN(b) || a < 0 || b < 0 || a >= arr.length || b >= arr.length) {
-    document.getElementById('swapCode').textContent = 'Ungültige Eingabe.';
-    document.getElementById('swapStruk').innerHTML = '<div class="struk-mini-empty">Ungültige Eingabe.</div>';
+    swapActive = false;
+    showSwapDefault();
     document.getElementById('swapSim').style.display = 'none';
     panel.innerHTML = '<strong>Ungültige Indizes.</strong> Beide Indizes müssen zwischen 0 und ' + (arr.length - 1) + ' liegen.';
     panel.style.display = 'block';
     return;
   }
 
+  swapActive = true;
   const before = [...arr];
   const valA = before[a], valB = before[b];
   const declCode = 'array = ' + arrLiteral(before);
@@ -2107,6 +2134,9 @@ function doSwap(safe) {
     document.getElementById('swapStruk').innerHTML =
       strukBands.map(band => '<div class="struk-band-mini">' + annotateCode(esc(band)) + '</div>').join('');
     const g1 = {}; g1[a] = valA;
+    // Auch das Array oben zeigt die (simulierte) Wirkung: erst wird array[a] ueberschrieben, dann wird derselbe Wert zurueckkopiert.
+    renderCabinet('cabinet', s1, -1, a, g1);
+    window.__swapTimer = setTimeout(() => renderCabinet('cabinet', s2, -1, -1, g1) || [...document.querySelectorAll('#cabinet .drawer')].forEach((d, i) => { if (i === a || i === b) d.classList.add('active2'); }), 1600);
     const m2 = {}; m2[a] = 'new'; m2[b] = 'new';
     renderSwapSim([
       { label: 'Start', data: before },
@@ -2114,10 +2144,11 @@ function doSwap(safe) {
       { label: 'Zeile 3: <code>array[' + b + '] = array[' + a + ']</code><br>kopiert nur denselben Wert zurück', data: s2, marks: m2, ghost: g1 }
     ], 'Tausch ohne Zwischenspeicher – ein Wert verschwindet (Simulation)');
     panel.innerHTML =
+      '<button class="secondary" style="float:right" onclick="swapRestoreView()">↩ Ansicht zurücksetzen</button>' +
       '<strong>So geht ein Wert verloren:</strong> Nach Zeile 2 steht an Index ' + a + ' bereits der Wert "' + esc(valB) + '" – ' +
       'der ursprüngliche Wert "' + esc(valA) + '" existiert an keiner Stelle mehr. Zeile 3 kopiert daher nur denselben ' +
       '("' + esc(valB) + '") zurück. Ergebnis: <code>array[' + a + ']</code> und <code>array[' + b + ']</code> enthalten am Ende ' +
-      'beide "' + esc(valB) + '" – "' + esc(valA) + '" ist unwiederbringlich weg. (Das reale Array oben bleibt zur Sicherheit unverändert – dies ist nur eine Simulation.)';
+      'beide "' + esc(valB) + '" – "' + esc(valA) + '" ist unwiederbringlich weg. (Das Array oben zeigt nur eine Simulation – das echte Array bleibt unverändert.)';
     panel.style.display = 'block';
   }
 }
@@ -2139,6 +2170,7 @@ let insertSnap = null, removeSnap = null;
 function refreshVerDecl() {
   const ins = document.getElementById('insArrDecl');
   if (!ins) return;
+  if (!swapActive && document.getElementById('swapCode')) showSwapDefault();
   const a = (insertQueueRunning || insertDone) && insertSnap ? insertSnap : arr;
   const r = (removeQueueRunning || removeDone) && removeSnap ? removeSnap : arr;
   ins.innerHTML = annotateCode(esc('array = ' + arrLiteral(a)));
@@ -2618,8 +2650,9 @@ document.querySelectorAll('.tab').forEach(tab => {
       }
       if (tab.dataset.view === 'loop') loopReset();
       if (tab.dataset.view === 'veraendern') {
-        document.getElementById('swapCode').textContent = 'Noch keine Aktion ausgeführt.';
-        document.getElementById('swapStruk').innerHTML = '<div class="struk-mini-empty">Noch keine Aktion ausgeführt.</div>';
+        swapActive = false;
+        clearTimeout(window.__swapTimer);
+        showSwapDefault();
         document.getElementById('swapErrorPanel').style.display = 'none';
         document.getElementById('swapSim').style.display = 'none';
         insertReset();
