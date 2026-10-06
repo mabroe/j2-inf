@@ -198,6 +198,16 @@
   .hl-a { background: var(--amber-dark); }
   .hl-b { background: #1D6F96; }
 
+  /* Schrank bleibt beim Scrollen sichtbar, damit Hervorhebungen immer zu sehen sind */
+  #cabinetWrap { position: sticky; top: 0; z-index: 30; background: #FAFAFA; padding-bottom: 12px; margin-bottom: 4px; }
+  .ref-tip {
+    position: fixed; z-index: 100; padding: 6px 10px; border-radius: 6px; color: #fff;
+    font-family: -apple-system, "Segoe UI", sans-serif; font-size: 0.8rem; max-width: 320px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25); pointer-events: none;
+  }
+  .ref-tip.a { background: var(--amber-dark); }
+  .ref-tip.b { background: #1D6F96; }
+  .ref-tip.n { background: #444; }
   .toast {
     position: absolute;
     left: 16px; right: 16px; bottom: -14px;
@@ -1226,7 +1236,7 @@
                 <div class="struk-loop-header">Wiederhole von i = len(array) - 1 solange i &gt; index, Schrittweite -1</div>
                 <div class="struk-loop-row">
                   <div class="struk-loop-gutter"></div>
-                  <div class="struk-loop-body">
+                  <div class="struk-loop-body tight">
                     <div class="struk-band-mini">Deklaration und Initialisierung: temp = array[i-1]</div>
                     <div class="struk-band-mini">Zuweisung: array[i-1] = array[i]</div>
                     <div class="struk-band-mini">Zuweisung: array[i] = temp</div>
@@ -1599,7 +1609,7 @@ document.addEventListener('click', function(e) {
     return;
   }
   if (el.dataset.ref !== undefined) {
-    highlightByRef(el.dataset.ref);
+    highlightByRef(el.dataset.ref, el);
     return;
   }
 
@@ -1627,7 +1637,19 @@ document.addEventListener('click', function(e) {
 // Stellt array[i-1], array[i], array[j], array[j+1] auf die aktuelle Position des laufenden Schritts.
 // array[i-1] / array[j] = Farbe 1 (orange), array[i] (beim Einfuegen) / array[j+1] = Farbe 2 (blau).
 let verRef = { i: null, j: null };
-function highlightByRef(ref) {
+function showRefTip(el, text, cls) {
+  document.querySelectorAll('.ref-tip').forEach(t => t.remove());
+  const r = el.getBoundingClientRect();
+  const tip = document.createElement('div');
+  tip.className = 'ref-tip ' + cls;
+  tip.textContent = text;
+  document.body.appendChild(tip);
+  tip.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 340)) + 'px';
+  tip.style.top = (r.bottom + 6) + 'px';
+  clearTimeout(window.__tipTimer);
+  window.__tipTimer = setTimeout(() => tip.remove(), 3500);
+}
+function highlightByRef(ref, el) {
   const view = (document.querySelector('.view.active') || {}).id || '';
   let base = null, data = arr, target = 'cabinet';
   if (view === 'view-veraendern') base = (ref === 'j' || ref === 'j+1') ? verRef.j : verRef.i;
@@ -1636,12 +1658,15 @@ function highlightByRef(ref) {
   const idx = base === null ? null : (ref === 'i-1' ? base - 1 : (ref === 'j+1' ? base + 1 : base));
   if (idx === null || idx < 0 || idx >= data.length) {
     renderCabinet(target, data, -1, -1);
-    flashToast('Dieser Ausdruck zeigt erst auf ein Element, wenn ein Schritt läuft – klicke zuerst „Nächster Schritt“.');
+    const msg = 'Noch kein Schritt gestartet – starte den Ablauf und klicke „Nächster Schritt“, dann zeigt dieser Ausdruck auf ein Element.';
+    if (el) showRefTip(el, msg, 'n');
+    flashToast(msg);
     return;
   }
   const second = (view === 'view-veraendern') && (ref === 'i' || ref === 'j+1');
   if (target === 'cabinet') { if (second) renderMainCabinet(-1, idx); else renderMainCabinet(idx, -1); }
   else renderCabinet(target, data, idx, -1);
+  if (el) showRefTip(el, el.textContent + '  →  Index ' + idx + ': ' + data[idx], second ? 'b' : 'a');
 }
 
 function highlightByValue(val) {
