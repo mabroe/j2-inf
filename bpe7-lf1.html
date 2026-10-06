@@ -208,6 +208,19 @@
   .ref-tip.a { background: var(--amber-dark); }
   .ref-tip.b { background: #1D6F96; }
   .ref-tip.n { background: #444; }
+  /* Tausch-Simulation: Zustand des Arrays nach jeder Zeile */
+  .sim-cab { background: var(--navy-dark); border-radius: 10px; padding: 10px 14px; margin: 12px 0; }
+  .sim-title { color: #FFD9A8; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+  .sim-row { display: flex; align-items: flex-end; gap: 8px; margin: 20px 0 8px; flex-wrap: wrap; }
+  .sim-label { color: #fff; width: 170px; font-size: 0.8rem; line-height: 1.25; padding-bottom: 14px; }
+  .sim-slot { width: 74px; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .sim-slot .drawer { height: 44px; font-size: 0.8rem; }
+  .sim-slot .index { margin-top: 3px; font-size: 0.72rem; }
+  .sim-slot .drawer.sim-new { background: #3FA7D6; color: #fff; border-color: #1D6F96; }
+  .sim-slot .drawer.sim-same { background: #E8963C; color: #fff; border-color: var(--amber-dark); }
+  .sim-ghost { position: absolute; top: -17px; font-size: 0.7rem; color: #fff; background: #C62828; border-radius: 4px; padding: 0 5px; text-decoration: line-through; white-space: nowrap; }
+  .sim-temp { align-self: center; margin-left: 10px; background: #fff; border: 2px solid #5CB85C; border-radius: 6px; color: var(--navy-dark); font-size: 0.8rem; padding: 6px 10px; font-weight: 600; }
+  .sim-temp.empty { border-style: dashed; border-color: #999; color: #999; background: transparent; }
   .toast {
     position: absolute;
     left: 16px; right: 16px; bottom: -14px;
@@ -1172,6 +1185,7 @@
             </div>
           </div>
         </div>
+        <div class="sim-cab" id="swapSim" style="display:none;"></div>
         <div class="error-panel" id="swapErrorPanel"></div>
       </details>
     </section>
@@ -2008,6 +2022,26 @@ function explainLoopStep() {
 }
 
 // ---------- VERAENDERN: Tauschen ----------
+// Zeigt den Zustand des Arrays nach jeder Zeile (Vorher / nach Zeile 1 / ...) mit markierten Aenderungen.
+// states: [{label, data, marks:{idx:'new'|'same'}, ghost:{idx:'Wert'}, temp:null|'Wert'|false}]
+function renderSwapSim(states, title) {
+  const box = document.getElementById('swapSim');
+  const esc2 = v => esc(String(v));
+  box.innerHTML = '<div class="sim-title">' + esc(title) + '</div>' + states.map(st =>
+    '<div class="sim-row"><div class="sim-label">' + st.label + '</div>' +
+    st.data.map((v, i) =>
+      '<div class="sim-slot">' + (st.ghost && st.ghost[i] !== undefined ? '<span class="sim-ghost">✕ ' + esc2(st.ghost[i]) + ' weg</span>' : '') +
+      '<div class="drawer filled' + (st.marks && st.marks[i] ? ' sim-' + st.marks[i] : '') + '">' + esc2(v) + '</div>' +
+      '<div class="index">' + i + '</div></div>'
+    ).join('') +
+    (st.temp !== undefined && st.temp !== null
+      ? (st.temp === false ? '<div class="sim-temp empty">temp: –</div>' : '<div class="sim-temp">temp = ' + esc2(st.temp) + '</div>')
+      : '') +
+    '</div>'
+  ).join('');
+  box.style.display = 'block';
+}
+
 function doSwap(safe) {
   const a = parseInt(document.getElementById('swapIndexA').value);
   const b = parseInt(document.getElementById('swapIndexB').value);
@@ -2018,48 +2052,72 @@ function doSwap(safe) {
   if (isNaN(a) || isNaN(b) || a < 0 || b < 0 || a >= arr.length || b >= arr.length) {
     document.getElementById('swapCode').textContent = 'Ungültige Eingabe.';
     document.getElementById('swapStruk').innerHTML = '<div class="struk-mini-empty">Ungültige Eingabe.</div>';
+    document.getElementById('swapSim').style.display = 'none';
     panel.innerHTML = '<strong>Ungültige Indizes.</strong> Beide Indizes müssen zwischen 0 und ' + (arr.length - 1) + ' liegen.';
     panel.style.display = 'block';
     return;
   }
 
+  const before = [...arr];
+  const valA = before[a], valB = before[b];
+  const declCode = 'array = ' + arrLiteral(before);
+  const declStruk = 'Deklaration und Initialisierung: array = ' + arrLiteral(before);
+  const s1 = [...before]; s1[a] = valB;           // nach Zeile 1 (ohne Zwischenspeicher)
+  const markA = {}; markA[a] = 'new';
+
   if (safe) {
-    const valA = arr[a], valB = arr[b];
-    const temp = valA;
-    arr[a] = arr[b];
-    arr[b] = temp;
+    const after = [...before]; after[a] = valB; after[b] = valA;
+    arr = after;
     renderMainCabinet(-1);
     const lines = [
+      declCode,
       'temp = array[' + a + ']         # "' + valA + '" retten',
       'array[' + a + '] = array[' + b + ']    # "' + valB + '" nach Index ' + a,
       'array[' + b + '] = temp         # geretteten Wert "' + valA + '" nach Index ' + b
     ];
     document.getElementById('swapCode').innerHTML = codeLinesHtml(lines.map(l => annotateCode(esc(l))));
     const strukBands = [
+      declStruk,
       'Deklaration und Initialisierung: temp = array[' + a + ']',
       'Zuweisung: array[' + a + '] = array[' + b + ']',
       'Zuweisung: array[' + b + '] = temp'
     ];
     document.getElementById('swapStruk').innerHTML =
-      strukBands.map(band => '<div class="struk-band-mini">' + esc(band) + '</div>').join('');
+      strukBands.map(band => '<div class="struk-band-mini">' + annotateCode(esc(band)) + '</div>').join('');
+    const m2 = {}; m2[a] = 'new'; m2[b] = 'same';
+    renderSwapSim([
+      { label: 'Start', data: before, temp: false },
+      { label: 'Zeile 2: <code>temp = array[' + a + ']</code><br>Wert gerettet', data: before, temp: valA, marks: (function(){const m={}; m[a]='same'; return m;})() },
+      { label: 'Zeile 3: <code>array[' + a + '] = array[' + b + ']</code><br>überschrieben – aber in temp gesichert', data: s1, temp: valA, marks: markA },
+      { label: 'Zeile 4: <code>array[' + b + '] = temp</code><br>Tausch vollständig', data: after, marks: m2 }
+    ], 'Sicherer Tausch – nichts geht verloren');
   } else {
-    const valA = arr[a], valB = arr[b];
+    const s2 = [...s1]; s2[b] = s1[a];             // nach Zeile 2: kopiert den schon ueberschriebenen Wert
     const lines = [
+      declCode,
       'array[' + a + '] = array[' + b + ']    # "' + valA + '" wird hier bereits überschrieben',
       'array[' + b + '] = array[' + a + ']    # kopiert den (falschen) neuen Wert zurück'
     ];
     document.getElementById('swapCode').innerHTML = codeLinesHtml(lines.map(l => annotateCode(esc(l))));
     const strukBands = [
+      declStruk,
       'Zuweisung: array[' + a + '] = array[' + b + ']',
       'Zuweisung: array[' + b + '] = array[' + a + ']'
     ];
     document.getElementById('swapStruk').innerHTML =
-      strukBands.map(band => '<div class="struk-band-mini">' + esc(band) + '</div>').join('');
+      strukBands.map(band => '<div class="struk-band-mini">' + annotateCode(esc(band)) + '</div>').join('');
+    const g1 = {}; g1[a] = valA;
+    const m2 = {}; m2[a] = 'new'; m2[b] = 'new';
+    renderSwapSim([
+      { label: 'Start', data: before },
+      { label: 'Zeile 2: <code>array[' + a + '] = array[' + b + ']</code><br>"' + esc(valA) + '" wird überschrieben', data: s1, marks: markA, ghost: g1 },
+      { label: 'Zeile 3: <code>array[' + b + '] = array[' + a + ']</code><br>kopiert nur denselben Wert zurück', data: s2, marks: m2, ghost: g1 }
+    ], 'Tausch ohne Zwischenspeicher – ein Wert verschwindet (Simulation)');
     panel.innerHTML =
-      '<strong>So geht ein Wert verloren:</strong> Nach Zeile 1 steht an Index ' + a + ' bereits der Wert "' + valB + '" – ' +
-      'der ursprüngliche Wert "' + valA + '" existiert an keiner Stelle mehr. Zeile 2 kopiert daher nur denselben ' +
-      '("' + valB + '") zurück. Ergebnis: <code>array[' + a + ']</code> und <code>array[' + b + ']</code> enthalten am Ende ' +
-      'beide "' + valB + '" – "' + valA + '" ist unwiederbringlich weg. (Das reale Array oben bleibt zur Sicherheit unverändert – dies ist nur eine Simulation.)';
+      '<strong>So geht ein Wert verloren:</strong> Nach Zeile 2 steht an Index ' + a + ' bereits der Wert "' + esc(valB) + '" – ' +
+      'der ursprüngliche Wert "' + esc(valA) + '" existiert an keiner Stelle mehr. Zeile 3 kopiert daher nur denselben ' +
+      '("' + esc(valB) + '") zurück. Ergebnis: <code>array[' + a + ']</code> und <code>array[' + b + ']</code> enthalten am Ende ' +
+      'beide "' + esc(valB) + '" – "' + esc(valA) + '" ist unwiederbringlich weg. (Das reale Array oben bleibt zur Sicherheit unverändert – dies ist nur eine Simulation.)';
     panel.style.display = 'block';
   }
 }
@@ -2563,6 +2621,7 @@ document.querySelectorAll('.tab').forEach(tab => {
         document.getElementById('swapCode').textContent = 'Noch keine Aktion ausgeführt.';
         document.getElementById('swapStruk').innerHTML = '<div class="struk-mini-empty">Noch keine Aktion ausgeführt.</div>';
         document.getElementById('swapErrorPanel').style.display = 'none';
+        document.getElementById('swapSim').style.display = 'none';
         insertReset();
         removeReset();
       }
