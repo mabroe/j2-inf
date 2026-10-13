@@ -137,6 +137,11 @@
   .kanban-card button.remove-btn { color: #B3413A; margin-left: auto; }
 
   .ichkann-section { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 6px 0 14px; margin-bottom: 20px; }
+  .ik-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-right: 20px; }
+  .ik-head h2 { padding: 14px 20px 4px; margin: 0; font-size: 1.1rem; color: var(--navy); }
+  .ik-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .ik-btn { background: var(--paper); border: 1px solid var(--line); color: var(--navy); border-radius: 7px; padding: 6px 12px; font-size: .84rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .ik-btn:hover { background: var(--empty); }
   .ichkann-section > h2 { padding: 14px 20px 4px; margin: 0; font-size: 1.1rem; color: var(--navy); }
   .lf-group { border-top: 1px solid var(--line); }
   .lf-group-header {
@@ -205,6 +210,19 @@
   .lf-nav a:hover { background: var(--empty); }
   .lf-nav a.active { background: var(--navy); color: white; border-color: var(--navy); }
   .lf-nav a.locked { color: var(--muted); opacity: 0.55; cursor: not-allowed; pointer-events: none; }
+
+  /* Markierungen (Merken / Besprechen) */
+  .mk-wrap { display: inline-flex; gap: 4px; margin-left: 6px; flex-shrink: 0; }
+  button.mk, .lf1-task-row button.mk, .fz-task-row button.mk { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 999px; padding: 2px 9px; font-size: 0.7rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  button.mk:hover, .lf1-task-row button.mk:hover, .fz-task-row button.mk:hover { background: var(--empty); color: var(--navy); }
+  button.mk.mk-me.on, .lf1-task-row button.mk.mk-me.on, .fz-task-row button.mk.mk-me.on { background: var(--amber); color: #fff; border-color: var(--amber-dark); }
+  button.mk.mk-ask.on, .lf1-task-row button.mk.mk-ask.on, .fz-task-row button.mk.mk-ask.on { background: #1D6F96; color: #fff; border-color: #155672; }
+  .mk-panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 0 0 12px; font-size: 0.86rem; }
+  .mk-panel summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+  .mk-panel .mk-count { font-weight: 500; color: var(--muted); margin-left: 8px; font-size: 0.8rem; }
+  .mk-panel .mk-group { margin-top: 8px; } .mk-panel .mk-group b { font-size: 0.74rem; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+  .mk-chip { display: inline-block; background: var(--empty); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin: 2px 4px 2px 0; cursor: pointer; font-size: 0.8rem; }
+  .mk-chip:hover { background: #fff; border-color: var(--amber); }
 </style>
 </head>
 <body>
@@ -290,7 +308,8 @@
   <div class="retro-box" id="retroBox"></div>
 
   <div class="ichkann-section">
-    <h2>Ich-Kann-Übersicht</h2>
+    <div class="ik-head"><h2>Ich-Kann-Übersicht</h2>
+      <span class="ik-actions"><button class="ik-btn" onclick="ikDrucken()" title="Druckansicht öffnen (auch als PDF speicherbar)">🖨️ Drucken / PDF</button><button class="ik-btn" onclick="ikCsv()" title="Als Tabelle (CSV, in Excel öffnen)">⬇️ Tabelle (CSV)</button></span></div>
     <div id="lfGroups"></div>
   </div>
 
@@ -764,6 +783,7 @@ function openTaskInfoModal(taskId) {
   const fzLabel = fzList.length > 1 ? "Feinziele " + fzList.join(", ") : (fzList[0] ? "Feinziel " + fzList[0] : "");
 
   document.getElementById("infoModalId").textContent = taskId + (fzLabel ? " · " + fzLabel : "");
+  llModalTask = taskId; llPlaceModalMarks();
   document.getElementById("infoModalTitle").textContent = "Aufgabendetails";
   refreshInfoModalSprintState();
 
@@ -1103,7 +1123,7 @@ function renderIchKannListe() {
         } else {
           statusHtml = '<button onclick="event.stopPropagation();addTaskToSprint(\'' + esc(t.id) + '\')">+ In Sprint</button>';
         }
-        return '<div class="fz-task-row" onclick="openTaskInfoModal(\'' + esc(t.id) + '\')"><span class="fz-task-text"><span class="task-num">' + esc(t.id) + '</span> ' + esc(t.kurz || t.text) + '</span>' + statusHtml + '</div>';
+        return '<div class="fz-task-row" onclick="openTaskInfoModal(\'' + esc(t.id) + '\')"><span class="fz-task-text"><span class="task-num">' + esc(t.id) + '</span> ' + esc(t.kurz || t.text) + '</span>' + statusHtml + llMarkHtml(t.id) + '</div>';
       }).join("");
       return '<div class="feinziel-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + fzKey + '" onclick="toggleFeinziel(this)">' +
         '<span class="ampel-dot" style="background:' + ampelColor(points) + '"></span>' +
@@ -1117,6 +1137,66 @@ function renderIchKannListe() {
       '<div class="lf-group-body">' + rows + '</div></div>';
   }).join("");
 }
+
+
+// ---------------------------------------------------------------------------
+// Ich-Kann-Liste: Druckansicht (PDF ueber den Druckdialog) und CSV-Export.
+// Enthaelt alle freigegebenen Feinziele inkl. Punktestand und Status je Aufgabe.
+// ---------------------------------------------------------------------------
+function ikDaten() {
+  const rows = [];
+  BLOCKS.filter(b => LF_FREIGABE[LF_META[b.id].lf]).forEach(block => {
+    const fzKeys = Object.keys(FEINZIEL_INDEX).filter(k => FEINZIEL_INDEX[k].blockId === block.id)
+      .sort((a, b) => fzSortKey(FEINZIEL_INDEX[a].fz).localeCompare(fzSortKey(FEINZIEL_INDEX[b].fz)));
+    const fzs = fzKeys.map(k => {
+      const d = FEINZIEL_INDEX[k];
+      const tasks = d.tasks.map(t => ({ id: t.id, kurz: t.kurz || t.text, tier: t.tier, done: doneEver(t.id) }));
+      return { fz: d.fz, titel: FEINZIEL_TASK_TITLES[block.id + "|" + d.fz] || "", punkte: pointsForFeinziel(k), tasks };
+    });
+    rows.push({ lf: LF_META[block.id].lf, titel: block.title, fzs });
+  });
+  return rows;
+}
+function ikCsv() {
+  const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+  const tier = { 1: "Basis", 2: "Normal", 3: "Schwer" };
+  const lines = [["Lernfeld", "Block", "Feinziel", "Feinziel-Titel", "Punkte (max. 3)", "Aufgabe", "Beschreibung", "Niveau", "Erledigt"].map(q).join(";")];
+  ikDaten().forEach(b => b.fzs.forEach(f => f.tasks.forEach(t =>
+    lines.push([b.lf, b.titel, f.fz, f.titel, f.punkte, t.id, t.kurz, tier[t.tier] || t.tier, t.done ? "ja" : "nein"].map(q).join(";")))));
+  const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ich-kann-liste-" + new Date().toISOString().slice(0, 10) + ".csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function ikDrucken() {
+  const daten = ikDaten();
+  if (!daten.length) { alert("Es ist noch kein Lernfortschritt freigegeben."); return; }
+  const datum = new Date().toLocaleDateString("de-DE");
+  const name = window.__llPseudo || "";
+  const box = d => d ? "☑" : "☐";
+  const body = daten.map(b => '<h2>' + esc(b.titel) + '</h2>' + b.fzs.map(f => {
+    const farbe = f.punkte >= 3 ? "#2E7D5B" : f.punkte >= 1 ? "#E8963C" : "#B9B9B9";
+    return '<div class="fz"><div class="fzh"><span class="dot" style="background:' + farbe + '"></span><b>[' + esc(f.fz) + '] ' + esc(f.titel) + '</b><span class="pk">' + f.punkte + ' / 3 Pkt.</span></div>' +
+      '<ul>' + f.tasks.map(t => '<li class="' + (t.done ? "d" : "") + '"><span class="cb">' + box(t.done) + '</span> <span class="id">' + esc(t.id) + '</span> ' + esc(t.kurz) + '</li>').join("") + '</ul></div>';
+  }).join("")).join("");
+  const html = '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Ich-Kann-Liste' + (name ? " – " + esc(name) : "") + '</title><style>' +
+    'body{font-family:Arial,Helvetica,sans-serif;color:#222;margin:24px;font-size:11pt}h1{font-size:17pt;margin:0 0 2px;color:#8B1A2B}.meta{color:#666;font-size:9.5pt;margin-bottom:14px}' +
+    'h2{font-size:12.5pt;margin:18px 0 6px;border-bottom:2px solid #8B1A2B;padding-bottom:3px;break-after:avoid}' +
+    '.fz{margin-bottom:8px;break-inside:avoid}.fzh{display:flex;align-items:center;gap:8px;background:#f3eeee;padding:4px 8px;border-radius:4px}' +
+    '.dot{width:11px;height:11px;border-radius:50%;display:inline-block;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pk{margin-left:auto;font-weight:700}' +
+    'ul{list-style:none;margin:3px 0 0;padding:0 0 0 10px}li{font-size:10pt;padding:1px 0;color:#555}li.d{color:#111}.cb{font-size:11pt}.id{font-family:monospace;font-size:8.5pt;color:#888}' +
+    '.leg{margin-top:16px;font-size:9pt;color:#666}.noprint{margin-bottom:12px}@media print{.noprint{display:none}body{margin:0}}' +
+    '</style></head><body><div class="noprint"><button onclick="window.print()">🖨️ Drucken / als PDF speichern</button></div>' +
+    '<h1>Ich-Kann-Liste</h1><div class="meta">' + (name ? esc(name) + ' · ' : '') + 'Stand: ' + datum + ' · Friedrich-List-Schule Mannheim</div>' + body +
+    '<div class="leg">Punkte je Feinziel: Basis = 1, Normal = 2, Schwer = 3 · ab 3 Punkten gilt ein Feinziel als erreicht (grün), 1–2 Punkte = angearbeitet (orange). ☑ = Aufgabe erledigt.</div></body></html>';
+  const w = window.open("", "_blank");
+  if (!w) { alert("Das Pop-up wurde blockiert – bitte Pop-ups für diese Seite erlauben."); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  setTimeout(() => { try { w.focus(); w.print(); } catch (e) {} }, 400);
+}
+window.ikDrucken = ikDrucken; window.ikCsv = ikCsv;
 
 function toggleLfGroup(headerEl) { headerEl.parentElement.classList.toggle("open"); }
 function toggleFeinziel(rowEl) { rowEl.classList.toggle("expanded"); }
@@ -1295,12 +1375,13 @@ function renderLfNav() {
     { href: "bpe7-lf1.html", label: "LF1 · Arrays", id: "LF1" },
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
     { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
-    { href: "index.html#handbuch", label: "Handbuch", id: "HB" }
+    { href: "index.html#handbuch", label: "Handbuch", id: "HB" },
+    { href: "fehler.html", label: "Fehler", id: "ERR" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && item.id !== "HB" && !LF_FREIGABE[item.id];
+    const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
@@ -1336,12 +1417,87 @@ function startHeartbeat() {
 // ---------------------------------------------------------------------------
 window.__logout = () => { signOut(auth).then(() => window.location.href = "anmeldung.html"); };
 
+// ---------------------------------------------------------------------------
+// Markierungen: "Merken" (nur fuer mich selbst) und "Besprechen" (Hinweis an die
+// Lehrkraft: diese Aufgabe sollten wir gemeinsam besprechen).
+// Speicherort: schueler/{uid}/markierungen/{taskId} = { merken, besprechen, updated }
+// ---------------------------------------------------------------------------
+let llMarks = {};
+let llModalTask = null;
+const LL_MARK_CFG = { getTask: id => getTaskById(id), openInfo: id => openTaskInfoModal(id), rerender: () => renderIchKannListe(), container: 'lfGroups', modalIdEl: 'infoModalId' };
+
+async function llLadeMarks() {
+  try {
+    const snap = await getDocs(collection(db, "schueler", currentUid, "markierungen"));
+    llMarks = {};
+    snap.forEach(d => { llMarks[d.id] = d.data(); });
+  } catch (e) { console.warn("Markierungen konnten nicht geladen werden:", e.code || e.message); }
+}
+function llMarkHtml(id) {
+  const m = llMarks[id] || {};
+  const q = "\'" + id + "\'";
+  return '<span class="mk-wrap" onclick="event.stopPropagation()">' +
+    '<button type="button" class="mk mk-me' + (m.merken ? ' on' : '') + '" title="Nur für mich: Aufgabe merken, um sie später schnell wiederzufinden" onclick="event.stopPropagation();llToggleMark(' + q + ',\'merken\')">' + (m.merken ? 'Gemerkt ✓' : 'Merken') + '</button>' +
+    '<button type="button" class="mk mk-ask' + (m.besprechen ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (m.besprechen ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
+    '</span>';
+}
+function llMarkLabel(id) {
+  const t = LL_MARK_CFG.getTask(id);
+  const kurz = t ? (t.kurz || String(t.text || '').replace(/^\[[\d.,\s]+\]\s*/, '').slice(0, 50)) : '';
+  return id + (kurz ? ' · ' + kurz : '');
+}
+function llRenderMarkPanel() {
+  const cont = document.getElementById(LL_MARK_CFG.container);
+  if (!cont) return;
+  let panel = document.getElementById('llMarkPanel');
+  if (!panel) { panel = document.createElement('details'); panel.id = 'llMarkPanel'; panel.className = 'mk-panel'; cont.parentNode.insertBefore(panel, cont); }
+  const ids = Object.keys(llMarks);
+  const me = ids.filter(i => llMarks[i].merken).sort();
+  const ask = ids.filter(i => llMarks[i].besprechen).sort();
+  if (!me.length && !ask.length) { panel.style.display = 'none'; return; }
+  panel.style.display = '';
+  const chips = list => list.map(i => '<span class="mk-chip" onclick="llOpenMarked(\'' + i + '\')">' + llEsc(llMarkLabel(i)) + '</span>').join('');
+  const wasOpen = panel.open;
+  panel.innerHTML = '<summary>Meine Markierungen <span class="mk-count">' + me.length + ' gemerkt · ' + ask.length + ' zur Besprechung</span></summary>' +
+    (me.length ? '<div class="mk-group"><b>Gemerkt (nur für mich)</b><div>' + chips(me) + '</div></div>' : '') +
+    (ask.length ? '<div class="mk-group"><b>Zur gemeinsamen Besprechung (Lehrkraft sieht das)</b><div>' + chips(ask) + '</div></div>' : '');
+  panel.open = wasOpen;
+}
+function llEsc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function llPlaceModalMarks() {
+  const idEl = document.getElementById(LL_MARK_CFG.modalIdEl);
+  if (!idEl) return;
+  let w = document.getElementById('llModalMarks');
+  if (!w) { w = document.createElement('span'); w.id = 'llModalMarks'; w.style.marginLeft = '10px'; idEl.parentNode.insertBefore(w, idEl.nextSibling); }
+  w.innerHTML = llModalTask ? llMarkHtml(llModalTask) : '';
+}
+function llOpenMarked(id) { LL_MARK_CFG.openInfo(id); }
+async function llToggleMark(id, kind) {
+  const alt = llMarks[id] ? Object.assign({}, llMarks[id]) : null;
+  const m = Object.assign({ merken: false, besprechen: false }, llMarks[id]);
+  m[kind] = !m[kind];
+  m.updated = new Date().toISOString();
+  llMarks[id] = m;
+  LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
+  try {
+    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), { merken: !!m.merken, besprechen: !!m.besprechen, updated: m.updated });
+  } catch (e) {
+    console.warn("Markierung konnte nicht gespeichert werden:", e.code || e.message);
+    if (alt) llMarks[id] = alt; else delete llMarks[id];
+    LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
+    alert("Markierung konnte nicht gespeichert werden (" + (e.code || e.message) + ").");
+  }
+}
+window.llToggleMark = llToggleMark;
+window.llOpenMarked = llOpenMarked;
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "anmeldung.html"; return; }
   currentUid = user.uid;
   try {
     const schuelerSnap = await getDoc(doc(db, "schueler", currentUid));
     if (schuelerSnap.exists() && schuelerSnap.data().klasseId) {
+      window.__llPseudo = schuelerSnap.data().pseudonym || "";
       // Live-Abo statt einmaligem getDoc: sobald die Lehrkraft ein LF freigibt (oder
       // sperrt), aendert sich das Firestore-Dokument und dieser Callback feuert erneut -
       // ohne dass Schueler:innen die Seite manuell neu laden muessen. Der erste Aufruf
@@ -1370,6 +1526,8 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
     await ladeAlleSprints();
+    await llLadeMarks();
+    llRenderMarkPanel();
     await ensureCurrentSprint();
     renderAll();
     showView();

@@ -944,6 +944,19 @@
     .lf1-print-solution h4 { font-size: 0.8rem; text-transform: uppercase; color: #A2222E; margin: 0 0 4px; }
     .lf1-print-lines { border: 1px solid #E6DCDD; border-radius: 6px; height: 140px; background-image: repeating-linear-gradient(to bottom, transparent, transparent 23px, #E6DCDD 24px); margin-bottom: 14px; }
   }
+
+  /* Markierungen (Merken / Besprechen) */
+  .mk-wrap { display: inline-flex; gap: 4px; margin-left: 6px; flex-shrink: 0; }
+  button.mk, .lf1-task-row button.mk, .fz-task-row button.mk { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 999px; padding: 2px 9px; font-size: 0.7rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  button.mk:hover, .lf1-task-row button.mk:hover, .fz-task-row button.mk:hover { background: var(--empty); color: var(--navy); }
+  button.mk.mk-me.on, .lf1-task-row button.mk.mk-me.on, .fz-task-row button.mk.mk-me.on { background: var(--amber); color: #fff; border-color: var(--amber-dark); }
+  button.mk.mk-ask.on, .lf1-task-row button.mk.mk-ask.on, .fz-task-row button.mk.mk-ask.on { background: #1D6F96; color: #fff; border-color: #155672; }
+  .mk-panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 0 0 12px; font-size: 0.86rem; }
+  .mk-panel summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+  .mk-panel .mk-count { font-weight: 500; color: var(--muted); margin-left: 8px; font-size: 0.8rem; }
+  .mk-panel .mk-group { margin-top: 8px; } .mk-panel .mk-group b { font-size: 0.74rem; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+  .mk-chip { display: inline-block; background: var(--empty); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin: 2px 4px 2px 0; cursor: pointer; font-size: 0.8rem; }
+  .mk-chip:hover { background: #fff; border-color: var(--amber); }
 </style>
 </head>
 <body>
@@ -2728,7 +2741,7 @@ function renderLf2AufgabenBrowser() {
         } else {
           statusHtml = '<button onclick="event.stopPropagation();lf2AddTaskToSprint(\'' + t.id + '\')">+ In Sprint aufnehmen</button>';
         }
-        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf2OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text"><span class="lf1-task-num">' + lf2Esc(t.id) + '</span> ' + lf2Esc(t.kurz || cleanText) + '</span>' + statusHtml + '</div>';
+        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf2OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text"><span class="lf1-task-num">' + lf2Esc(t.id) + '</span> ' + lf2Esc(t.kurz || cleanText) + '</span>' + statusHtml + llMarkHtml(t.id) + '</div>';
       }).join("");
       return '<div class="lf1-fz-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + block.id + '|' + fz + '" onclick="this.classList.toggle(\'expanded\')">' +
         '<span class="lf1-ampel" style="background:' + lf2Ampel(points) + '"></span>' +
@@ -2764,6 +2777,7 @@ function lf2OpenInfoModal(taskId) {
   const fz = m ? m[1] : "";
   const auftragText = m ? m[2] : task.text;
   document.getElementById("lf1InfoModalId").textContent = taskId + (fz ? " · Feinziel " + fz : "");
+  llModalTask = taskId; llPlaceModalMarks();
   const problemEl = document.getElementById("lf1InfoModalProblem");
   if (task.problem) {
     problemEl.innerHTML = "<strong>Problemstellung</strong>" + lf2Esc(task.problem);
@@ -2918,12 +2932,13 @@ function renderLfNav(currentPage) {
     { href: "bpe7-lf1.html", label: "LF1 · Arrays", id: "LF1" },
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
     { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
-    { href: "index.html#handbuch", label: "Handbuch", id: "HB" }
+    { href: "index.html#handbuch", label: "Handbuch", id: "HB" },
+    { href: "fehler.html", label: "Fehler", id: "ERR" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && item.id !== "HB" && !LF_FREIGABE[item.id];
+    const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
@@ -2949,6 +2964,80 @@ function startHeartbeat() {
 }
 
 window.__logout = () => { signOut(auth).then(() => window.location.href = "anmeldung.html"); };
+
+// ---------------------------------------------------------------------------
+// Markierungen: "Merken" (nur fuer mich selbst) und "Besprechen" (Hinweis an die
+// Lehrkraft: diese Aufgabe sollten wir gemeinsam besprechen).
+// Speicherort: schueler/{uid}/markierungen/{taskId} = { merken, besprechen, updated }
+// ---------------------------------------------------------------------------
+let llMarks = {};
+let llModalTask = null;
+const LL_MARK_CFG = { getTask: id => lf2GetTaskById(id), openInfo: id => lf2OpenInfoModal(id), rerender: () => renderLf2AufgabenBrowser(), container: 'lf2AufgabenBrowser', modalIdEl: 'lf1InfoModalId' };
+
+async function llLadeMarks() {
+  try {
+    const snap = await getDocs(collection(db, "schueler", currentUid, "markierungen"));
+    llMarks = {};
+    snap.forEach(d => { llMarks[d.id] = d.data(); });
+  } catch (e) { console.warn("Markierungen konnten nicht geladen werden:", e.code || e.message); }
+}
+function llMarkHtml(id) {
+  const m = llMarks[id] || {};
+  const q = "\'" + id + "\'";
+  return '<span class="mk-wrap" onclick="event.stopPropagation()">' +
+    '<button type="button" class="mk mk-me' + (m.merken ? ' on' : '') + '" title="Nur für mich: Aufgabe merken, um sie später schnell wiederzufinden" onclick="event.stopPropagation();llToggleMark(' + q + ',\'merken\')">' + (m.merken ? 'Gemerkt ✓' : 'Merken') + '</button>' +
+    '<button type="button" class="mk mk-ask' + (m.besprechen ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (m.besprechen ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
+    '</span>';
+}
+function llMarkLabel(id) {
+  const t = LL_MARK_CFG.getTask(id);
+  const kurz = t ? (t.kurz || String(t.text || '').replace(/^\[[\d.,\s]+\]\s*/, '').slice(0, 50)) : '';
+  return id + (kurz ? ' · ' + kurz : '');
+}
+function llRenderMarkPanel() {
+  const cont = document.getElementById(LL_MARK_CFG.container);
+  if (!cont) return;
+  let panel = document.getElementById('llMarkPanel');
+  if (!panel) { panel = document.createElement('details'); panel.id = 'llMarkPanel'; panel.className = 'mk-panel'; cont.parentNode.insertBefore(panel, cont); }
+  const ids = Object.keys(llMarks);
+  const me = ids.filter(i => llMarks[i].merken).sort();
+  const ask = ids.filter(i => llMarks[i].besprechen).sort();
+  if (!me.length && !ask.length) { panel.style.display = 'none'; return; }
+  panel.style.display = '';
+  const chips = list => list.map(i => '<span class="mk-chip" onclick="llOpenMarked(\'' + i + '\')">' + llEsc(llMarkLabel(i)) + '</span>').join('');
+  const wasOpen = panel.open;
+  panel.innerHTML = '<summary>Meine Markierungen <span class="mk-count">' + me.length + ' gemerkt · ' + ask.length + ' zur Besprechung</span></summary>' +
+    (me.length ? '<div class="mk-group"><b>Gemerkt (nur für mich)</b><div>' + chips(me) + '</div></div>' : '') +
+    (ask.length ? '<div class="mk-group"><b>Zur gemeinsamen Besprechung (Lehrkraft sieht das)</b><div>' + chips(ask) + '</div></div>' : '');
+  panel.open = wasOpen;
+}
+function llEsc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function llPlaceModalMarks() {
+  const idEl = document.getElementById(LL_MARK_CFG.modalIdEl);
+  if (!idEl) return;
+  let w = document.getElementById('llModalMarks');
+  if (!w) { w = document.createElement('span'); w.id = 'llModalMarks'; w.style.marginLeft = '10px'; idEl.parentNode.insertBefore(w, idEl.nextSibling); }
+  w.innerHTML = llModalTask ? llMarkHtml(llModalTask) : '';
+}
+function llOpenMarked(id) { LL_MARK_CFG.openInfo(id); }
+async function llToggleMark(id, kind) {
+  const alt = llMarks[id] ? Object.assign({}, llMarks[id]) : null;
+  const m = Object.assign({ merken: false, besprechen: false }, llMarks[id]);
+  m[kind] = !m[kind];
+  m.updated = new Date().toISOString();
+  llMarks[id] = m;
+  LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
+  try {
+    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), { merken: !!m.merken, besprechen: !!m.besprechen, updated: m.updated });
+  } catch (e) {
+    console.warn("Markierung konnte nicht gespeichert werden:", e.code || e.message);
+    if (alt) llMarks[id] = alt; else delete llMarks[id];
+    LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
+    alert("Markierung konnte nicht gespeichert werden (" + (e.code || e.message) + ").");
+  }
+}
+window.llToggleMark = llToggleMark;
+window.llOpenMarked = llOpenMarked;
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "anmeldung.html"; return; }
@@ -2983,6 +3072,8 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
     await ladeAlleSprints();
+    await llLadeMarks();
+    llRenderMarkPanel();
     renderLf2AufgabenBrowser();
     renderLfNav("LF2");
     startHeartbeat();

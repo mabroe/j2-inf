@@ -99,6 +99,27 @@
   .bar-chart-label { font-size: 0.62rem; color: var(--muted); margin-top: 4px; white-space: nowrap; transform: rotate(-45deg); transform-origin: top right; }
   .bar-chart-empty { color: var(--muted); font-size: 0.85rem; padding: 10px 0; }
   .sprint-task-chip { display: inline-block; font-size: 0.72rem; color: var(--navy); background: var(--empty); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; margin: 1px 3px 1px 0; white-space: nowrap; }
+  /* Besprechung + Fortschritt */
+  .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 14px; }
+  .kpi { flex: 1 1 150px; background: var(--empty); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+  .kpi .kv { font-size: 1.5rem; font-weight: 800; color: var(--navy); line-height: 1.1; }
+  .kpi .kl { font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; margin-top: 2px; }
+  .kpi .ks { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+  .pbar { position: relative; height: 10px; background: #E9E1E2; border-radius: 6px; overflow: hidden; min-width: 70px; }
+  .pbar > span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--navy); border-radius: 6px; }
+  .pbar.amber > span { background: var(--amber); }
+  .pbar.green > span { background: var(--done-border); }
+  .pnum { font-size: 0.74rem; color: var(--muted); margin-top: 2px; white-space: nowrap; }
+  .spark { display: inline-flex; align-items: flex-end; gap: 2px; height: 22px; }
+  .spark i { display: block; width: 6px; background: var(--navy); border-radius: 2px 2px 0 0; min-height: 2px; opacity: .85; }
+  .spark i.z { background: #D8CDCF; }
+  .act-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  table.stat-table.dicht td, table.stat-table.dicht th { padding: 6px 8px; font-size: 0.84rem; }
+  table.stat-table th.sortbar { cursor: pointer; }
+  table.stat-table th.sortbar:hover { color: var(--navy); }
+  .bs-names { font-size: 0.78rem; color: var(--muted); }
+  .bs-id { font-weight: 700; color: var(--navy); cursor: pointer; text-decoration: underline dotted; }
+  .lfmini { display: inline-block; min-width: 92px; margin-right: 10px; vertical-align: top; }
   .status-badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.74rem; font-weight: 700; }
   .status-badge.aktiv { background: var(--done-bg); color: var(--done-border); }
   .status-badge.deaktiviert { background: var(--fail-bg); color: var(--fail-border); }
@@ -204,6 +225,7 @@
   <div class="dash-tabs">
     <div class="dash-tab active" data-tab="klassen">Meine Klassen</div>
     <div class="dash-tab" data-tab="aufgaben">Aufgaben-Browser</div>
+    <div class="dash-tab" data-tab="besprechung">Besprechung <span id="bsTabBadge" style="display:none;background:var(--amber);color:#fff;border-radius:10px;padding:0 7px;font-size:0.72rem;margin-left:4px;"></span></div>
     <div class="dash-tab" data-tab="werkstaetten">Werkstätten</div>
     <div class="dash-tab" data-tab="statistik">Statistik</div>
   </div>
@@ -247,6 +269,27 @@
     </div>
   </div>
 
+  <div class="dash-view" id="dashview-besprechung">
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h2 style="margin:0;">Zur gemeinsamen Besprechung markierte Aufgaben</h2>
+        <div class="row" style="gap:8px;margin-bottom:0;">
+          <select id="bsKlasse" style="margin-bottom:0;width:auto;"></select>
+          <button class="secondary" id="bsRefresh">🔄 Aktualisieren</button>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:0.84rem;margin:6px 0 10px;">Schüler:innen können Aufgaben mit „Besprechen“ markieren. Hier seht ihr, welche Aufgaben wie oft markiert wurden – die häufigsten oben. „Merken“ (persönliche Markierung) wird bewusst <b>nicht</b> angezeigt. Aufgaben anhaken und als Review-Liste kopieren.</p>
+      <div class="error-box" id="bsError"></div>
+      <div id="bsKpi"></div>
+      <div id="bsListe" style="color:var(--muted);">Lade…</div>
+      <div class="row" style="margin-top:12px;gap:10px;align-items:center;">
+        <button id="bsCopy">Review-Liste kopieren</button>
+        <button class="secondary" id="bsAlle">Alle auswählen</button>
+        <span id="bsSel" style="color:var(--muted);font-size:0.84rem;"></span>
+      </div>
+    </div>
+  </div>
+
   <div class="dash-view" id="dashview-werkstaetten">
     <div class="panel">
       <h2>Lernwerkstätten</h2>
@@ -272,6 +315,35 @@
       </div>
       <div class="error-box" id="statistikError"></div>
       <div id="statistikUebersicht" style="color:var(--muted);">Lade…</div>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h2 style="margin:0;">Fortschritt je Schüler:in</h2>
+        <div class="row" style="gap:8px;margin-bottom:0;">
+          <select id="fsKlasse" style="margin-bottom:0;width:auto;"></select>
+          <input type="text" id="fsSuche" placeholder="Pseudonym suchen…" style="margin-bottom:0;width:170px;">
+          <select id="fsSort" style="margin-bottom:0;width:auto;">
+            <option value="name">Sortierung: Name</option>
+            <option value="fortschritt_ab">Fortschritt: hoch → niedrig</option>
+            <option value="fortschritt_auf">Fortschritt: niedrig → hoch</option>
+            <option value="inaktiv">Zuletzt aktiv: am längsten her zuerst</option>
+            <option value="besprechen">Meiste Besprechungswünsche</option>
+          </select>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:0.82rem;margin:6px 0 10px;">Fortschritt = erledigte Aufgaben der für die Klasse freigegebenen Lernfelder (ohne Freigabe: alle). Der Verlauf zeigt die erledigten Aufgaben der letzten 8 Kalenderwochen (ältestes links). Zeile anklicken für die Feinziel-Details.</p>
+      <div id="fsKpi"></div>
+      <div id="fsTabelle" style="color:var(--muted);">Lade…</div>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h2 style="margin:0;">Feinziele im Klassenüberblick</h2>
+        <select id="fzKlasse" style="margin-bottom:0;width:auto;"></select>
+      </div>
+      <p style="color:var(--muted);font-size:0.82rem;margin:6px 0 10px;">Durchschnittliche Zielerreichung je Feinziel (Punkte wie im Ich-Kann: max. 3 je Person) und wie viele Schüler:innen das Feinziel erreicht haben (≥ 3 Punkte). So seht ihr, wo die Klasse Förderbedarf hat.</p>
+      <div id="fzTabelle" style="color:var(--muted);">Lade…</div>
     </div>
 
     <div class="panel">
@@ -959,12 +1031,18 @@ function schuljahresWochen() {
   // fuer die Lehrkraft in dieser einen Browser-Sitzung.
   // ---------------------------------------------------------------------------
   const KLARNAMEN_KEY = "ll_klarnamen_map";
+  // Anzeigename ueberall im Dashboard: "Klarname (Pseudonym)", falls ein Klarname hinterlegt ist.
+  function sName(pseudonym) {
+    const k = (ladeKlarnamenMap()[pseudonym] || "").trim();
+    return k ? k + " (" + pseudonym + ")" : String(pseudonym);
+  }
   function ladeKlarnamenMap() {
     try { return JSON.parse(localStorage.getItem(KLARNAMEN_KEY)) || {}; }
     catch (e) { return {}; }
   }
   function speichereKlarnamenMap(map) {
     localStorage.setItem(KLARNAMEN_KEY, JSON.stringify(map));
+    try { if (typeof renderAlleNamen === "function") renderAlleNamen(); } catch (e) { /* noch nicht geladen */ }
   }
   window.__speichereKlarname = (input) => {
     const map = ladeKlarnamenMap();
@@ -1125,6 +1203,7 @@ function schuljahresWochen() {
       for (const d of sprintSnap.docs) await deleteDoc(d.ref);
       const sessSnap = await getDocs(collection(db, "schueler", uid, "sessions"));
       for (const d of sessSnap.docs) await deleteDoc(d.ref);
+      try { const mkSnap = await getDocs(collection(db, "schueler", uid, "markierungen")); for (const d of mkSnap.docs) await deleteDoc(d.ref); } catch (e) { /* optional */ }
       await deleteDoc(doc(db, "schueler", uid));
 
       alert('Konto "' + pseudonym + '" wurde vollstaendig geloescht.');
@@ -1172,6 +1251,7 @@ function schuljahresWochen() {
           for (const d of sprintSnap.docs) await deleteDoc(d.ref);
           const sessSnap = await getDocs(collection(db, "schueler", s.uid, "sessions"));
           for (const d of sessSnap.docs) await deleteDoc(d.ref);
+          try { const mkSnap = await getDocs(collection(db, "schueler", s.uid, "markierungen")); for (const d of mkSnap.docs) await deleteDoc(d.ref); } catch (e) { /* optional */ }
           await deleteDoc(doc(db, "schueler", s.uid));
         } catch (err) {
           console.warn("Firestore-Daten von " + s.pseudonym + " konnten nicht vollstaendig geloescht werden: " + (err.code || err.message));
@@ -1198,7 +1278,7 @@ function schuljahresWochen() {
   // FORTSCHRITTS-MODAL (Ich-Kann-Uebersicht einer/eines einzelnen Schueler:in)
   // ---------------------------------------------------------------------------
   window.__zeigeFortschritt = async (uid, pseudonym) => {
-    document.getElementById("progressModalTitle").textContent = "Fortschritt: " + pseudonym;
+    document.getElementById("progressModalTitle").textContent = "Fortschritt: " + sName(pseudonym);
     const body = document.getElementById("progressModalBody");
     body.innerHTML = "Lade…";
     document.getElementById("progressModalOverlay").classList.add("open");
@@ -1235,8 +1315,18 @@ function schuljahresWochen() {
         body.innerHTML = '<p style="color:var(--muted);">Noch keine Aufgaben in einem Sprint bearbeitet.</p>';
         return;
       }
+      const chipHtml = ids => ids.map(id => `<span class="sprint-task-chip task-open" data-id="${esc(id)}" title="Aufgabe öffnen" style="cursor:pointer;">${esc(aufgabeKurzLabel(id))}</span>`).join(" ");
+      const erledigtIds = [...erledigteTasks].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      let besIds = [];
+      try {
+        const mk = await getDocs(collection(db, "schueler", uid, "markierungen"));
+        mk.forEach(m => { if (m.data().besprechen) besIds.push(m.id); });
+      } catch (e) { /* optional */ }
+      besIds.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      const extra = `<h4 style="margin:14px 0 6px;color:var(--navy);">Erledigte Aufgaben (${erledigtIds.length})</h4><div>${erledigtIds.length ? chipHtml(erledigtIds) : '<span style="color:var(--muted);">noch keine</span>'}</div>` +
+        (besIds.length ? `<h4 style="margin:14px 0 6px;color:var(--navy);">Zur Besprechung markiert (${besIds.length})</h4><div>${chipHtml(besIds)}</div>` : "");
 
-      body.innerHTML = keys.map(key => {
+      body.innerHTML = extra + '<h4 style="margin:14px 0 6px;color:var(--navy);">Feinziele</h4>' + keys.map(key => {
         const [lf, fz] = key.split("|");
         const pts = punkteJeFeinziel[key];
         const farbe = pts >= 3 ? "#2E7D5B" : pts >= 1 ? "#E8963C" : "#B9B9B9";
@@ -1246,6 +1336,7 @@ function schuljahresWochen() {
           <span class="fz-pts">${pts} / 3 Pkt.</span>
         </div>`;
       }).join("");
+      body.querySelectorAll(".task-open").forEach(c => c.addEventListener("click", () => window.__oeffneAufgabenModal(c.dataset.id)));
     } catch (err) {
       body.innerHTML = '<p style="color:var(--fail-border);">Fehler beim Laden: ' + esc(err.code || err.message) + '</p>';
     }
@@ -1272,7 +1363,7 @@ function schuljahresWochen() {
         renderAufgabenBrowser();
         aufgabenBrowserGerendert = true;
       }
-      if (tab.dataset.tab === "statistik" && !statistikGeladen) {
+      if ((tab.dataset.tab === "statistik" || tab.dataset.tab === "besprechung") && !statistikGeladen) {
         statistikGeladen = true;
         ladeStatistik();
       }
@@ -1544,6 +1635,8 @@ function schuljahresWochen() {
           const erledigtWeekly = {};
           const erledigtWeeklyTasks = {}; // weekKey -> [taskId, ...] - fuer die Detailansicht "Aufgaben pro Sprint je Schueler:in"
           let erledigtGesamt = 0;
+          const taskStatus = {}; // taskId -> bester Status ueber alle Sprints (done > doing > todo)
+          const RANG = { todo: 1, doing: 2, done: 3 };
           try {
             const sprintSnap = await getDocs(collection(db, "schueler", s.uid, "sprints"));
             sprintSnap.forEach(spd => {
@@ -1552,7 +1645,9 @@ function schuljahresWochen() {
               let anzahl = 0;
               const erledigteIds = [];
               Object.keys(tasks).forEach(taskId => {
-                if (tasks[taskId].status === "done") { anzahl++; erledigteIds.push(taskId); }
+                const st = tasks[taskId].status;
+                if ((RANG[st] || 0) > (RANG[taskStatus[taskId]] || 0)) taskStatus[taskId] = st;
+                if (st === "done") { anzahl++; erledigteIds.push(taskId); }
               });
               if (anzahl > 0) {
                 erledigtWeekly[weekKey] = (erledigtWeekly[weekKey] || 0) + anzahl;
@@ -1562,8 +1657,14 @@ function schuljahresWochen() {
             });
           } catch (e) { /* siehe oben */ }
 
+          const marks = {};
+          try {
+            const mkSnap = await getDocs(collection(db, "schueler", s.uid, "markierungen"));
+            mkSnap.forEach(md => { marks[md.id] = md.data(); });
+          } catch (e) { /* optional */ }
+
           const letzteAktivitaet = logins.length ? new Date(Math.max(...logins.map(d => d.getTime()))) : null;
-          schuelerListe.push({ uid: s.uid, pseudonym: s.pseudonym, deaktiviert: !!s.deaktiviert, logins, erledigtWeekly, erledigtWeeklyTasks, erledigtGesamt, letzteAktivitaet });
+          schuelerListe.push({ uid: s.uid, pseudonym: s.pseudonym, deaktiviert: !!s.deaktiviert, logins, erledigtWeekly, erledigtWeeklyTasks, erledigtGesamt, letzteAktivitaet, taskStatus, marks });
         }
         klassenDaten.push({ id: k.id, name: k.name, schueler: schuelerListe });
       }
@@ -1600,6 +1701,10 @@ function schuljahresWochen() {
       renderStatistikUebersicht();
       renderStatistikCharts();
       renderStatistikProSchueler();
+      fuelleKlassenSelects();
+      renderFortschrittJeSchueler();
+      renderFeinzielUeberblick();
+      renderBesprechung();
     } catch (err) {
       errEl.textContent = "Fehler beim Laden der Statistik: " + (err.code || err.message);
       errEl.style.display = "block";
@@ -1750,10 +1855,10 @@ function schuljahresWochen() {
       const kwLabel = z.weekKey.split("-W")[1] || z.weekKey;
       return `<tr>
         ${zeigeKlassenspalte ? `<td>${esc(z.klasse)}</td>` : ""}
-        <td>${esc(z.pseudonym)}</td>
+        <td>${esc(sName(z.pseudonym))}</td>
         ${zeigeSprintspalte ? `<td>KW${esc(kwLabel)}</td>` : ""}
         <td>${z.anzahl}</td>
-        <td>${z.ids.map(id => `<span class="sprint-task-chip">${esc(aufgabeKurzLabel(id))}</span>`).join(" ")}</td>
+        <td>${z.ids.map(id => `<span class="sprint-task-chip task-open" data-id="${esc(id)}" title="Aufgabe öffnen" style="cursor:pointer;">${esc(aufgabeKurzLabel(id))}</span>`).join(" ")}</td>
       </tr>`;
     }).join("");
 
@@ -1762,7 +1867,219 @@ function schuljahresWochen() {
         <thead><tr>${zeigeKlassenspalte ? "<th>Klasse</th>" : ""}<th>Schüler:in</th>${zeigeSprintspalte ? "<th>Sprint</th>" : ""}<th>Anzahl</th><th>Erledigte Aufgaben</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
+    el.querySelectorAll(".task-open").forEach(c => c.addEventListener("click", () => window.__oeffneAufgabenModal(c.dataset.id)));
   }
+  function renderAlleNamen() {
+    if (!statistikRohdaten) return;
+    renderStatistikProSchueler(); renderFortschrittJeSchueler(); renderBesprechung();
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // FORTSCHRITT JE SCHUELER:IN, FEINZIEL-UEBERBLICK, BESPRECHUNGS-UEBERSICHT
+  // (alles aus statistikRohdaten, siehe ladeStatistik)
+  // ---------------------------------------------------------------------------
+  function fuelleKlassenSelects() {
+    ["fsKlasse", "fzKlasse", "bsKlasse"].forEach(id => {
+      const el = document.getElementById(id);
+      const alt = el.value;
+      el.innerHTML = (id === "fzKlasse" ? "" : '<option value="__alle__">Alle Klassen</option>') +
+        statistikRohdaten.map(k => `<option value="${esc(k.id)}">${esc(k.name)}</option>`).join("");
+      if ([...el.options].some(o => o.value === alt)) el.value = alt;
+    });
+  }
+  function klassenAuswahl(selId) {
+    const v = document.getElementById(selId).value;
+    return (!v || v === "__alle__") ? statistikRohdaten : statistikRohdaten.filter(k => k.id === v);
+  }
+  function freigegebeneLfs(klasseId) {
+    const k = meineKlassen.find(x => x.id === klasseId);
+    const fr = (k && k.freigaben) || {};
+    const lfs = ["LF1", "LF2", "LF3"].filter(lf => fr[lf]);
+    return lfs.length ? lfs : ["LF1", "LF2", "LF3"];
+  }
+  function tageSeit(d) { return d ? Math.floor((Date.now() - d.getTime()) / 86400000) : null; }
+
+  let fsSortAktuell = null;
+  function renderFortschrittJeSchueler() {
+    const tab = document.getElementById("fsTabelle"), kpi = document.getElementById("fsKpi");
+    if (!statistikRohdaten || !statistikRohdaten.length) { tab.innerHTML = '<p style="color:var(--muted);">Noch keine Klasse angelegt.</p>'; kpi.innerHTML = ""; return; }
+    const suche = document.getElementById("fsSuche").value.trim().toLowerCase();
+    const sort = fsSortAktuell || document.getElementById("fsSort").value;
+    const wochen = schuljahresWochen().slice(-8);
+    const zeilen = [];
+    klassenAuswahl("fsKlasse").forEach(k => {
+      const lfs = freigegebeneLfs(k.id);
+      const gesamtLf = {}; lfs.forEach(lf => gesamtLf[lf] = ALLE_AUFGABEN.filter(a => a.lf === lf).length);
+      const gesamt = lfs.reduce((n, lf) => n + gesamtLf[lf], 0);
+      k.schueler.forEach(s => {
+        if (suche && !sName(s.pseudonym).toLowerCase().includes(suche)) return;
+        const proLf = {}; lfs.forEach(lf => proLf[lf] = 0);
+        let doing = 0, todo = 0, done = 0, punkte = 0;
+        Object.keys(s.taskStatus || {}).forEach(id => {
+          const t = ALLE_AUFGABEN.find(a => a.id === id); if (!t || !lfs.includes(t.lf)) return;
+          const st = s.taskStatus[id];
+          if (st === "done") { done++; proLf[t.lf]++; punkte += t.tier; } else if (st === "doing") doing++; else todo++;
+        });
+        const verlauf = wochen.map(w => (s.erledigtWeekly || {})[w] || 0);
+        const bes = Object.keys(s.marks || {}).filter(id => s.marks[id].besprechen).length;
+        zeilen.push({ uid: s.uid, name: sName(s.pseudonym), pseudo: s.pseudonym, klasse: k.name, deaktiviert: s.deaktiviert, lfs, gesamtLf, gesamt, done, doing, todo, punkte, proLf, verlauf, bes, logins: s.logins.length, tage: tageSeit(s.letzteAktivitaet), zuletzt: s.letzteAktivitaet });
+      });
+    });
+    const cmp = {
+      name: (a, b) => a.name.localeCompare(b.name),
+      fortschritt_ab: (a, b) => (b.done / (b.gesamt || 1)) - (a.done / (a.gesamt || 1)) || a.name.localeCompare(b.name),
+      fortschritt_auf: (a, b) => (a.done / (a.gesamt || 1)) - (b.done / (b.gesamt || 1)) || a.name.localeCompare(b.name),
+      inaktiv: (a, b) => (b.tage === null ? 9999 : b.tage) - (a.tage === null ? 9999 : a.tage),
+      besprechen: (a, b) => b.bes - a.bes || a.name.localeCompare(b.name),
+      logins: (a, b) => b.logins - a.logins, doing: (a, b) => b.doing - a.doing
+    }[sort] || ((a, b) => 0);
+    zeilen.sort(cmp);
+    if (!zeilen.length) { tab.innerHTML = '<p style="color:var(--muted);">Keine Schüler:innen gefunden.</p>'; kpi.innerHTML = ""; return; }
+
+    const aktive = zeilen.filter(z => !z.deaktiviert);
+    const avg = aktive.length ? aktive.reduce((n, z) => n + z.done / (z.gesamt || 1), 0) / aktive.length : 0;
+    const inaktiv = aktive.filter(z => z.tage === null || z.tage > 14);
+    const nullErl = aktive.filter(z => z.done === 0);
+    const diese = new Set(wochen.slice(-2));
+    kpi.innerHTML = `<div class="kpi-row">
+      <div class="kpi"><div class="kv">${aktive.length}</div><div class="kl">Aktive Schüler:innen</div></div>
+      <div class="kpi"><div class="kv">${Math.round(avg * 100)} %</div><div class="kl">⌀ Fortschritt</div><div class="ks">erledigte Aufgaben der Freigabe</div></div>
+      <div class="kpi"><div class="kv">${nullErl.length}</div><div class="kl">Noch nichts erledigt</div><div class="ks">${esc(nullErl.slice(0, 4).map(z => z.name).join(", "))}${nullErl.length > 4 ? " …" : ""}</div></div>
+      <div class="kpi"><div class="kv">${inaktiv.length}</div><div class="kl">Seit &gt; 14 Tagen inaktiv</div><div class="ks">${esc(inaktiv.slice(0, 4).map(z => z.name).join(", "))}${inaktiv.length > 4 ? " …" : ""}</div></div>
+    </div>`;
+
+    const maxV = Math.max(1, ...zeilen.flatMap(z => z.verlauf));
+    const showKlasse = klassenAuswahl("fsKlasse").length > 1;
+    const sortTh = (key, label) => `<th class="sortbar" data-sort="${key}">${label}${sort === key ? " ▾" : ""}</th>`;
+    tab.innerHTML = `<div style="overflow-x:auto"><table class="stat-table dicht"><thead><tr>
+      <th class="sortbar" data-sort="name">Schüler:in${sort === "name" ? " ▾" : ""}</th>${showKlasse ? "<th>Klasse</th>" : ""}
+      <th class="sortbar" data-sort="fortschritt_ab" style="min-width:150px;">Fortschritt gesamt${sort.startsWith("fortschritt") ? " ▾" : ""}</th>
+      <th>Je Lernfeld</th>
+      <th class="sortbar" data-sort="doing">In Arbeit / offen${sort === "doing" ? " ▾" : ""}</th>
+      <th>Verlauf (8 KW)</th>
+      <th class="sortbar" data-sort="inaktiv">Zuletzt aktiv${sort === "inaktiv" ? " ▾" : ""}</th>
+      <th class="sortbar" data-sort="logins">Logins${sort === "logins" ? " ▾" : ""}</th>
+      <th class="sortbar" data-sort="besprechen">Besprechen${sort === "besprechen" ? " ▾" : ""}</th></tr></thead><tbody>` +
+      zeilen.map(z => {
+        const pct = Math.round(z.done / (z.gesamt || 1) * 100);
+        const farbe = z.tage === null ? "#C62828" : z.tage <= 7 ? "#2E7D5B" : z.tage <= 14 ? "#E8963C" : "#C62828";
+        const lfCells = z.lfs.map(lf => `<span class="lfmini"><div style="font-size:.7rem;color:var(--muted)">${lf}</div><div class="pbar ${z.proLf[lf] >= z.gesamtLf[lf] * 0.8 ? "green" : "amber"}"><span style="width:${Math.round(z.proLf[lf] / (z.gesamtLf[lf] || 1) * 100)}%"></span></div><div class="pnum">${z.proLf[lf]} / ${z.gesamtLf[lf]}</div></span>`).join("");
+        const spark = `<span class="spark">${z.verlauf.map((v, i) => `<i class="${v === 0 ? "z" : ""}" style="height:${v === 0 ? 2 : Math.max(4, Math.round(v / maxV * 22))}px" title="KW ${esc((wochen[i] || "").split("-W")[1] || "")}: ${v}"></i>`).join("")}</span>`;
+        return `<tr style="cursor:pointer;${z.deaktiviert ? "opacity:.55;" : ""}" data-uid="${esc(z.uid)}" data-name="${esc(z.pseudo)}">
+          <td><b>${esc(z.name)}</b>${z.deaktiviert ? ' <span class="status-badge deaktiviert">gesperrt</span>' : ""}</td>${showKlasse ? `<td>${esc(z.klasse)}</td>` : ""}
+          <td><div class="pbar"><span style="width:${pct}%"></span></div><div class="pnum">${z.done} / ${z.gesamt} Aufgaben · ${pct} % · ${z.punkte} Pkt.</div></td>
+          <td>${lfCells}</td>
+          <td>${z.doing} / ${z.todo}</td>
+          <td>${spark}</td>
+          <td><span class="act-dot" style="background:${farbe}"></span>${z.zuletzt ? (z.tage === 0 ? "heute" : "vor " + z.tage + " T.") : "nie"}</td>
+          <td>${z.logins}</td>
+          <td>${z.bes ? `<b style="color:#1D6F96">${z.bes}</b>` : "–"}</td></tr>`;
+      }).join("") + "</tbody></table></div>";
+    tab.querySelectorAll("th.sortbar").forEach(th => th.addEventListener("click", () => {
+      fsSortAktuell = th.dataset.sort; document.getElementById("fsSort").value = [...document.getElementById("fsSort").options].some(o => o.value === fsSortAktuell) ? fsSortAktuell : document.getElementById("fsSort").value;
+      renderFortschrittJeSchueler();
+    }));
+    tab.querySelectorAll("tbody tr").forEach(tr => tr.addEventListener("click", () => window.__zeigeFortschritt(tr.dataset.uid, tr.dataset.name)));
+  }
+
+  function renderFeinzielUeberblick() {
+    const el = document.getElementById("fzTabelle");
+    if (!statistikRohdaten || !statistikRohdaten.length) { el.innerHTML = ""; return; }
+    const k = klassenAuswahl("fzKlasse")[0];
+    if (!k) { el.innerHTML = ""; return; }
+    const lfs = freigegebeneLfs(k.id);
+    const aktive = k.schueler.filter(s => !s.deaktiviert);
+    if (!aktive.length) { el.innerHTML = '<p style="color:var(--muted);">Keine aktiven Schüler:innen.</p>'; return; }
+    const keys = {};
+    ALLE_AUFGABEN.forEach(t => { if (!lfs.includes(t.lf)) return; feinzielListe(t).forEach(fz => { keys[t.lf + "|" + fz] = true; }); });
+    const sortiert = Object.keys(keys).sort((a, b) => { const [la, fa] = a.split("|"), [lb, fb] = b.split("|"); return la !== lb ? la.localeCompare(lb) : fa.localeCompare(fb, undefined, { numeric: true }); });
+    const rows = sortiert.map(key => {
+      const [lf, fz] = key.split("|");
+      const aufg = ALLE_AUFGABEN.filter(t => t.lf === lf && feinzielListe(t).includes(fz));
+      let sumP = 0, erreicht = 0;
+      aktive.forEach(s => {
+        let p = 0; aufg.forEach(t => { if ((s.taskStatus || {})[t.id] === "done") p += t.tier; });
+        sumP += Math.min(p, 3); if (p >= 3) erreicht++;
+      });
+      const avg = sumP / aktive.length / 3;
+      const bes = aktive.filter(s => aufg.some(t => (s.marks || {})[t.id] && s.marks[t.id].besprechen)).length;
+      return { key, lf, fz, avg, erreicht, bes };
+    });
+    el.innerHTML = `<div style="overflow-x:auto"><table class="stat-table dicht"><thead><tr><th>Feinziel</th><th style="min-width:160px;">⌀ Zielerreichung</th><th>≥ 3 Punkte erreicht</th><th>Besprechungswünsche</th></tr></thead><tbody>` +
+      rows.map(r => `<tr><td>${esc(r.lf)} · [${esc(r.fz)}] ${esc(FEINZIEL_TITLES[r.key] || "")}</td>
+        <td><div class="pbar ${r.avg >= 0.7 ? "green" : r.avg >= 0.35 ? "amber" : ""}"><span style="width:${Math.round(r.avg * 100)}%"></span></div><div class="pnum">${Math.round(r.avg * 100)} %</div></td>
+        <td>${r.erreicht} von ${aktive.length}</td><td>${r.bes ? `<b style="color:#1D6F96">${r.bes}</b> von ${aktive.length}` : "–"}</td></tr>`).join("") + "</tbody></table></div>";
+  }
+
+  // --- Besprechung ---
+  let bsZeilen = [];
+  function renderBesprechung() {
+    const el = document.getElementById("bsListe"), kpi = document.getElementById("bsKpi");
+    if (!statistikRohdaten) return;
+    const klassen = klassenAuswahl("bsKlasse");
+    const aktive = klassen.flatMap(k => k.schueler.filter(s => !s.deaktiviert).map(s => ({ ...s, klasse: k.name })));
+    const map = {};
+    aktive.forEach(s => Object.keys(s.marks || {}).forEach(id => {
+      if (s.marks[id].besprechen) (map[id] = map[id] || []).push(s);
+    }));
+    bsZeilen = Object.keys(map).map(id => ({ id, von: map[id], n: map[id].length, t: ALLE_AUFGABEN.find(a => a.id === id) }))
+      .sort((a, b) => b.n - a.n || a.id.localeCompare(b.id));
+    const badge = document.getElementById("bsTabBadge");
+    const gesamtAlle = statistikRohdaten.flatMap(k => k.schueler.filter(s => !s.deaktiviert)).reduce((n, s) => n + Object.keys(s.marks || {}).filter(i => s.marks[i].besprechen).length, 0);
+    badge.style.display = gesamtAlle ? "inline-block" : "none"; badge.textContent = gesamtAlle;
+    const total = aktive.length;
+    if (!bsZeilen.length) {
+      kpi.innerHTML = "";
+      el.innerHTML = '<p style="color:var(--muted);">Bisher hat noch niemand eine Aufgabe zur Besprechung markiert.</p>';
+      document.getElementById("bsSel").textContent = ""; return;
+    }
+    const top = bsZeilen[0];
+    const mitMarkierung = new Set(bsZeilen.flatMap(z => z.von.map(s => s.uid))).size;
+    kpi.innerHTML = `<div class="kpi-row">
+      <div class="kpi"><div class="kv">${bsZeilen.length}</div><div class="kl">Aufgaben markiert</div></div>
+      <div class="kpi"><div class="kv">${top.n} / ${total}</div><div class="kl">Meistgenannt</div><div class="ks">${esc(top.id)}${top.t ? " · " + esc(top.t.kurz) : ""}</div></div>
+      <div class="kpi"><div class="kv">${mitMarkierung} / ${total}</div><div class="kl">Beteiligte Schüler:innen</div></div>
+    </div>`;
+    el.innerHTML = `<table class="stat-table dicht"><thead><tr><th></th><th>Aufgabe</th><th>Feinziel</th><th style="min-width:170px;">Markiert von</th><th>Wer?</th></tr></thead><tbody>` +
+      bsZeilen.map((z, i) => {
+        const pct = total ? Math.round(z.n / total * 100) : 0;
+        const label = z.n === total && total > 1 ? "von allen" : "von " + total;
+        return `<tr><td><input type="checkbox" class="bsChk" data-i="${i}" style="width:auto;margin:0;"></td>
+          <td><span class="bs-id" data-id="${esc(z.id)}">${esc(z.id)}</span><div style="font-size:.8rem;color:var(--muted)">${z.t ? esc(z.t.kurz) : ""}</div></td>
+          <td>${z.t ? esc(z.t.lf + " · " + z.t.feinziel) : ""}</td>
+          <td><div class="pbar ${pct >= 50 ? "" : "amber"}"><span style="width:${pct}%"></span></div><div class="pnum"><b>${z.n}</b> Schüler:in${z.n === 1 ? "" : "nen"} (${pct} %) – ${label}</div></td>
+          <td class="bs-names">${esc(z.von.map(s => sName(s.pseudonym)).sort().join(", "))}</td></tr>`;
+      }).join("") + "</tbody></table>";
+    el.querySelectorAll(".bs-id").forEach(b => b.addEventListener("click", () => window.__oeffneAufgabenModal(b.dataset.id)));
+    el.querySelectorAll(".bsChk").forEach(c => c.addEventListener("change", bsAuswahlAnzeigen));
+    bsAuswahlAnzeigen();
+  }
+  function bsAuswahlAnzeigen() {
+    const n = document.querySelectorAll(".bsChk:checked").length;
+    document.getElementById("bsSel").textContent = n ? n + " Aufgabe(n) ausgewählt" : "";
+  }
+  document.getElementById("bsAlle").addEventListener("click", () => {
+    const boxes = [...document.querySelectorAll(".bsChk")];
+    const alle = boxes.every(b => b.checked);
+    boxes.forEach(b => { b.checked = !alle; });
+    document.getElementById("bsAlle").textContent = alle ? "Alle auswählen" : "Alle abwählen";
+    bsAuswahlAnzeigen();
+  });
+  document.getElementById("bsCopy").addEventListener("click", async () => {
+    let sel = [...document.querySelectorAll(".bsChk:checked")].map(c => bsZeilen[+c.dataset.i]);
+    if (!sel.length) sel = bsZeilen;
+    const total = klassenAuswahl("bsKlasse").reduce((n, k) => n + k.schueler.filter(s => !s.deaktiviert).length, 0);
+    const text = "Review-Liste (zur Besprechung markierte Aufgaben)\n" + sel.map(z => "- " + z.id + (z.t ? " – " + z.t.kurz : "") + " (" + z.n + " von " + total + ")").join("\n");
+    try { await navigator.clipboard.writeText(text); document.getElementById("bsSel").textContent = sel.length + " Aufgabe(n) in die Zwischenablage kopiert."; }
+    catch (e) { window.prompt("Review-Liste kopieren:", text); }
+  });
+  document.getElementById("bsKlasse").addEventListener("change", renderBesprechung);
+  document.getElementById("bsRefresh").addEventListener("click", ladeStatistik);
+  document.getElementById("fsKlasse").addEventListener("change", renderFortschrittJeSchueler);
+  document.getElementById("fsSuche").addEventListener("input", renderFortschrittJeSchueler);
+  document.getElementById("fsSort").addEventListener("change", () => { fsSortAktuell = null; renderFortschrittJeSchueler(); });
+  document.getElementById("fzKlasse").addEventListener("change", renderFeinzielUeberblick);
 
   document.getElementById("statistikRefreshBtn").addEventListener("click", ladeStatistik);
   document.getElementById("statistikKlasseFilter").addEventListener("change", renderStatistikCharts);

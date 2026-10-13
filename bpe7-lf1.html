@@ -133,7 +133,7 @@
   .collapsible-summary h3 { display: inline; margin: 0; }
 
   /* Persistent cabinet (shared across build/loop/struktogramm) */
-  .cabinet-wrap { margin-bottom: 16px; }
+  .cabinet-wrap { margin-bottom: 16px; position: relative; }
   .cabinet {
     display: flex;
     align-items: flex-end;
@@ -142,6 +142,7 @@
     background: var(--navy-dark);
     border-radius: 10px;
     overflow-x: auto;
+    overflow-y: hidden;
     min-height: 150px;
     position: relative;
   }
@@ -210,6 +211,42 @@
   .ref-tip.n { background: #444; }
   /* Tausch-Simulation: Zustand des Arrays nach jeder Zeile */
   .cab-ghost { position: absolute; top: -24px; left: 0; background: #C62828; color: #fff; font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 0.7rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; text-decoration: line-through; white-space: nowrap; z-index: 2; }
+  .cab-ghost.saved { background: #2E7D32; text-decoration: none; }
+  .varpanel { display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; margin:12px 0 0; }
+  .varbox { background:#fff; border:2px solid #C9D3E3; border-radius:8px; padding:6px 12px; min-width:120px; font-family:-apple-system,'Segoe UI',sans-serif; }
+  .varbox .vn { font-size:0.72rem; font-weight:700; text-transform:uppercase; color:#5B6B85; }
+  .varbox .vv { font-family:'JetBrains Mono',Consolas,monospace; font-size:1.05rem; font-weight:700; color:var(--navy-dark); min-height:1.4em; }
+  .varbox.temp { border-color:#5CB85C; }
+  .varbox.temp.empty { border-style:dashed; border-color:#999; }
+  .varbox.temp.empty .vv { color:#999; }
+  .varbox.temp.fresh { background:#E8F5E9; box-shadow:0 0 0 3px rgba(92,184,92,.35); }
+  .varbox.note { flex:1; min-width:220px; border-style:dashed; font-size:0.85rem; line-height:1.35; color:var(--navy-dark); }
+  .calc-bubble { position:relative; margin:6px 0 4px 34px; background:#FFF4E0; color:#3A2A10; border:1.5px solid var(--amber-dark); border-radius:8px; padding:5px 10px; font-family:Consolas,monospace; font-size:0.82rem; line-height:1.4; box-shadow:0 2px 6px rgba(0,0,0,.25); }
+  .calc-bubble::before { content:""; position:absolute; top:-7px; left:22px; width:11px; height:11px; background:#FFF4E0; border-left:1.5px solid var(--amber-dark); border-top:1.5px solid var(--amber-dark); transform:rotate(45deg); }
+  .calc-bubble .cb-l { display:block; font-family:-apple-system,'Segoe UI',sans-serif; font-size:0.66rem; font-weight:700; text-transform:uppercase; color:var(--amber-dark); letter-spacing:.03em; }
+  .var-row.tmp { border-left:4px solid #5CB85C; padding-left:8px; }
+  .var-row.tmp .var-name { color:#9BE59B; }
+  .var-row.notemp .var-value { color:#9FB0C8; font-style:italic; }
+  .code-block .line-wrap { position: relative; }
+  .calc-bubble { position:absolute !important; left:34px; top:calc(100% - 2px); z-index:8; margin:0 !important; max-width:92%; }
+  .vars-panel { min-height: 196px; }
+  .ctrl-wrap { position: sticky; bottom: 0; z-index: 25; background: #FAFAFA; border-top: 2px solid var(--line); padding: 10px 0 8px; margin-top: 14px; box-shadow: 0 -6px 12px rgba(0,0,0,0.06); padding-bottom: 6px; }
+  .ctrl-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .ctrl-bar kbd { font-family: Consolas, monospace; font-size: 0.72rem; background: rgba(255,255,255,0.28); border: 1px solid rgba(0,0,0,0.25); border-radius: 4px; padding: 0 5px; margin-left: 6px; }
+  .ctrl-bar button.secondary kbd, .ctrl-bar .chip kbd { background: #fff; border-color: var(--line); color: var(--muted); }
+  .ctrl-wrap .status-strip { margin-top: 6px; min-height: 2.9em; padding-top: 7px; padding-bottom: 7px; }
+  .explain-pop { display: none; position: fixed; right: max(16px, calc(50vw - 532px)); bottom: 136px; width: min(470px, 92vw); max-height: 52vh; overflow-y: auto; z-index: 60; margin: 0 !important; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border: 2px solid var(--info, #1D6F96); background: #fff !important; }
+  .explain-pop .ep-head { display: flex; justify-content: space-between; align-items: center; font-family: -apple-system, 'Segoe UI', sans-serif; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--info, #1D6F96); margin-bottom: 6px; }
+  .explain-pop .ep-hint { font-weight: 600; text-transform: none; color: var(--muted); font-size: 0.74rem; margin-left: auto; margin-right: 10px; }
+  kbd.kb { font-family: Consolas, monospace; font-size: 0.72rem; background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--navy-dark); }
+  .ctrl-bar button.explain-btn.open { background: var(--amber); color: #fff; border-color: var(--amber-dark); }
+  .ctrl-bar button.explain-btn.open kbd { background: rgba(255,255,255,0.35); color: #fff; }
+  .info-btn kbd { font-family: Consolas, monospace; font-size: 0.7rem; background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 6px; color: var(--muted); }
+  .modal-hint { margin-top: 14px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--muted); text-align: right; }
+  .explain-pop .ep-x { cursor: pointer; border: none; background: var(--empty); border-radius: 6px; font-size: 1rem; line-height: 1; padding: 2px 8px; }
+  .ver-h3, .build-sec > h3 { display: none; }
+  .nohelp { background:#FFF8E7; border-left:4px solid var(--amber-dark); border-radius:6px; padding:10px 14px; margin:12px 0 0; font-size:0.9rem; line-height:1.45; }
+  .nohelp b { color:var(--amber-dark); }
   .sim-cab { background: var(--navy-dark); border-radius: 10px; padding: 10px 14px; margin: 12px 0; }
   .sim-title { color: #FFD9A8; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
   .sim-row { display: flex; align-items: flex-end; gap: 8px; margin: 20px 0 8px; flex-wrap: wrap; }
@@ -224,7 +261,7 @@
   .sim-temp.empty { border-style: dashed; border-color: #999; color: #999; background: transparent; }
   .toast {
     position: absolute;
-    left: 16px; right: 16px; bottom: -14px;
+    left: 16px; right: 16px; bottom: -4px;
     transform: translateY(100%);
     background: var(--navy);
     color: white;
@@ -298,6 +335,10 @@
     border-bottom: 1px solid #2A4568;
   }
   .var-row:last-child { border-bottom: none; }
+  .var-row.chg { background: rgba(232,150,60,0.28); border-radius: 4px; padding-left: 6px; padding-right: 6px; }
+  .var-row.calc .var-value { color: #FFE2B8; font-family: Consolas, monospace; }
+  .struk-hl { background: rgba(232,150,60,0.45) !important; outline: 2px solid var(--amber-dark); outline-offset: -2px; }
+  .chip.toggle-on { background: var(--amber); color: #fff; border-color: var(--amber-dark); }
   .var-name { color: #FFD9A8; font-weight: 700; }
   .var-value { color: #D9E4F5; text-align: right; word-break: break-word; }
   .struk-mini-wrap {
@@ -977,6 +1018,19 @@
     .lf1-print-solution h4 { font-size: 0.8rem; text-transform: uppercase; color: #A2222E; margin: 0 0 4px; }
     .lf1-print-lines { border: 1px solid #E6DCDD; border-radius: 6px; height: 140px; background-image: repeating-linear-gradient(to bottom, transparent, transparent 23px, #E6DCDD 24px); margin-bottom: 14px; }
   }
+
+  /* Markierungen (Merken / Besprechen) */
+  .mk-wrap { display: inline-flex; gap: 4px; margin-left: 6px; flex-shrink: 0; }
+  button.mk, .lf1-task-row button.mk, .fz-task-row button.mk { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 999px; padding: 2px 9px; font-size: 0.7rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  button.mk:hover, .lf1-task-row button.mk:hover, .fz-task-row button.mk:hover { background: var(--empty); color: var(--navy); }
+  button.mk.mk-me.on, .lf1-task-row button.mk.mk-me.on, .fz-task-row button.mk.mk-me.on { background: var(--amber); color: #fff; border-color: var(--amber-dark); }
+  button.mk.mk-ask.on, .lf1-task-row button.mk.mk-ask.on, .fz-task-row button.mk.mk-ask.on { background: #1D6F96; color: #fff; border-color: #155672; }
+  .mk-panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 0 0 12px; font-size: 0.86rem; }
+  .mk-panel summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+  .mk-panel .mk-count { font-weight: 500; color: var(--muted); margin-left: 8px; font-size: 0.8rem; }
+  .mk-panel .mk-group { margin-top: 8px; } .mk-panel .mk-group b { font-size: 0.74rem; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+  .mk-chip { display: inline-block; background: var(--empty); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin: 2px 4px 2px 0; cursor: pointer; font-size: 0.8rem; }
+  .mk-chip:hover { background: #fff; border-color: var(--amber); }
 </style>
 </head>
 <body>
@@ -1003,17 +1057,18 @@
 
   <!-- shared cabinet: visible for build, loop, struktogramm -->
   <div class="cabinet-wrap" id="cabinetWrap">
-    <div class="cabinet" id="cabinet">
-      <div class="toast" id="toast"></div>
-    </div>
+    <div class="cabinet" id="cabinet"></div>
+    <div class="toast" id="toast"></div>
   </div>
 
   <!-- BUILD VIEW -->
   <div class="view active" id="view-build">
     <div class="view-head">
       <h2>Aufbauen &amp; Zugreifen</h2>
-      <button class="info-btn" onclick="openModal('build')">ℹ️ Erklärung</button>
+      <button class="info-btn" onclick="openModal('build')">ℹ️ Erklärung <kbd>I</kbd></button>
     </div>
+
+    <div class="chip-row" id="buildModeChips" style="margin-bottom:6px;"></div>
 
     <div class="code-output-row">
       <div class="code-col">
@@ -1036,8 +1091,8 @@
     <div class="error-panel" id="errorPanel"></div>
     <div class="concept-panel" id="conceptPanel"></div>
 
-    <section class="panel">
-      <h3>1. Werte hinzufügen</h3>
+    <section class="panel build-sec" data-bmode="add">
+      <h3>Werte hinzufügen</h3>
       <p class="desc">array.append(...) fügt einen neuen Wert immer ganz hinten an – niemals mittendrin.</p>
       <div class="row">
         <input type="text" id="appendInput" placeholder="z. B. Nord" maxlength="12" oninput="updateAppendLabel()">
@@ -1045,8 +1100,8 @@
       </div>
     </section>
 
-    <section class="panel">
-      <h3>2. Zugriff über den Index</h3>
+    <section class="panel build-sec" data-bmode="access">
+      <h3>Zugriff über den Index</h3>
       <p class="desc">Wähle zuerst einen Index. Entscheide danach, ob du den Wert nur ansehen oder überschreiben willst.</p>
       <div class="access-card">
         <div class="access-step">Schritt 1 · Index wählen</div>
@@ -1068,13 +1123,15 @@
       </div>
     </section>
 
-    <section class="panel">
-      <h3>Weitere Werkzeuge</h3>
+    <section class="panel build-sec" data-bmode="len">
+      <h3>Länge anzeigen</h3>
+      <p class="desc">len(array) gibt zurück, <strong>wie viele</strong> Elemente das Array gerade enthält – nicht den höchsten Index.</p>
+      <div class="row"><button onclick="showLength()">len(array) anzeigen</button></div>
+    </section>
+
+    <section class="panel build-sec" data-bmode="tools">
+      <h3>Array zurücksetzen</h3>
       <div class="tool-grid">
-        <div class="tool-card">
-          <button class="secondary" onclick="showLength()">len(array) anzeigen</button>
-          <p>Zeigt, <strong>wie viele</strong> Elemente das Array gerade enthält.</p>
-        </div>
         <div class="tool-card">
           <button class="secondary" onclick="restoreArray()">Ausgangsdaten wiederherstellen</button>
           <p>Setzt das Array zurück auf die Startwerte Nord, Ost, Süd.</p>
@@ -1091,7 +1148,7 @@
   <div class="view" id="view-loop">
     <div class="view-head">
       <h2>Schleife durchlaufen</h2>
-      <button class="info-btn" onclick="openModal('loop')">ℹ️ Erklärung</button>
+      <button class="info-btn" onclick="openModal('loop')">ℹ️ Erklärung <kbd>I</kbd></button>
     </div>
 
     <div class="code-output-row">
@@ -1129,40 +1186,33 @@
         <div class="vars-panel" id="loopVarsPanel"></div>
 
         <div class="block-label">Struktogramm</div>
-        <div class="struk-mini-wrap">
-        <div class="struk-band-mini" id="loopStrukDecl">Deklaration und Initialisierung: array = []</div>
+        <div class="struk-mini-wrap" id="loopStruk">
+        <div class="struk-band-mini" id="loopStrukDecl" data-sk="decl">Deklaration und Initialisierung: array = []</div>
         <div class="struk-loop-frame">
-          <div class="struk-loop-header">Wiederhole von i = 0 solange i &lt; len(array), Schrittweite 1</div>
+          <div class="struk-loop-header" data-sk="loop">Wiederhole von i = 0 solange i &lt; len(array), Schrittweite 1</div>
           <div class="struk-loop-row">
             <div class="struk-loop-gutter"></div>
-            <div class="struk-loop-body">Ausgabe: array[i]</div>
+            <div class="struk-loop-body" data-sk="out">Ausgabe: array[i]</div>
           </div>
         </div>
         </div>
       </div>
     </div>
 
-    <section class="panel">
-      <div class="row">
-        <button onclick="loopStep()">Nächster Schritt</button>
-        <button class="secondary" onclick="loopReset()">Zurücksetzen</button>
-        <button class="secondary" onclick="explainLoopStep()">❓ Diesen Schritt erklären</button>
-      </div>
-      <div class="status-strip" id="loopStatus">Noch nicht gestartet – klicke auf „Nächster Schritt“.</div>
-      <div class="concept-panel" id="loopExplainBox"></div>
-    </section>
+    <div class="ctrl-wrap" data-ctrl="loop"></div>
+    <div class="concept-panel explain-pop" id="loopExplainBox"></div>
   </div>
 
   <!-- VERAENDERN VIEW -->
   <div class="view" id="view-veraendern">
     <div class="view-head">
       <h2>Verändern</h2>
-      <button class="info-btn" onclick="openModal('veraendern')">ℹ️ Erklärung</button>
+      <button class="info-btn" onclick="openModal('veraendern')">ℹ️ Erklärung <kbd>I</kbd></button>
     </div>
 
-    <section class="panel" style="margin-top:0;border-top:none;padding-top:0;">
-      <details open>
-        <summary class="collapsible-summary"><h3>1. Zwei Werte tauschen</h3></summary>
+    <div class="chip-row" id="verModeChips" style="margin-bottom:6px;"></div>
+    <section class="panel ver-sec" data-mode="swap" style="margin-top:0;border-top:none;padding-top:0;">
+      <div><h3 class="ver-h3">1. Zwei Werte tauschen</h3>
         <p class="desc">Wählt zwei Indizes. Ein sicherer Tausch braucht eine Zwischenspeicher-Variable – sonst geht ein Wert verloren.</p>
         <div class="access-card">
           <div class="row">
@@ -1188,12 +1238,11 @@
         </div>
         <div class="sim-cab" id="swapSim" style="display:none;"></div>
         <div class="error-panel" id="swapErrorPanel"></div>
-      </details>
+      </div>
     </section>
 
-    <section class="panel">
-      <details open>
-        <summary class="collapsible-summary"><h3>2. Element einfügen</h3></summary>
+    <section class="panel ver-sec" data-mode="ins">
+      <div><h3 class="ver-h3">2. Element einfügen</h3>
         <p class="desc">Ein neuer Wert soll an einer bestimmten Stelle stehen, ohne bestehende Werte zu überschreiben – dafür wandert er, an letzter Stelle angehängt, per Vertauschen Schritt für Schritt an seine richtige Position.</p>
         <div class="access-card">
           <div class="row">
@@ -1206,15 +1255,15 @@
           <div class="code-col">
             <div class="block-label">Code</div>
             <div class="code-block" id="insertCodeBlock">
-              <div class="line-wrap">
+              <div class="line-wrap" id="insLineDecl">
                 <div class="code-line-row"><span class="code-line-num">1</span><span class="code-line-text" id="insArrDecl">array = []</span></div>
                 <span class="annot">das Array, in das eingefügt wird (Zustand vor dem Einfügen)</span>
               </div>
-              <div class="line-wrap">
+              <div class="line-wrap" id="insLineA">
                 <div class="code-line-row"><span class="code-line-num">2</span><span class="code-line-text">neuer_wert = input("Wert: ")</span></div>
                 <span class="annot" id="insNoteVal">einzufügender Wert (Eingabefeld „Wert“)</span>
               </div>
-              <div class="line-wrap">
+              <div class="line-wrap" id="insLineB">
                 <div class="code-line-row"><span class="code-line-num">3</span><span class="code-line-text">index = int(input("Index: "))</span></div>
                 <span class="annot" id="insNoteIdx">Position, an der der Wert stehen soll (Eingabefeld „Index“)</span>
               </div>
@@ -1241,39 +1290,35 @@
             </div>
           </div>
           <div class="side-col">
+            <div class="block-label">Variablen</div>
+            <div class="vars-panel" id="insVarsPanel"></div>
             <div class="block-label">Struktogramm</div>
-            <div class="struk-mini-wrap auto-annotate">
-              <div class="struk-band-mini" id="insStrukDecl">Deklaration und Initialisierung: array = []</div>
-              <div class="struk-band-mini">Einlesen: neuer_wert</div>
-              <div class="struk-band-mini">Einlesen: index</div>
-              <div class="struk-band-mini">Zuweisung (Anhängen): array[len(array)] = neuer_wert</div>
+            <div class="struk-mini-wrap auto-annotate" id="insStruk">
+              <div class="struk-band-mini" id="insStrukDecl" data-sk="decl">Deklaration und Initialisierung: array = []</div>
+              <div class="struk-band-mini" data-sk="inp">Einlesen: neuer_wert</div>
+              <div class="struk-band-mini" data-sk="inp">Einlesen: index</div>
+              <div class="struk-band-mini" data-sk="append">Zuweisung (Anhängen): array[len(array)] = neuer_wert</div>
               <div class="struk-loop-frame">
-                <div class="struk-loop-header">Wiederhole von i = len(array) - 1 solange i &gt; index, Schrittweite -1</div>
+                <div class="struk-loop-header" data-sk="loop">Wiederhole von i = len(array) - 1 solange i &gt; index, Schrittweite -1</div>
                 <div class="struk-loop-row">
                   <div class="struk-loop-gutter"></div>
                   <div class="struk-loop-body tight">
-                    <div class="struk-band-mini">Deklaration und Initialisierung: temp = array[i-1]</div>
-                    <div class="struk-band-mini">Zuweisung: array[i-1] = array[i]</div>
-                    <div class="struk-band-mini">Zuweisung: array[i] = temp</div>
+                    <div class="struk-band-mini" data-sk="temp">Deklaration und Initialisierung: temp = array[i-1]</div>
+                    <div class="struk-band-mini" data-sk="copy">Zuweisung: array[i-1] = array[i]</div>
+                    <div class="struk-band-mini" data-sk="back">Zuweisung: array[i] = temp</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="row" style="margin-top:12px;">
-          <button onclick="insertStep()">Nächster Schritt</button>
-          <button class="secondary" onclick="insertReset()">Zurücksetzen</button>
-          <button class="secondary" onclick="explainInsertStep()">❓ Diesen Schritt erklären</button>
-        </div>
-        <div class="status-strip" id="insertStatus">Gebt Wert und Index ein und klickt „Einfügen starten“.</div>
-        <div class="concept-panel" id="insertExplainBox"></div>
-      </details>
+        <div class="ctrl-wrap" data-ctrl="ins"></div>
+        <div class="concept-panel explain-pop" id="insertExplainBox"></div>
+      </div>
     </section>
 
-    <section class="panel">
-      <details open>
-        <summary class="collapsible-summary"><h3>3. Element entfernen</h3></summary>
+    <section class="panel ver-sec" data-mode="rem">
+      <div><h3 class="ver-h3">3. Element entfernen</h3>
         <p class="desc">Der Wert an einer bestimmten Stelle soll verschwinden – dafür rücken alle folgenden Werte einen Platz nach vorne, dann wird der letzte (jetzt doppelte) Platz entfernt.</p>
         <div class="access-card">
           <div class="row">
@@ -1285,11 +1330,11 @@
           <div class="code-col">
             <div class="block-label">Code</div>
             <div class="code-block" id="removeCodeBlock">
-              <div class="line-wrap">
+              <div class="line-wrap" id="remLineDecl">
                 <div class="code-line-row"><span class="code-line-num">1</span><span class="code-line-text" id="remArrDecl">array = []</span></div>
                 <span class="annot">das Array, aus dem entfernt wird (Zustand vor dem Entfernen)</span>
               </div>
-              <div class="line-wrap">
+              <div class="line-wrap" id="removeLineIdx">
                 <div class="code-line-row"><span class="code-line-num">2</span><span class="code-line-text">index = int(input("Index: "))</span></div>
                 <span class="annot">Position des Werts, der entfernt werden soll (Eingabefeld „Index“)</span>
               </div>
@@ -1308,29 +1353,27 @@
             </div>
           </div>
           <div class="side-col">
+            <div class="block-label">Variablen</div>
+            <div class="vars-panel" id="remVarsPanel"></div>
             <div class="block-label">Struktogramm</div>
-            <div class="struk-mini-wrap auto-annotate">
-              <div class="struk-band-mini" id="remStrukDecl">Deklaration und Initialisierung: array = []</div>
-              <div class="struk-band-mini">Einlesen: index</div>
+            <div class="struk-mini-wrap auto-annotate" id="remStruk">
+              <div class="struk-band-mini" id="remStrukDecl" data-sk="decl">Deklaration und Initialisierung: array = []</div>
+              <div class="struk-band-mini" data-sk="inp">Einlesen: index</div>
               <div class="struk-loop-frame">
-                <div class="struk-loop-header">Wiederhole von j = index solange j &lt; len(array) - 1, Schrittweite 1</div>
+                <div class="struk-loop-header" data-sk="loop">Wiederhole von j = index solange j &lt; len(array) - 1, Schrittweite 1</div>
                 <div class="struk-loop-row">
                   <div class="struk-loop-gutter"></div>
-                  <div class="struk-loop-body">Zuweisung: array[j] = array[j+1]</div>
+                  <div class="struk-loop-body" data-sk="assign">Zuweisung: array[j] = array[j+1]</div>
                 </div>
               </div>
-              <div class="struk-band-mini">Zuweisung: array = array[0 : len(array) - 1]</div>
+              <div class="struk-band-mini" data-sk="shrink">Zuweisung: array = array[0 : len(array) - 1]</div>
             </div>
           </div>
         </div>
-        <div class="row" style="margin-top:12px;">
-          <button onclick="removeStep()">Nächster Schritt</button>
-          <button class="secondary" onclick="removeReset()">Zurücksetzen</button>
-          <button class="secondary" onclick="explainRemoveStep()">❓ Diesen Schritt erklären</button>
-        </div>
-        <div class="status-strip" id="removeStatus">Gebt einen Index ein und klickt „Entfernen starten“.</div>
-        <div class="concept-panel" id="removeExplainBox"></div>
-      </details>
+        <div class="nohelp"><b>Warum kein temp?</b> Beim Einfügen müssen <u>beide</u> Werte erhalten bleiben (sie tauschen den Platz) – deshalb braucht der zu überschreibende Wert einen Zwischenspeicher. Beim Entfernen ist der überschriebene Wert entweder der, der gelöscht werden soll, oder eine Kopie, die schon eine Stelle weiter vorne steht. Er geht also nichts verloren, was man noch braucht.</div>
+        <div class="ctrl-wrap" data-ctrl="rem"></div>
+        <div class="concept-panel explain-pop" id="removeExplainBox"></div>
+      </div>
     </section>
   </div>
 
@@ -1338,7 +1381,7 @@
   <div class="view" id="view-auswerten">
     <div class="view-head">
       <h2>Auswerten</h2>
-      <button class="info-btn" onclick="openModal('auswerten')">ℹ️ Erklärung</button>
+      <button class="info-btn" onclick="openModal('auswerten')">ℹ️ Erklärung <kbd>I</kbd></button>
     </div>
     <p class="desc" style="margin-top:-6px;">Eigenes Zahlen-Array, weil Summe/Durchschnitt/Maximum/Minimum nur bei Zahlen Sinn ergeben.</p>
 
@@ -1366,22 +1409,15 @@
       </div>
     </div>
 
-    <section class="panel">
-      <div class="row">
-        <button onclick="auswStep()">Nächster Schritt</button>
-        <button class="secondary" onclick="auswReset()">Zurücksetzen</button>
-        <button class="secondary" onclick="explainAuswStep()">❓ Diesen Schritt erklären</button>
-      </div>
-      <div class="status-strip" id="auswStatus">Noch nicht gestartet – klickt auf „Nächster Schritt“.</div>
-      <div class="concept-panel" id="auswExplainBox"></div>
-    </section>
+    <div class="ctrl-wrap" data-ctrl="ausw"></div>
+    <div class="concept-panel explain-pop" id="auswExplainBox"></div>
   </div>
 
   <!-- STRUKTOGRAMM VIEW -->
   <div class="view" id="view-struktogramm">
     <div class="view-head">
       <h2>Struktogramm ↔ Code</h2>
-      <button class="info-btn" onclick="openModal('struktogramm')">ℹ️ Erklärung</button>
+      <button class="info-btn" onclick="openModal('struktogramm')">ℹ️ Erklärung <kbd>I</kbd></button>
     </div>
 
     <table class="struk-table">
@@ -1447,7 +1483,7 @@
   <div class="view" id="view-aufgaben">
     <div class="view-head">
       <h2>Aufgaben</h2>
-      <button class="info-btn" onclick="openModal('aufgaben')">ℹ️ Erklärung</button>
+      <button class="info-btn" onclick="openModal('aufgaben')">ℹ️ Erklärung <kbd>I</kbd></button>
     </div>
     <p class="desc" style="margin-top:-4px;">Wählt Aufgaben aus und zieht sie in euren aktuellen Sprint – die Auswahl erscheint dann auf dem <a href="index.html">Sprint-Board</a>. Aufgaben sind nicht nach Schwierigkeit beschriftet: Schätzt selbst ein, ob ihr euch eine Aufgabe zutraut.</p>
     <div style="margin:-6px 0 12px;"><button class="lf1-pdf-btn" onclick="lf1ExportAllAsPdf()">📄 Alle Aufgaben (LF1) als PDF</button></div>
@@ -1577,7 +1613,7 @@ function codeLinesHtml(annotatedLines) {
   ).join('');
 }
 
-function renderCabinet(targetId, data, highlight, highlight2, ghost) {
+function renderCabinet(targetId, data, highlight, highlight2, ghost, ghostText) {
   const cab = document.getElementById(targetId);
   const toast = targetId === 'cabinet' ? document.getElementById('toast') : null;
   cab.innerHTML = '';
@@ -1590,8 +1626,8 @@ function renderCabinet(targetId, data, highlight, highlight2, ghost) {
       if (ghost && ghost[i] !== undefined) {
         slot.style.position = 'relative';
         const g = document.createElement('span');
-        g.className = 'cab-ghost';
-        g.textContent = '✕ ' + ghost[i] + ' überschrieben';
+        g.className = 'cab-ghost' + (ghostText ? ' saved' : '');
+        g.textContent = ghostText ? ('✓ ' + ghost[i] + ' ' + ghostText) : ('✕ ' + ghost[i] + ' überschrieben');
         slot.appendChild(g);
       }
       const drawer = document.createElement('div');
@@ -1605,7 +1641,6 @@ function renderCabinet(targetId, data, highlight, highlight2, ghost) {
       cab.appendChild(slot);
     });
   }
-  if (toast) cab.appendChild(toast);
 }
 
 function renderMainCabinet(highlight = -1, highlight2 = -1) {
@@ -1945,88 +1980,87 @@ function restoreArray() {
 
 // ---------- LOOP tab ----------
 let loopIndex = -1;
+let loopTrace = [], loopPos = -1;
 
-function refreshLoopVarsPanel() {
-  const arrValueHtml = annotateCode(esc(arrLiteral(arr)));
-  const iValue = loopIndex < 0
-    ? '– (noch nicht gestartet)'
-    : (loopIndex < arr.length ? String(loopIndex) : '– (Schleife beendet)');
+function buildLoopTrace() {
+  const n = arr.length, T = [];
+  const push = o => T.push(Object.assign({ coarse: false, lines: [], linesC: null, i: null, h: -1, outN: 0, bub: null }, o));
+  push({ lines: ['arr'], sk: 'decl', status: 'Zeile 1: <code>array = ' + arrLiteral(arr) + '</code> &nbsp;→&nbsp; das Array wird angelegt.',
+    exp: '<strong>Deklaration.</strong> Das Array, das durchlaufen wird. Außer <code>array</code> gibt es noch keine Variable.' });
+  for (let i = 0; i < n; i++) {
+    push({ lines: ['for'], sk: 'loop', i, h: i, outN: i, bub: ['for', 'Schleifenbedingung', 'i &lt; len(array) → ' + i + ' &lt; ' + n + ' → wahr'],
+      status: 'Schleifenkopf: <code>i = ' + i + '</code>, Bedingung <code>i &lt; len(array)</code> (' + i + ' &lt; ' + n + ') ist wahr.',
+      exp: '<strong>Schleifenkopf.</strong> Vor jedem Durchlauf prüft Python, ob <code>i &lt; len(array)</code> noch gilt. Mit <code>i = ' + i + '</code> ist das wahr, also läuft der Rumpf.' });
+    push({ coarse: true, lines: ['print'], linesC: ['for', 'print'], sk: 'out', i, h: i, outN: i + 1, bub: ['print', 'Wert an dieser Stelle', 'array[' + i + '] = "' + esc(arr[i]) + '"'],
+      status: 'Durchlauf <b>' + (i + 1) + '</b> von <b>' + n + '</b> &nbsp;·&nbsp; i = <span class="amber-val">' + i + '</span> &nbsp;·&nbsp; array[' + i + '] = <span class="amber-val">"' + esc(arr[i]) + '"</span>',
+      exp: '<strong>Es gibt hier nur eine einzige Schleife</strong> (<code>for i in range(len(array)):</code>), die das ganze Array einmal von vorne nach hinten durchläuft.<br><br>Wir sind beim Durchlauf mit <code>i = ' + i + '</code>:<br>1. Python nimmt den Wert an genau dieser Stelle: <code>array[' + i + ']</code> ist "' + esc(arr[i]) + '".<br>2. Der Rumpf gibt ihn aus: <code>print(array[' + i + '])</code>.<br>3. Danach erhöht Python <code>i</code> automatisch um 1 und prüft erneut, ob <code>i &lt; len(array)</code> (<code>' + (i + 1) + ' &lt; ' + n + '</code>) noch gilt.' });
+  }
+  push({ lines: ['for'], sk: 'loop', i: n, h: -1, outN: n, bub: ['for', 'Schleifenbedingung', 'i &lt; len(array) → ' + n + ' &lt; ' + n + ' → falsch'],
+    status: 'Schleifenkopf: <code>i = ' + n + '</code>, Bedingung <code>i &lt; len(array)</code> (' + n + ' &lt; ' + n + ') ist falsch – die Schleife endet.',
+    exp: '<strong>Schleifenende.</strong> <code>i</code> hat ' + n + ' erreicht, die Bedingung <code>i &lt; len(array)</code> ist nicht mehr wahr. Python bricht ab, ohne den Rumpf noch einmal auszuführen.' });
+  push({ coarse: true, lines: [], sk: null, i: n, h: -1, outN: n, done: true,
+    status: '<b>Schleife beendet.</b> Alle ' + n + ' Indizes (0 bis ' + (n - 1) + ') wurden durchlaufen.',
+    exp: '<strong>Die Schleife ist beendet.</strong> Alle Indizes von 0 bis ' + (n - 1) + ' wurden genau einmal durchlaufen.' });
+  return T;
+}
+
+const LOOP_LINES = { arr: 'loopLineArr', for: 'loopLineFor', print: 'loopLinePrint' };
+
+function showLoopEntry() {
+  const e = loopTrace[loopPos];
+  Object.values(LOOP_LINES).forEach(id => document.getElementById(id).classList.remove('on'));
+  const row = (n, v, c) => verVarRow(n, v, c);
   document.getElementById('loopArrDecl').innerHTML = annotateCode(esc('array = ' + arrLiteral(arr)));
   document.getElementById('loopStrukDecl').textContent = 'Deklaration und Initialisierung: array = ' + arrLiteral(arr);
-  document.getElementById('loopVarsPanel').innerHTML =
-    '<div class="var-row"><span class="var-name">array</span><span class="var-value">' + arrValueHtml + '</span></div>' +
-    '<div class="var-row"><span class="var-name">i</span><span class="var-value">' + iValue + '</span></div>';
+  const out = document.getElementById('loopOutput');
+  if (!e) {
+    loopIndex = -1;
+    document.getElementById('loopVarsPanel').innerHTML = row('array', annotateCode(esc(arrLiteral(arr))));
+    verBubble('loopCodeBlock', null); verStruk('loopStruk', null);
+    out.textContent = 'Noch keine Ausgabe.';
+    renderMainCabinet(-1);
+    return;
+  }
+  loopIndex = (e.i !== null && e.i < arr.length) ? e.i : -1;
+  const lines = (!detailMode && e.linesC) ? e.linesC : e.lines;
+  lines.forEach(k => document.getElementById(LOOP_LINES[k]).classList.add('on'));
+  verBubble('loopCodeBlock', detailMode && e.bub && LOOP_LINES[e.bub[0]], e.bub && e.bub[1], e.bub && e.bub[2]);
+  verStruk('loopStruk', e.sk);
+  document.getElementById('loopVarsPanel').innerHTML = row('array', annotateCode(esc(arrLiteral(arr)))) +
+    (e.i !== null ? row('i', e.i < arr.length ? e.i : e.i + ' (Schleife beendet)', e.sk === 'loop' || e.sk === 'out' ? 'chg' : '') : '');
+  renderMainCabinet(e.h);
+  let o = '';
+  for (let k = 0; k < e.outN; k++) o += (k ? '<br>' : '') + 'i = ' + k + '  →  print(array[' + k + '])  →  <span class="out">' + esc(arr[k]) + '</span>';
+  if (e.done) o += '<br><span class="out">-- Schleife beendet --</span>';
+  out.innerHTML = o || 'Noch keine Ausgabe.';
+  const vis = loopTrace.filter(trVisible);
+  document.getElementById('loopStatus').innerHTML = e.status + ' <span style="color:var(--muted);font-size:.8rem">(Schritt ' + (vis.indexOf(e) + 1) + ' von ' + vis.length + ')</span>';
+  if (document.getElementById('loopExplainBox').style.display === 'block') explainLoopStep(true);
 }
+function refreshLoopVarsPanel() { if (!loopTrace.length) loopReset(); else showLoopEntry(); }
 
 function loopReset() {
-  loopIndex = -1;
-  document.getElementById('loopOutput').textContent = 'Noch keine Ausgabe.';
-  document.getElementById('loopStatus').textContent = 'Noch nicht gestartet – klicke auf „Nächster Schritt“.';
-  document.getElementById('loopLineFor').classList.remove('on');
-  document.getElementById('loopLinePrint').classList.remove('on');
+  loopTrace = buildLoopTrace();
+  loopPos = -1;
   document.getElementById('loopExplainBox').style.display = 'none';
-  renderMainCabinet(-1);
-  refreshLoopVarsPanel();
+  document.getElementById('loopStatus').textContent = 'Noch nicht gestartet – klicke auf „Nächster Schritt“.';
+  showLoopEntry();
 }
-
 function loopStep() {
-  if (arr.length === 0) {
-    document.getElementById('loopStatus').textContent = 'Das Array ist leer – es gibt nichts zu durchlaufen.';
-    return;
-  }
-  loopIndex++;
-  const forLine = document.getElementById('loopLineFor');
-  const printLine = document.getElementById('loopLinePrint');
-
-  if (loopIndex >= arr.length) {
-    forLine.classList.remove('on');
-    printLine.classList.remove('on');
-    document.getElementById('loopStatus').innerHTML =
-      '<b>Schleife beendet.</b> Alle ' + arr.length + ' Indizes (0 bis ' + (arr.length - 1) + ') wurden durchlaufen.';
-    renderMainCabinet(-1);
-    const out = document.getElementById('loopOutput');
-    out.innerHTML += '<br><span class="out">-- Schleife beendet --</span>';
-    refreshLoopVarsPanel();
-    return;
-  }
-
-  forLine.classList.add('on');
-  printLine.classList.add('on');
-  renderMainCabinet(loopIndex);
-  refreshLoopVarsPanel();
-
-  document.getElementById('loopStatus').innerHTML =
-    'Durchlauf <b>' + (loopIndex + 1) + '</b> von <b>' + arr.length + '</b> &nbsp;·&nbsp; ' +
-    'i = <span class="amber-val">' + loopIndex + '</span> &nbsp;·&nbsp; ' +
-    'array[' + loopIndex + '] = <span class="amber-val">"' + esc(arr[loopIndex]) + '"</span>';
-
-  const out = document.getElementById('loopOutput');
-  const line = 'i = ' + loopIndex + '  →  print(array[' + loopIndex + '])  →  <span class="out">' + esc(arr[loopIndex]) + '</span>';
-  out.innerHTML = (loopIndex === 0 ? '' : out.innerHTML + '<br>') + line;
+  if (arr.length === 0) { document.getElementById('loopStatus').textContent = 'Das Array ist leer – es gibt nichts zu durchlaufen.'; return; }
+  for (let k = loopPos + 1; k < loopTrace.length; k++) if (trVisible(loopTrace[k])) { loopPos = k; showLoopEntry(); return; }
+  document.getElementById('loopStatus').textContent = 'Bereits fertig – klicke „Zurücksetzen“, um erneut zu starten.';
 }
-
-function explainLoopStep() {
+function loopBack() {
+  for (let k = loopPos - 1; k >= 0; k--) if (trVisible(loopTrace[k])) { loopPos = k; showLoopEntry(); return; }
+  loopPos = -1; showLoopEntry();
+  document.getElementById('loopStatus').textContent = 'Zurück am Anfang – klicke „Nächster Schritt“.';
+}
+function explainLoopStep(refresh) {
   const box = document.getElementById('loopExplainBox');
-  box.style.display = 'block';
-  if (loopIndex < 0) {
-    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Nächster Schritt“.';
-    return;
-  }
-  if (loopIndex >= arr.length) {
-    box.innerHTML =
-      '<strong>Die Schleife ist beendet.</strong> Das liegt daran, dass <code>i</code> jetzt ' + arr.length +
-      ' erreicht hat – und die Bedingung <code>i &lt; len(array)</code> (also <code>' + arr.length + ' &lt; ' + arr.length +
-      '</code>) ist nicht mehr wahr. Python bricht deshalb die Schleife ab, ohne den Rumpf noch einmal auszuführen.';
-    return;
-  }
-  box.innerHTML =
-    '<strong>Es gibt hier nur eine einzige Schleife</strong> (<code>for i in range(len(array)):</code>), die das ganze Array einmal ' +
-    'von vorne nach hinten durchläuft.<br><br>' +
-    'Wir sind gerade beim Durchlauf mit <code>i = ' + loopIndex + '</code>. Das bedeutet konkret:<br>' +
-    '1. Python nimmt den Wert an genau dieser Stelle: <code>array[' + loopIndex + ']</code> ist "' + esc(arr[loopIndex]) + '".<br>' +
-    '2. Der Schleifenrumpf wird mit diesem Wert ausgeführt: <code>print(array[' + loopIndex + '])</code> gibt "' + esc(arr[loopIndex]) + '" aus.<br>' +
-    '3. Danach erhöht Python <code>i</code> automatisch um 1 (auf ' + (loopIndex + 1) + ') und prüft erneut, ob <code>i &lt; len(array)</code> ' +
-    '(also <code>' + (loopIndex + 1) + ' &lt; ' + arr.length + '</code>) noch gilt, bevor der nächste Durchlauf beginnt.';
+  if (!refresh && box.style.display === 'block') { box.style.display = 'none'; return; }
+  const e = loopTrace[loopPos];
+  setExplain(box, e ? e.exp : '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Nächster Schritt“.');
 }
 
 // ---------- VERAENDERN: Tauschen ----------
@@ -2153,238 +2187,395 @@ function doSwap(safe) {
   }
 }
 
-// ---------- VERAENDERN: Einfügen ----------
-let insertQueue = [];
-let insertQueueRunning = false;
-let insertDone = false;
-let lastInsertStep = null;
-
-function highlightInsertLine(n) {
-  // n: 1 = Anhaengen (Zeile 1), 2 = Schleife/Vertauschen (Zeilen 2-5)
-  [1, 2, 3, 4, 5].forEach(i => document.getElementById('insertLine' + i).classList.remove('on'));
-  if (n === 1) document.getElementById('insertLine1').classList.add('on');
-  else if (n === 2) [2, 3, 4, 5].forEach(i => document.getElementById('insertLine' + i).classList.add('on'));
+// ---------- Gemeinsame Bedienung (Detailansicht, Bedienleiste, Tastenkürzel) ----------
+let detailMode = true;
+function setExplain(box, html) {
+  box.innerHTML = '<div class="ep-head"><span>❓ Schritt erklären</span><span class="ep-hint">Schließen: <kbd class="kb">E</kbd> oder <kbd class="kb">Esc</kbd></span><button class="ep-x" title="Schließen (E oder Esc)" onclick="this.closest(\'.explain-pop\').style.display=\'none\'">×</button></div>' + html;
+  box.style.display = 'block';
 }
+function closeExplainPops() { document.querySelectorAll('.explain-pop').forEach(b => { b.style.display = 'none'; }); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeExplainPops(); });
+function trVisible(e) { return detailMode ? !e.cOnly : e.coarse; }
+
+const CTRL = {
+  loop:  { next: 'loopStep',   back: 'loopBack',   reset: 'loopReset',   explain: 'explainLoopStep',   status: 'loopStatus', box: 'loopExplainBox',   init: 'Noch nicht gestartet – klicke auf „Nächster Schritt“.' },
+  ausw:  { next: 'auswStep',   back: 'auswBack',   reset: 'auswReset',   explain: 'explainAuswStep',   status: 'auswStatus', box: 'auswExplainBox',   init: 'Noch nicht gestartet – klickt auf „Nächster Schritt“.' },
+  ins:   { next: 'insertStep', back: 'insertBack', reset: 'insertReset', explain: 'explainInsertStep', status: 'insertStatus', box: 'insertExplainBox', init: 'Gebt Wert und Index ein und klickt „Einfügen starten“.' },
+  rem:   { next: 'removeStep', back: 'removeBack', reset: 'removeReset', explain: 'explainRemoveStep', status: 'removeStatus', box: 'removeExplainBox', init: 'Gebt einen Index ein und klickt „Entfernen starten“.' }
+};
+function renderCtrlBars() {
+  document.querySelectorAll('.ctrl-wrap[data-ctrl]').forEach(w => {
+    const c = CTRL[w.dataset.ctrl];
+    w.innerHTML = '<div class="ctrl-bar">' +
+      '<button onclick="' + c.next + '()" title="Tastenkürzel: Pfeil rechts">Nächster Schritt <kbd>→</kbd></button>' +
+      '<button class="secondary" onclick="' + c.back + '()" title="Tastenkürzel: Pfeil links">Schritt zurück <kbd>←</kbd></button>' +
+      '<button class="secondary" onclick="' + c.reset + '()" title="Tastenkürzel: R">Zurücksetzen <kbd>R</kbd></button>' +
+      '<span class="chip detail-chip' + (detailMode ? ' toggle-on' : '') + '" onclick="toggleDetail()" title="Detailansicht: jeder Code-Schritt einzeln, mit Rechnungen (Tastenkürzel: D)">Detailansicht <kbd>D</kbd></span>' +
+      '<button class="secondary explain-btn" onclick="' + c.explain + '()" title="Tastenkürzel: E">❓ Schritt erklären <kbd>E</kbd></button>' +
+      '</div><div class="status-strip" id="' + c.status + '">' + c.init + '</div>';
+  });
+}
+function syncExplainBtns() {
+  Object.keys(CTRL).forEach(k => {
+    const box = document.getElementById(CTRL[k].box);
+    const wrap = document.querySelector('.ctrl-wrap[data-ctrl="' + k + '"]');
+    if (!box || !wrap) return;
+    const btn = wrap.querySelector('.explain-btn');
+    if (btn) btn.classList.toggle('open', box.style.display === 'block');
+  });
+}
+const _expObs = new MutationObserver(syncExplainBtns);
+function observeExplainBoxes() {
+  document.querySelectorAll('.explain-pop').forEach(b => _expObs.observe(b, { attributes: true, attributeFilter: ['style'] }));
+}
+function toggleDetail() {
+  detailMode = !detailMode;
+  document.querySelectorAll('.detail-chip').forEach(c => c.classList.toggle('toggle-on', detailMode));
+  const adj = (tr, pos) => { let k = pos; while (k > 0 && !trVisible(tr[k])) k--; return k; };
+  if (loopPos >= 0) loopPos = adj(loopTrace, loopPos);
+  if (auswPos >= 0) auswPos = adj(auswTrace, auswPos);
+  if (insPos >= 0) insPos = adj(insTrace, insPos);
+  if (remPos >= 0) remPos = adj(remTrace, remPos);
+  if (loopTrace.length && document.getElementById('view-loop').classList.contains('active')) showLoopEntry();
+  if (auswTrace.length && document.getElementById('view-auswerten').classList.contains('active')) showAuswEntry();
+  if (insTrace.length) showInsEntry();
+  if (remTrace.length) showRemEntry();
+}
+
+let buildMode = 'add';
+function renderBuildChips() {
+  const modes = [['add', 'Werte hinzufügen'], ['access', 'Zugriff über den Index'], ['len', 'Länge anzeigen'], ['tools', 'Array zurücksetzen']];
+  document.getElementById('buildModeChips').innerHTML = modes.map(([k, l]) =>
+    '<span class="chip' + (buildMode === k ? ' active' : '') + '" onclick="setBuildMode(\'' + k + '\')">' + l + '</span>').join('');
+  document.querySelectorAll('#view-build .build-sec').forEach(sec => { sec.style.display = sec.dataset.bmode === buildMode ? '' : 'none'; });
+}
+function setBuildMode(m) { buildMode = m; renderBuildChips(); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter' || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+  const t = e.target;
+  if (!t || t.tagName !== 'INPUT' || !t.closest('#view-build, #view-veraendern, #view-auswerten')) return;
+  let btn = null;
+  const row = t.closest('.row, .overwrite-inline');
+  if (row) btn = row.querySelector('button');
+  if (!btn) { const card = t.closest('.access-card'); if (card) btn = card.querySelector('button'); }
+  if (btn) { e.preventDefault(); btn.click(); if (!t.closest('#view-build')) t.blur(); }
+});
+
+let verMode = 'swap';
+function renderVerChips() {
+  const modes = [['swap', 'Zwei Werte tauschen'], ['ins', 'Element einfügen'], ['rem', 'Element entfernen']];
+  document.getElementById('verModeChips').innerHTML = modes.map(([k, l]) =>
+    '<span class="chip' + (verMode === k ? ' active' : '') + '" onclick="setVerMode(\'' + k + '\')">' + l + '</span>').join('');
+  document.querySelectorAll('#view-veraendern .ver-sec').forEach(sec => { sec.style.display = sec.dataset.mode === verMode ? '' : 'none'; });
+}
+function setVerMode(m) {
+  if (m === verMode) return;
+  insertReset(); removeReset();
+  if (typeof swapRestoreView === 'function' && verMode === 'swap') swapRestoreView();
+  verMode = m;
+  renderVerChips();
+}
+
+renderCtrlBars();
+observeExplainBoxes();
+renderVerChips();
+renderBuildChips();
+
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const t = e.target;
+  if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+  const mo = document.getElementById('modalOverlay');
+  if (e.key.toLowerCase() === 'i') {
+    if (mo && mo.classList.contains('open')) { closeModal(); e.preventDefault(); return; }
+    const vid = ((document.querySelector('.view.active') || {}).id || '').replace('view-', '');
+    if (typeof modalTexts !== 'undefined' && modalTexts[vid]) { openModal(vid); e.preventDefault(); }
+    return;
+  }
+  if (mo && mo.classList.contains('open')) return;
+  const v = (document.querySelector('.view.active') || {}).id;
+  const key = v === 'view-loop' ? 'loop' : v === 'view-auswerten' ? 'ausw' : (v === 'view-veraendern' && verMode !== 'swap' ? verMode : null);
+  if (!key) return;
+  const c = CTRL[key];
+  const k = e.key.toLowerCase();
+  const act = k === 'arrowright' ? c.next : k === 'arrowleft' ? c.back : k === 'r' ? c.reset : k === 'e' ? c.explain : k === 'd' ? 'toggleDetail' : null;
+  if (!act) return;
+  e.preventDefault();
+  window[act]();
+});
+
+// ---------- VERAENDERN: gemeinsame Helfer (Ablaufprotokoll, Variablen, Rechen-Sprechblase) ----------
+function verBubble(blockId, lineId, label, text) {
+  document.querySelectorAll('#' + blockId + ' .calc-bubble').forEach(e => e.remove());
+  if (!lineId || !text) return;
+  const line = document.getElementById(lineId);
+  if (!line) return;
+  const d = document.createElement('div');
+  d.className = 'calc-bubble';
+  d.innerHTML = '<span class="cb-l">' + esc(label) + '</span>' + text;
+  const row = line.querySelector('.code-line-row');
+  row.parentNode.insertBefore(d, row.nextSibling);
+}
+function verStruk(containerId, sk) {
+  document.querySelectorAll('#' + containerId + ' .struk-hl').forEach(e => e.classList.remove('struk-hl'));
+  if (!sk) return;
+  document.querySelectorAll('#' + containerId + ' [data-sk="' + sk + '"]').forEach(e => e.classList.add('struk-hl'));
+}
+function verVarRow(name, val, cls) {
+  return '<div class="var-row' + (cls ? ' ' + cls : '') + '"><span class="var-name">' + name + '</span><span class="var-value">' + val + '</span></div>';
+}
+const vq = v => '"' + esc(v) + '"';
 
 let insertSnap = null, removeSnap = null;
 function refreshVerDecl() {
   const ins = document.getElementById('insArrDecl');
   if (!ins) return;
   if (!swapActive && document.getElementById('swapCode')) showSwapDefault();
-  const a = (insertQueueRunning || insertDone) && insertSnap ? insertSnap : arr;
-  const r = (removeQueueRunning || removeDone) && removeSnap ? removeSnap : arr;
+  const a = insTrace.length && insertSnap ? insertSnap : arr;
+  const r = remTrace.length && removeSnap ? removeSnap : arr;
   ins.innerHTML = annotateCode(esc('array = ' + arrLiteral(a)));
   document.getElementById('remArrDecl').innerHTML = annotateCode(esc('array = ' + arrLiteral(r)));
   document.getElementById('insStrukDecl').innerHTML = annotateCode(esc('Deklaration und Initialisierung: array = ' + arrLiteral(a)));
   document.getElementById('remStrukDecl').innerHTML = annotateCode(esc('Deklaration und Initialisierung: array = ' + arrLiteral(r)));
 }
 
+// ---------- VERAENDERN: Einfügen ----------
+let insTrace = [], insPos = -1, insInput = null;
+const INS_LINES = { decl: 'insLineDecl', a: 'insLineA', b: 'insLineB', l4: 'insertLine1', l5: 'insertLine2', l6: 'insertLine3', l7: 'insertLine4', l8: 'insertLine5' };
+
+function buildInsTrace(val, idx, snap) {
+  const T = [], n = snap.length;
+  let d = [...snap];
+  const push = o => T.push(Object.assign({ coarse: false, lines: [], i: null, temp: undefined, h1: -1, h2: -1, ghost: null, ghostText: '', bub: null, chg: null, vv: false, vi: false }, o, { data: [...(o.data || d)] }));
+  push({ lines: ['decl'], sk: 'decl', status: 'Zeile 1: <code>array = ' + arrLiteral(snap) + '</code> &nbsp;→&nbsp; das Array, in das eingefügt wird.', exp: '<strong>Deklaration.</strong> Das Array vor dem Einfügen. Noch gibt es nur diese eine Variable.' });
+  push({ lines: ['a'], sk: 'inp', vv: true, chg: 'inp', status: 'Zeile 2: <code>neuer_wert = ' + vq(val) + '</code> &nbsp;→&nbsp; der einzufügende Wert wird eingelesen.', exp: '<strong>Eingabe 1.</strong> <code>neuer_wert</code> enthält den Wert, der eingefügt werden soll.' });
+  push({ lines: ['b'], sk: 'inp', vv: true, vi: true, chg: 'inp', status: 'Zeile 3: <code>index = ' + idx + '</code> &nbsp;→&nbsp; an Position ' + idx + ' soll er stehen.', exp: '<strong>Eingabe 2.</strong> <code>index</code> ist die Position, an der der neue Wert am Ende stehen soll.' });
+  push({ coarse: true, cOnly: true, lines: ['a', 'b'], sk: 'inp', vv: true, vi: true, chg: 'inp',
+    status: 'Eingaben: <code>neuer_wert = ' + vq(val) + '</code>, <code>index = ' + idx + '</code> &nbsp;→&nbsp; ' + vq(val) + ' soll an Position ' + idx + ' stehen.',
+    exp: '<strong>Eingaben.</strong> Zwei Variablen werden angelegt: der einzufügende Wert und die Position (<code>index</code>), an der er am Ende stehen soll.' });
+  d = [...d, val];
+  push({ coarse: true, lines: ['l4'], sk: 'append', vv: true, vi: true, h1: n, data: d, bub: ['l4', 'Anhängen', 'array[' + n + '] = ' + vq(val)],
+    status: '<code>array.append(' + vq(val) + ')</code> &nbsp;→&nbsp; der neue Wert steht ganz hinten, an Index ' + n + '.',
+    exp: '<strong>Vorbereitungsschritt.</strong> Der neue Wert wird ganz ans Ende angehängt – dort ist immer Platz, ohne dass etwas überschrieben wird. Von dort muss er noch an seine Position wandern.' });
+  let temp;
+  for (let i = n; i > idx; i--) {
+    push({ lines: ['l5'], sk: 'loop', vv: true, vi: true, i, temp, h1: i - 1, h2: i, data: d, chg: 'i', bub: ['l5', 'Schleifenbedingung', 'i &gt; index → ' + i + ' &gt; ' + idx + ' → wahr'],
+      status: 'Schleifenkopf: <code>i = ' + i + '</code>, Bedingung <code>i &gt; index</code> (' + i + ' &gt; ' + idx + ') ist wahr – der Rumpf läuft.',
+      exp: '<strong>Schleifenkopf.</strong> Die Schleife läuft rückwärts. Solange <code>i &gt; index</code> gilt, wird getauscht – hier mit <code>i = ' + i + '</code>.' });
+    temp = d[i - 1];
+    push({ lines: ['l6'], sk: 'temp', vv: true, vi: true, i, temp, h1: i - 1, h2: i, data: d, chg: 'temp', bub: ['l6', 'temp wird angelegt/gesetzt', 'temp = array[' + (i - 1) + '] = ' + vq(temp)],
+      status: '<code>temp = <span class="hl-a">array[' + (i - 1) + ']</span></code> &nbsp;→&nbsp; temp merkt sich ' + vq(temp) + ', bevor es überschrieben wird.',
+      exp: '<strong>Zwischenspeichern.</strong> <code>array[' + (i - 1) + ']</code> (' + vq(temp) + ') wird in <code>temp</code> gesichert – gleich wird dieser Platz überschrieben.' });
+    const old = d[i - 1];
+    const d2 = [...d]; d2[i - 1] = d[i];
+    push({ lines: ['l7'], sk: 'copy', vv: true, vi: true, i, temp, h1: i - 1, h2: i, data: d2, ghost: { [i - 1]: old }, ghostText: 'in temp gesichert', chg: 'arr',
+      bub: ['l7', 'Zuweisung', 'array[' + (i - 1) + '] = array[' + i + '] = ' + vq(d[i])],
+      status: '<code><span class="hl-a">array[' + (i - 1) + ']</span> = <span class="hl-b">array[' + i + ']</span></code> &nbsp;→&nbsp; ' + vq(d[i]) + ' steht jetzt an zwei Stellen, ' + vq(old) + ' nur noch in <code>temp</code>.',
+      exp: '<strong>Überschreiben.</strong> <code>array[' + (i - 1) + ']</code> bekommt den Wert von <code>array[' + i + ']</code>. ' + vq(old) + ' ist im Array weg, aber noch in <code>temp</code>. Jetzt steht ' + vq(d[i]) + ' zweimal im Array.' });
+    d = d2;
+    const d3 = [...d]; d3[i] = temp;
+    push({ coarse: true, lines: ['l8'], sk: 'back', vv: true, vi: true, i, temp, h1: i - 1, h2: i, data: d3, chg: 'arr',
+      bub: ['l8', 'Zuweisung', 'array[' + i + '] = temp = ' + vq(temp)],
+      status: 'i = ' + i + ' &nbsp;·&nbsp; <code><span class="hl-b">array[' + i + ']</span> = temp</code> (' + vq(temp) + ') &nbsp;→&nbsp; <span class="hl-a">array[' + (i - 1) + ']</span> und <span class="hl-b">array[' + i + ']</span> sind vertauscht.',
+      exp: '<strong>Zurückschreiben.</strong> <code>array[' + i + ']</code> bekommt den gesicherten Wert aus <code>temp</code>. Damit ist der Tausch vollständig – nichts ging verloren. Ein Tausch braucht diese drei Zuweisungen, weil beide Werte erhalten bleiben müssen.' });
+    d = d3;
+  }
+  push({ coarse: true, lines: ['l5'], sk: 'loop', vv: true, vi: true, i: idx < n ? idx + 1 : null, temp, h1: idx, data: d, chg: 'i', bub: ['l5', 'Schleifenbedingung', 'nächstes i = ' + idx + ' → ' + idx + ' &gt; ' + idx + ' → falsch'],
+    status: '<b>Fertig!</b> Bedingung <code>i &gt; index</code> ist falsch (' + idx + ' &gt; ' + idx + ') – die Schleife endet, ' + vq(val) + ' steht an Index ' + idx + '.',
+    exp: '<strong>Schleifenende.</strong> Der neue Wert hat seine Position erreicht (<code>index = ' + idx + '</code>), die Bedingung ist falsch, die Schleife endet.' });
+  return T;
+}
+function insVisible(e) { return trVisible(e); }
+
+function showInsEntry() {
+  const e = insTrace[insPos];
+  Object.values(INS_LINES).forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('on'); });
+  const noteV = document.getElementById('insNoteVal'), noteI = document.getElementById('insNoteIdx');
+  const panel = document.getElementById('insVarsPanel');
+  const data = e ? e.data : arr;
+  if (!e) {
+    panel.innerHTML = verVarRow('array', '[' + arr.map(x => vq(x)).join(', ') + ']');
+    verBubble('insertCodeBlock', null); verStruk('insStruk', null);
+    renderCabinet('cabinet', arr, -1, -1); refreshVerDecl(); verRef.i = null;
+    return;
+  }
+  arr = [...e.data];
+  noteV.textContent = 'einzufügender Wert – hier: "' + insInput.val + '"';
+  noteI.textContent = 'Position, an der der Wert stehen soll – hier: ' + insInput.idx;
+  e.lines.forEach(k => document.getElementById(INS_LINES[k]).classList.add('on'));
+  verBubble('insertCodeBlock', detailMode && e.bub && INS_LINES[e.bub[0]], e.bub && e.bub[1], e.bub && e.bub[2]);
+  verStruk('insStruk', e.sk);
+  panel.innerHTML = verVarRow('array', '[' + arr.map(x => vq(x)).join(', ') + ']', e.chg === 'arr' ? 'chg' : '') +
+    (e.vv ? verVarRow('neuer_wert', vq(insInput.val), e.chg === 'inp' ? 'chg' : '') : '') + (e.vi ? verVarRow('index', insInput.idx, e.chg === 'inp' ? 'chg' : '') : '') +
+    (e.i !== null ? verVarRow('i', e.i, e.chg === 'i' ? 'chg' : '') : '') +
+    (e.temp !== undefined ? verVarRow('temp (Hilfsvariable)', vq(e.temp), 'tmp' + (e.chg === 'temp' ? ' chg' : '')) : '');
+  renderCabinet('cabinet', arr, e.h1, e.h2, e.ghost, e.ghostText);
+  refreshVerDecl();
+  verRef.i = e.i;
+  const vis = insTrace.filter(insVisible);
+  document.getElementById('insertStatus').innerHTML = e.status + ' <span style="color:var(--muted);font-size:.8rem">(Schritt ' + (vis.indexOf(e) + 1) + ' von ' + vis.length + ')</span>';
+  if (document.getElementById('insertExplainBox').style.display === 'block') explainInsertStep(true);
+}
+
 function insertStart() {
   const val = document.getElementById('insertValue').value.trim();
   const idx = parseInt(document.getElementById('insertIndex').value);
+  if (insTrace.length && insPos >= 0 && insPos < insTrace.length - 1 && !insertDoneNow()) arr = [...insertSnap];
+  if (insTrace.length && insertSnap && insertDoneNow()) { /* fertig: neuer Start auf dem veränderten Array */ }
   if (!val || isNaN(idx) || idx < 0 || idx > arr.length) {
-    document.getElementById('insertStatus').textContent =
-      'Bitte einen Wert und einen gültigen Index (0 bis ' + arr.length + ') eingeben.';
+    document.getElementById('insertStatus').textContent = 'Bitte einen Wert und einen gültigen Index (0 bis ' + arr.length + ') eingeben.';
     return;
   }
-  insertQueue = [];
-  insertDone = false;
-  lastInsertStep = null;
-  verRef.i = null;
   insertSnap = [...arr];
+  insInput = { val, idx };
+  insTrace = buildInsTrace(val, idx, insertSnap);
+  insPos = -1;
+  document.getElementById('insertExplainBox').style.display = 'none';
+  verBubble('insertCodeBlock', null);
+  showInsEntry();
   document.getElementById('insNoteVal').textContent = 'einzufügender Wert – hier: "' + val + '"';
   document.getElementById('insNoteIdx').textContent = 'Position, an der der Wert stehen soll – hier: ' + idx;
-  document.getElementById('insertExplainBox').style.display = 'none';
-  const n = arr.length;
-  insertQueue.push({ type: 'append', val });
-  for (let i = n; i > idx; i--) insertQueue.push({ type: 'swap', i });
-  insertQueueRunning = true;
-  refreshVerDecl();
-  document.getElementById('insertStatus').textContent = 'Bereit – klickt „Nächster Schritt“, um den neuen Wert anzuhängen.';
-  highlightInsertLine(0);
+  document.getElementById('insertStatus').textContent = 'Bereit – klickt „Nächster Schritt“.';
 }
+function insertDoneNow() { return insTrace.length > 0 && insPos === insTrace.length - 1; }
 
 function insertStep() {
-  if (insertDone) {
-    document.getElementById('insertStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu beginnen.';
-    return;
-  }
-  if (!insertQueueRunning || insertQueue.length === 0) {
-    document.getElementById('insertStatus').textContent = 'Klickt zuerst „Einfügen starten“.';
-    return;
-  }
-  const step = insertQueue.shift();
-  lastInsertStep = step;
-  if (step.type === 'append') {
-    arr.push(step.val);
-    verRef.i = null;
-    renderMainCabinet(arr.length - 1);
-    document.getElementById('insertStatus').innerHTML =
-      'array.append("' + esc(step.val) + '") &nbsp;→&nbsp; der neue Wert steht jetzt ganz hinten, an Index ' + (arr.length - 1) + '.';
-    highlightInsertLine(1);
-  } else if (step.type === 'swap') {
-    const i = step.i;
-    const temp = arr[i - 1];
-    arr[i - 1] = arr[i];
-    arr[i] = temp;
-    verRef.i = i;
-    renderMainCabinet(i - 1, i);
-    document.getElementById('insertStatus').innerHTML =
-      '<span class="hl-a">array[' + (i - 1) + ']</span> und <span class="hl-b">array[' + i + ']</span> wurden vertauscht &nbsp;→&nbsp; der neue Wert wandert eine Position nach vorne.';
-    highlightInsertLine(2);
-  }
-  if (insertQueue.length === 0) {
-    document.getElementById('insertStatus').innerHTML += '<br><b>Fertig!</b> Der neue Wert steht jetzt an der richtigen Position.';
-    insertQueueRunning = false;
-    insertDone = true;
-  }
-  if (document.getElementById('insertExplainBox').style.display === 'block') explainInsertStep();
+  if (!insTrace.length) { document.getElementById('insertStatus').textContent = 'Klickt zuerst „Einfügen starten“.'; return; }
+  for (let k = insPos + 1; k < insTrace.length; k++) if (insVisible(insTrace[k])) { insPos = k; showInsEntry(); return; }
+  document.getElementById('insertStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu beginnen.';
 }
-
-function explainInsertStep() {
+function insertBack() {
+  if (!insTrace.length) return;
+  for (let k = insPos - 1; k >= 0; k--) if (insVisible(insTrace[k])) { insPos = k; showInsEntry(); return; }
+  insPos = -1; arr = [...insertSnap]; showInsEntry();
+  document.getElementById('insertStatus').textContent = 'Zurück am Anfang – klickt „Nächster Schritt“.';
+}
+function explainInsertStep(refresh) {
   const box = document.getElementById('insertExplainBox');
-  box.style.display = 'block';
-  if (!lastInsertStep) {
-    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Einfügen starten“ und dann „Nächster Schritt“.';
-    return;
-  }
-  if (lastInsertStep.type === 'append') {
-    box.innerHTML =
-      '<strong>Das ist der Vorbereitungsschritt, noch keine Schleife.</strong> Der neue Wert "' + esc(lastInsertStep.val) + '" ' +
-      'wird zunächst ganz ans Ende des Arrays angehängt – dort ist immer Platz, ohne dass etwas überschrieben wird. ' +
-      'Von dort aus muss er jetzt noch an seine eigentliche Position wandern.';
-  } else if (lastInsertStep.type === 'swap') {
-    const i = lastInsertStep.i;
-    box.innerHTML =
-      '<strong>Wir sind in der Schleife, die von hinten nach vorne läuft.</strong> Die Laufvariable steht gerade bei ' +
-      '<code>i = ' + i + '</code>. In diesem Durchlauf werden <code>array[' + (i - 1) + ']</code> und <code>array[' + i + ']</code> ' +
-      'vertauscht – dafür wird <code>array[' + (i - 1) + ']</code> zunächst in <code>temp</code> gerettet, bevor es ' +
-      'überschrieben wird.<br><br>' +
-      '<strong>Warum tauschen statt einfach kopieren?</strong> So bleibt der neue Wert immer sichtbar im Array und wandert Schritt ' +
-      'für Schritt an seine richtige Stelle, statt dass er (unsichtbar) erst ganz am Ende eingetragen wird.';
-  }
+  if (!refresh && box.style.display === 'block') { box.style.display = 'none'; return; }
+  const e = insTrace[insPos];
+  setExplain(box, e ? e.exp : '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Einfügen starten“ und dann „Nächster Schritt“.');
 }
-
 function insertReset() {
-  insertQueue = [];
-  insertQueueRunning = false;
-  insertDone = false;
-  lastInsertStep = null;
+  if (insTrace.length && insertSnap && !insertDoneNow()) arr = [...insertSnap];
+  insTrace = []; insPos = -1; insInput = null;
   verRef.i = null;
   document.getElementById('insNoteVal').textContent = 'einzufügender Wert (Eingabefeld „Wert“)';
   document.getElementById('insNoteIdx').textContent = 'Position, an der der Wert stehen soll (Eingabefeld „Index“)';
   document.getElementById('insertStatus').textContent = 'Gebt Wert und Index ein und klickt „Einfügen starten“.';
   document.getElementById('insertExplainBox').style.display = 'none';
-  highlightInsertLine(0);
-  renderMainCabinet(-1);
+  Object.values(INS_LINES).forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('on'); });
+  showInsEntry();
 }
 
 // ---------- VERAENDERN: Entfernen ----------
-let removeQueue = [];
-let removeQueueRunning = false;
-let removeDone = false;
-let lastRemoveStep = null;
+let remTrace = [], remPos = -1, remIdx = 0;
+const REM_LINES = { decl: 'remLineDecl', a: 'removeLineIdx', l3: 'removeLine1', l4: 'removeLine2', l5: 'removeLine3' };
 
-function highlightRemoveLine(n) {
-  // n: 1 = Schleife/Verschieben (Zeilen 1+2), 2 = letzten Platz entfernen (Zeile 3)
-  [1, 2, 3].forEach(i => document.getElementById('removeLine' + i).classList.remove('on'));
-  if (n === 1) { document.getElementById('removeLine1').classList.add('on'); document.getElementById('removeLine2').classList.add('on'); }
-  else if (n === 2) document.getElementById('removeLine3').classList.add('on');
+function buildRemTrace(idx, snap) {
+  const T = [], n = snap.length;
+  let d = [...snap];
+  const push = o => T.push(Object.assign({ coarse: false, lines: [], j: null, h1: -1, h2: -1, ghost: null, chg: null }, o, { data: [...(o.data || d)] }));
+  push({ lines: ['decl'], sk: 'decl', chg: null, status: 'Zeile 1: <code>array = ' + arrLiteral(snap) + '</code> &nbsp;→&nbsp; das Array, aus dem entfernt wird.', exp: '<strong>Deklaration.</strong> Das Array vor dem Entfernen.' });
+  push({ coarse: true, lines: ['a'], sk: 'inp', chg: 'inp', status: 'Eingabe: <code>index = ' + idx + '</code> &nbsp;→&nbsp; der Wert ' + vq(snap[idx]) + ' an Index ' + idx + ' soll verschwinden.',
+    exp: '<strong>Eingabe.</strong> <code>index</code> ist die Position des Werts, der entfernt werden soll.' });
+  for (let j = idx; j < n - 1; j++) {
+    push({ lines: ['l3'], sk: 'loop', j, h1: j, data: d, chg: 'j', bub: ['l3', 'Schleifenbedingung', 'j &lt; len(array) - 1 → ' + j + ' &lt; ' + (n - 1) + ' → wahr'],
+      status: 'Schleifenkopf: <code>j = ' + j + '</code>, Bedingung <code>j &lt; len(array) - 1</code> (' + j + ' &lt; ' + (n - 1) + ') ist wahr.',
+      exp: '<strong>Schleifenkopf.</strong> Die Schleife läuft vorwärts von <code>index</code> bis zum vorletzten Platz. Mit <code>j = ' + j + '</code> ist die Bedingung wahr.' });
+    const old = d[j];
+    const d2 = [...d]; d2[j] = d[j + 1];
+    const why = j === idx ? 'ist genau der Wert, der gelöscht werden soll' : 'steht schon in array[' + (j - 1) + '] (im Durchlauf davor kopiert)';
+    push({ coarse: true, lines: ['l4'], sk: 'assign', j, h1: j, h2: j + 1, data: d2, ghost: { [j]: old }, chg: 'arr', bub: ['l4', 'Zuweisung', 'array[' + j + '] = array[' + (j + 1) + '] = ' + vq(d[j + 1])],
+      status: '<span class="hl-a">array[' + j + ']</span> = <span class="hl-b">array[' + (j + 1) + ']</span> &nbsp;→&nbsp; ' + vq(d[j + 1]) + ' rückt nach vorn; der überschriebene Wert ' + vq(old) + ' ' + why + ' – <b>kein temp nötig</b>.',
+      exp: '<strong>Warum braucht das kein temp?</strong> Der überschriebene Wert in <code>array[' + j + ']</code> (' + vq(old) + ') ' + why + '. Beim Tauschen müssen beide Werte erhalten bleiben, beim Entfernen nicht.<br><br><strong>Warum von vorne nach hinten?</strong> Jeder Wert rückt von der Lücke aus in Richtung Ende auf.' });
+    d = d2;
+  }
+  push({ lines: ['l3'], sk: 'loop', j: Math.max(n - 1, idx), h1: -1, data: d, chg: 'j', bub: ['l3', 'Schleifenbedingung', 'j = ' + (n - 1) + ' → ' + (n - 1) + ' &lt; ' + (n - 1) + ' → falsch'],
+    status: 'Schleifenkopf: <code>j &lt; len(array) - 1</code> (' + (n - 1) + ' &lt; ' + (n - 1) + ') ist falsch – die Schleife endet.',
+    exp: '<strong>Schleifenende.</strong> Alle folgenden Werte sind eine Position nach vorne gerückt. Der letzte Platz enthält jetzt noch eine Kopie (er ist doppelt belegt).' });
+  push({ coarse: true, lines: ['l5'], sk: 'shrink', j: Math.max(n - 1, idx), h1: -1, data: d.slice(0, d.length - 1), chg: 'arr', bub: ['l5', 'Zuweisung', 'Länge ' + n + ' → ' + (n - 1)],
+    status: '<b>Fertig!</b> Der letzte (jetzt doppelte) Platz wurde entfernt.',
+    exp: '<strong>Aufräumen.</strong> Der überflüssige letzte Platz wird entfernt, damit das Array wieder die richtige Länge hat.' });
+  return T;
 }
+function remVisible(e) { return trVisible(e); }
+
+function showRemEntry() {
+  const e = remTrace[remPos];
+  Object.values(REM_LINES).forEach(id => document.getElementById(id).classList.remove('on'));
+  const panel = document.getElementById('remVarsPanel');
+  const notemp = verVarRow('temp (Hilfsvariable)', 'nicht nötig', 'tmp notemp');
+  if (!e) {
+    panel.innerHTML = verVarRow('array', '[' + arr.map(x => vq(x)).join(', ') + ']') + notemp;
+    verBubble('removeCodeBlock', null); verStruk('remStruk', null);
+    renderCabinet('cabinet', arr, -1, -1); refreshVerDecl(); verRef.j = null;
+    return;
+  }
+  arr = [...e.data];
+  e.lines.forEach(k => document.getElementById(REM_LINES[k]).classList.add('on'));
+  verBubble('removeCodeBlock', detailMode && e.bub && REM_LINES[e.bub[0]], e.bub && e.bub[1], e.bub && e.bub[2]);
+  verStruk('remStruk', e.sk);
+  panel.innerHTML = verVarRow('array', '[' + arr.map(x => vq(x)).join(', ') + ']', e.chg === 'arr' ? 'chg' : '') +
+    (e.sk === 'decl' ? '' : verVarRow('index', remIdx, e.chg === 'inp' ? 'chg' : '')) +
+    (e.j !== null ? verVarRow('j', e.j, e.chg === 'j' ? 'chg' : '') : '') + notemp;
+  renderCabinet('cabinet', arr, e.h1, e.h2, e.ghost, 'wird nicht mehr gebraucht');
+  refreshVerDecl();
+  verRef.j = e.j;
+  const vis = remTrace.filter(remVisible);
+  document.getElementById('removeStatus').innerHTML = e.status + ' <span style="color:var(--muted);font-size:.8rem">(Schritt ' + (vis.indexOf(e) + 1) + ' von ' + vis.length + ')</span>';
+  if (document.getElementById('removeExplainBox').style.display === 'block') explainRemoveStep(true);
+}
+function removeDoneNow() { return remTrace.length > 0 && remPos === remTrace.length - 1; }
 
 function removeStart() {
+  if (remTrace.length && !removeDoneNow()) arr = [...removeSnap];
   const idx = parseInt(document.getElementById('removeIndex').value);
   if (isNaN(idx) || idx < 0 || idx >= arr.length) {
-    document.getElementById('removeStatus').textContent =
-      'Bitte einen gültigen Index (0 bis ' + (arr.length - 1) + ') eingeben.';
+    document.getElementById('removeStatus').textContent = 'Bitte einen gültigen Index (0 bis ' + (arr.length - 1) + ') eingeben.';
     return;
   }
-  removeQueue = [];
-  removeDone = false;
-  lastRemoveStep = null;
-  verRef.j = null;
   removeSnap = [...arr];
+  remIdx = idx;
+  remTrace = buildRemTrace(idx, removeSnap);
+  remPos = -1;
   document.getElementById('removeExplainBox').style.display = 'none';
-  const n = arr.length;
-  for (let j = idx; j < n - 1; j++) removeQueue.push({ type: 'shift', j });
-  removeQueue.push({ type: 'shrink' });
-  removeQueueRunning = true;
-  refreshVerDecl();
+  verBubble('removeCodeBlock', null);
+  showRemEntry();
   document.getElementById('removeStatus').textContent = 'Bereit – klickt „Nächster Schritt“.';
-  highlightRemoveLine(1);
 }
-
 function removeStep() {
-  if (removeDone) {
-    document.getElementById('removeStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu beginnen.';
-    return;
-  }
-  if (!removeQueueRunning || removeQueue.length === 0) {
-    document.getElementById('removeStatus').textContent = 'Klickt zuerst „Entfernen starten“.';
-    return;
-  }
-  const step = removeQueue.shift();
-  lastRemoveStep = step;
-  if (step.type === 'shift') {
-    const j = step.j;
-    arr[j] = arr[j + 1];
-    verRef.j = j;
-    renderMainCabinet(j, j + 1);
-    document.getElementById('removeStatus').innerHTML =
-      '<span class="hl-a">array[' + j + ']</span> = <span class="hl-b">array[' + (j + 1) + ']</span> &nbsp;→&nbsp; Wert von Index ' + (j + 1) + ' nach Index ' + j + ' verschoben.';
-    highlightRemoveLine(1);
-  } else if (step.type === 'shrink') {
-    arr = arr.slice(0, arr.length - 1);
-    verRef.j = null;
-    renderMainCabinet(-1);
-    document.getElementById('removeStatus').innerHTML = '<b>Fertig!</b> Der letzte (jetzt doppelte) Platz wurde entfernt.';
-    highlightRemoveLine(2);
-    removeQueueRunning = false;
-    removeDone = true;
-  }
-  if (document.getElementById('removeExplainBox').style.display === 'block') explainRemoveStep();
+  if (!remTrace.length) { document.getElementById('removeStatus').textContent = 'Klickt zuerst „Entfernen starten“.'; return; }
+  for (let k = remPos + 1; k < remTrace.length; k++) if (remVisible(remTrace[k])) { remPos = k; showRemEntry(); return; }
+  document.getElementById('removeStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu beginnen.';
 }
-
-function explainRemoveStep() {
+function removeBack() {
+  if (!remTrace.length) return;
+  for (let k = remPos - 1; k >= 0; k--) if (remVisible(remTrace[k])) { remPos = k; showRemEntry(); return; }
+  remPos = -1; arr = [...removeSnap]; showRemEntry();
+  document.getElementById('removeStatus').textContent = 'Zurück am Anfang – klickt „Nächster Schritt“.';
+}
+function explainRemoveStep(refresh) {
   const box = document.getElementById('removeExplainBox');
-  box.style.display = 'block';
-  if (!lastRemoveStep) {
-    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Entfernen starten“ und dann „Nächster Schritt“.';
-    return;
-  }
-  if (lastRemoveStep.type === 'shift') {
-    const j = lastRemoveStep.j;
-    box.innerHTML =
-      '<strong>Wir sind in der Schleife, die von vorne nach hinten läuft.</strong> Die Laufvariable steht gerade bei ' +
-      '<code>j = ' + j + '</code>. In diesem Durchlauf wird der Wert von Index ' + (j + 1) + ' nach Index ' + j + ' kopiert.<br><br>' +
-      '<strong>Warum von vorne nach hinten?</strong> Anders als beim Einfügen wollen wir hier eine Lücke schließen, die weiter ' +
-      'vorne entstanden ist – jeder Wert rückt eine Position auf, immer von der Lücke aus in Richtung Ende.';
-  } else if (lastRemoveStep.type === 'shrink') {
-    box.innerHTML =
-      '<strong>Die Schleife ist jetzt fertig durchlaufen</strong> – alle Werte nach der Löschstelle wurden bereits eine Position ' +
-      'nach vorne verschoben. Dadurch ist der letzte Platz im Array jetzt doppelt belegt (er enthält noch eine Kopie vom ' +
-      'vorletzten Wert). In diesem letzten Schritt wird dieser überflüssige letzte Platz entfernt, damit das Array wieder ' +
-      'die richtige Länge hat.';
-  }
+  if (!refresh && box.style.display === 'block') { box.style.display = 'none'; return; }
+  const e = remTrace[remPos];
+  setExplain(box, e ? e.exp : '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Entfernen starten“ und dann „Nächster Schritt“.');
 }
-
 function removeReset() {
-  removeQueue = [];
-  removeQueueRunning = false;
-  removeDone = false;
-  lastRemoveStep = null;
+  if (remTrace.length && removeSnap && !removeDoneNow()) arr = [...removeSnap];
+  remTrace = []; remPos = -1;
   verRef.j = null;
   document.getElementById('removeStatus').textContent = 'Gebt einen Index ein und klickt „Entfernen starten“.';
   document.getElementById('removeExplainBox').style.display = 'none';
-  highlightRemoveLine(0);
-  renderMainCabinet(-1);
+  Object.values(REM_LINES).forEach(id => document.getElementById(id).classList.remove('on'));
+  showRemEntry();
 }
 
 // ---------- AUSWERTEN ----------
 let auswArr = [12, 45, 33, 8, 20];
 let auswMode = 'summe';
-let auswIndex = -1;
-let auswAcc = 0;
+let auswLastInfo = {};
 
 function setAuswArray() {
   const raw = document.getElementById('auswArrayInput').value.trim();
@@ -2439,7 +2630,7 @@ function renderAuswCodeBlock() {
 
 function highlightAuswLine(idx) {
   // Zeile 0 ist die Array-Deklaration; die Schritte beziehen sich auf die Zeilen danach.
-  document.querySelectorAll('#auswCodeBlock .line-wrap').forEach((el, i) => el.classList.toggle('on', idx >= 0 && i === idx + 1));
+  document.querySelectorAll('#auswCodeBlock .line-wrap').forEach((el, i) => el.classList.toggle('on', idx >= -1 && i === idx + 1));
 }
 
 // ---------- Struktogramm-Helfer (offizielle Operatorenliste-Notation) ----------
@@ -2469,164 +2660,185 @@ function altStrukHtml(conditionHtml, jHtml, nHtml, nested) {
   '</div>';
 }
 
+function auswVarName() {
+  return auswMode === 'summe' ? 'ergebnis' : auswMode === 'durchschnitt' ? 'summe' : (auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert');
+}
+
 function renderAuswStruk() {
   const panel = document.getElementById('auswStruk');
+  const band = (t, sk) => '<div class="struk-band-mini" data-sk="' + sk + '">' + esc(t) + '</div>';
   let pre, loopHeader, loopBodyHtml, post;
+  const v = auswVarName();
   if (auswMode === 'summe' || auswMode === 'durchschnitt') {
-    const varName = auswMode === 'durchschnitt' ? 'summe' : 'ergebnis';
-    pre = ['Deklaration und Initialisierung: ' + varName + ' = 0'];
+    pre = [['Deklaration und Initialisierung: ' + v + ' = 0', 'init']];
     loopHeader = 'Wiederhole von i = 0 solange i < len(array), Schrittweite 1';
-    loopBodyHtml = '<div class="struk-band-mini" style="border:none;">' +
-      esc('Zuweisung: ' + varName + ' = ' + varName + ' + array[i]') + '</div>';
+    loopBodyHtml = '<div class="struk-band-mini" data-sk="assign" style="border:none;">' +
+      esc('Zuweisung: ' + v + ' = ' + v + ' + array[i]') + '</div>';
     post = [];
-    if (auswMode === 'durchschnitt') post.push('Deklaration und Initialisierung: durchschnitt = summe / len(array)');
-    post.push('Ausgabe: ' + (auswMode === 'durchschnitt' ? 'durchschnitt' : varName));
+    if (auswMode === 'durchschnitt') post.push(['Deklaration und Initialisierung: durchschnitt = summe / len(array)', 'calc']);
+    post.push(['Ausgabe: ' + (auswMode === 'durchschnitt' ? 'durchschnitt' : v), 'out']);
   } else {
-    const v = auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert';
     const cmp = auswMode === 'maximum' ? '>' : '<';
-    pre = ['Deklaration und Initialisierung: ' + v + ' = array[0]'];
+    pre = [['Deklaration und Initialisierung: ' + v + ' = array[0]', 'init']];
     loopHeader = 'Wiederhole von i = 1 solange i < len(array), Schrittweite 1';
-    const jHtml = '<div class="struk-band-mini" style="border:none;">' +
-      esc('Zuweisung: ' + v + ' = array[i]') + '</div>';
+    const jHtml = '<div class="struk-band-mini" data-sk="assign" style="border:none;">' + esc('Zuweisung: ' + v + ' = array[i]') + '</div>';
     loopBodyHtml = altStrukHtml(esc('array[i] ' + cmp + ' ' + v), jHtml, '', true);
-    post = ['Ausgabe: ' + v];
+    post = [['Ausgabe: ' + v, 'out']];
   }
-  pre.unshift('Deklaration und Initialisierung: array = [' + auswArr.join(', ') + ']');
-  let html = pre.map(b => '<div class="struk-band-mini">' + esc(b) + '</div>').join('');
-  html += loopStrukHtml(esc(loopHeader), loopBodyHtml, true);
-  html += post.map(b => '<div class="struk-band-mini">' + esc(b) + '</div>').join('');
+  pre.unshift(['Deklaration und Initialisierung: array = [' + auswArr.join(', ') + ']', 'decl']);
+  let html = pre.map(b => band(b[0], b[1])).join('');
+  html += loopStrukHtml('<span data-sk="loop">' + esc(loopHeader) + '</span>', loopBodyHtml, true);
+  html += post.map(b => band(b[0], b[1])).join('');
   panel.innerHTML = html;
+  const top = panel.querySelector('.struk-alt-top'); if (top) top.setAttribute('data-sk', 'cond');
+}
+function highlightAuswStruk(sk) {
+  document.querySelectorAll('#auswStruk .struk-hl').forEach(e => e.classList.remove('struk-hl'));
+  if (!sk) return;
+  document.querySelectorAll('#auswStruk [data-sk="' + sk + '"]').forEach(e => {
+    const t = sk === 'loop' ? (e.closest('.struk-loop-header') || e) : e;
+    t.classList.add('struk-hl');
+  });
 }
 
-function updateAuswVars() {
-  const varName = auswMode === 'summe' ? 'ergebnis' : auswMode === 'durchschnitt' ? 'summe' : (auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert');
-  const iVal = auswIndex >= 0 && auswIndex < auswArr.length ? auswIndex : (auswIndex === -2 ? '– (fertig)' : '– (noch nicht gestartet)');
+// ---------- Ablaufprotokoll (Trace) ----------
+// Jeder Eintrag = ein Teilschritt. fine: nur im Detail-Modus sichtbar, coarse: auch im Grob-Modus.
+let auswTrace = [], auswPos = -1;
+
+function buildAuswTrace() {
+  const A = auswArr, n = A.length, T = [];
+  const v = auswVarName();
+  const mm = auswMode === 'maximum' || auswMode === 'minimum';
+  const lang = auswMode === 'maximum' ? 'Höchstwert' : 'Tiefstwert';
+  const cmp = auswMode === 'maximum' ? '>' : '<';
+  const cmpWord = auswMode === 'maximum' ? 'größer' : 'kleiner';
+  const push = o => T.push(Object.assign({ coarse: false, i: null, dur: null, calc: null, calcLabel: '', chg: null, cab: -1, out: null }, o));
+  const R = x => Math.round(x * 100) / 100;
+  let acc = mm ? A[0] : 0;
+  push({ b: -1, sk: 'decl', acc, noV: true, status: 'Zeile 1: <code>array = [' + A.join(', ') + ']</code> &nbsp;→&nbsp; das Array wird angelegt.', exp: '<strong>Deklaration.</strong> Das Array mit den Zahlen wird angelegt. Danach gibt es noch keine weiteren Variablen.' });
+  push({ coarse: true, b: 0, sk: 'init', acc, chg: 'v', cab: mm ? 0 : -1, phase: 'init',
+    status: mm ? '<code>' + v + ' = array[0]</code> &nbsp;→&nbsp; Startwert ' + acc : '<code>' + v + ' = 0</code> &nbsp;→&nbsp; Startwert 0',
+    exp: '<strong>Zeile vor der Schleife</strong> – sie läuft nur ein einziges Mal. Hier bekommt <code>' + v + '</code> seinen Startwert' +
+      (mm ? ': <code>array[0]</code>, der erste Wert. Deshalb startet die Schleife erst bei <code>i = 1</code>.' : ': 0 ist neutral beim Addieren und verfälscht das Ergebnis nicht.') });
+  const first = mm ? 1 : 0;
+  for (let i = first; i < n; i++) {
+    const val = A[i];
+    push({ b: 1, sk: 'loop', i, acc, chg: 'i', cab: i, calcLabel: 'Schleifenbedingung', calc: 'i < len(array) → ' + i + ' < ' + n + ' → wahr',
+      status: 'Schleifenkopf: <code>i = ' + i + '</code>, Bedingung <code>i &lt; len(array)</code> ist wahr (' + i + ' &lt; ' + n + ') – der Rumpf wird ausgeführt.',
+      exp: '<strong>Schleifenkopf.</strong> Vor jedem Durchlauf prüft die Schleife, ob <code>i &lt; len(array)</code> noch gilt. Mit <code>i = ' + i + '</code> ist das wahr, also läuft der Rumpf. <code>array[' + i + ']</code> ist ' + val + '.' });
+    if (!mm) {
+      const nw = acc + val;
+      push({ b: 2, sk: 'assign', i, acc, cab: i, calcLabel: 'Rechnung (rechte Seite)', calc: v + ' + array[i] = ' + acc + ' + ' + val + ' = ' + nw,
+        status: 'Rechte Seite wird berechnet: <code>' + v + ' + array[' + i + ']</code> = ' + acc + ' + ' + val + ' = <b>' + nw + '</b> (' + v + ' ist noch ' + acc + ').',
+        exp: '<strong>Erst rechnen, dann speichern.</strong> Python berechnet zuerst die rechte Seite: aktueller Wert von <code>' + v + '</code> (' + acc + ') plus <code>array[' + i + ']</code> (' + val + ') = ' + nw + '. Die Variable selbst ändert sich erst im nächsten Teilschritt.' });
+      const old = acc; acc = nw;
+      push({ coarse: true, b: 2, sk: 'assign', i, acc, chg: 'v', cab: i, calcLabel: 'Zuweisung', calc: v + ' = ' + old + ' + ' + val + ' = ' + nw,
+        status: 'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' &nbsp;·&nbsp; ' + v + ' = ' + old + ' + ' + val + ' = <b>' + acc + '</b>',
+        exp: '<strong>Zuweisung.</strong> <code>' + v + '</code> bekommt jetzt den berechneten Wert ' + acc + ' (vorher ' + old + '). Danach erhöht die Schleife <code>i</code> um 1 und prüft die Bedingung erneut.' });
+    } else {
+      const better = auswMode === 'maximum' ? val > acc : val < acc;
+      push({ coarse: !better, b: 2, sk: 'cond', i, acc, cab: i, calcLabel: 'Vergleich', calc: 'array[i] ' + cmp + ' ' + v + ' → ' + val + ' ' + cmp + ' ' + acc + ' → ' + (better ? 'wahr (J)' : 'falsch (N)'),
+        status: 'Verzweigung: <code>array[' + i + '] ' + cmp + ' ' + v + '</code> → ' + val + ' ' + cmp + ' ' + acc + ' ist <b>' + (better ? 'wahr → Zweig J' : 'falsch → Zweig N, es passiert nichts') + '</b>' + (better ? '' : ' (' + v + ' bleibt ' + acc + ').'),
+        exp: '<strong>Verzweigung.</strong> Verglichen wird <code>array[' + i + ']</code> (' + val + ') mit dem bisherigen <code>' + v + '</code> (' + acc + '): Ist der neue Wert ' + cmpWord + '? ' +
+          (better ? 'Ja – es geht in den J-Zweig, dort wird der Wert übernommen.' : 'Nein – der N-Zweig ist leer, <code>' + v + '</code> bleibt unverändert. Danach geht es mit dem nächsten <code>i</code> weiter.') });
+      if (better) {
+        const old = acc; acc = val;
+        push({ coarse: true, b: 3, sk: 'assign', i, acc, chg: 'v', cab: i, calcLabel: 'Zuweisung', calc: v + ' = array[' + i + '] = ' + val,
+          status: 'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' ' + cmp + ' ' + old + ' → wahr &nbsp;→&nbsp; neuer ' + lang + ': <b>' + acc + '</b>',
+          exp: '<strong>J-Zweig.</strong> Weil <code>array[' + i + ']</code> (' + val + ') ' + cmpWord + ' war als der bisherige ' + lang + ' (' + old + '), wird <code>' + v + '</code> auf ' + val + ' gesetzt.' });
+      }
+    }
+  }
+  push({ b: 1, sk: 'loop', i: n, acc, chg: 'i', calcLabel: 'Schleifenbedingung', calc: 'i < len(array) → ' + n + ' < ' + n + ' → falsch',
+    status: 'Schleifenkopf: <code>i = ' + n + '</code>, Bedingung <code>i &lt; len(array)</code> ist falsch – die Schleife endet.',
+    exp: '<strong>Schleifenende.</strong> Es gibt kein <code>array[' + n + ']</code> mehr, die Bedingung <code>i &lt; len(array)</code> ist falsch. Die Schleife wird verlassen. (Im Struktogramm zählt i bis ' + n + '; in Python bleibt i nach der for-Schleife beim letzten Index.)' });
+  let dur = null, result = acc;
+  if (auswMode === 'durchschnitt') {
+    dur = R(acc / n); result = dur;
+    push({ coarse: true, b: 3, sk: 'calc', i: n, acc, dur, chg: 'dur', calcLabel: 'Rechnung', calc: 'summe / len(array) = ' + acc + ' / ' + n + ' = ' + dur,
+      status: '<code>durchschnitt = summe / len(array)</code> = ' + acc + ' / ' + n + ' = <b>' + dur + '</b>',
+      exp: '<strong>Durchschnitt.</strong> Erst nach der Schleife wird die Summe (' + acc + ') durch die Anzahl der Elemente <code>len(array)</code> = ' + n + ' geteilt. Das Ergebnis wird in der neuen Variablen <code>durchschnitt</code> gespeichert.' });
+  }
+  push({ coarse: true, b: T.length ? (mm ? 4 : (auswMode === 'durchschnitt' ? 4 : 3)) : 0, sk: 'out', i: n, acc, dur, out: result, cab: -1, phase: 'done',
+    status: '<b>Fertig!</b> Ausgabe: ' + result,
+    exp: '<strong>Ausgabe.</strong> Die Schleife ist durch, das Endergebnis <code>' + (auswMode === 'durchschnitt' ? 'durchschnitt' : v) + '</code> = ' + result + ' wird ausgegeben.' });
+  return T;
+}
+
+function auswVisible(e) { return trVisible(e); }
+
+function showAuswEntry() {
+  const e = auswTrace[auswPos];
+  const v = auswVarName();
+  const dm = auswMode === 'durchschnitt';
+  const row = (name, val, cls) => '<div class="var-row' + (cls ? ' ' + cls : '') + '"><span class="var-name">' + name + '</span><span class="var-value">' + val + '</span></div>';
+  if (!e) {
+    document.getElementById('auswVarsPanel').innerHTML =
+      row('array', '[' + auswArr.join(', ') + ']');
+    document.querySelectorAll('#auswCodeBlock .calc-bubble').forEach(x => x.remove());
+    highlightAuswLine(-2); highlightAuswStruk(null);
+    renderCabinet('auswCabinet', auswArr, -1);
+    auswLastInfo = {};
+    const out = document.getElementById('auswOutput'); out.classList.remove('visible'); out.innerHTML = '';
+    document.getElementById('auswStatus').textContent = 'Noch nicht gestartet – klickt auf „Nächster Schritt“.';
+    return;
+  }
   document.getElementById('auswVarsPanel').innerHTML =
-    '<div class="var-row"><span class="var-name">array</span><span class="var-value">[' + auswArr.join(', ') + ']</span></div>' +
-    '<div class="var-row"><span class="var-name">i</span><span class="var-value">' + iVal + '</span></div>' +
-    '<div class="var-row"><span class="var-name">' + varName + '</span><span class="var-value">' + auswAcc + '</span></div>';
+    row('array', '[' + auswArr.join(', ') + ']') +
+    (e.i !== null ? row('i', e.i, e.chg === 'i' ? 'chg' : '') : '') +
+    (e.noV ? '' : row(v, e.acc, e.chg === 'v' ? 'chg' : '')) +
+    (dm && e.dur !== null ? row('durchschnitt', e.dur, e.chg === 'dur' ? 'chg' : '') : '');
+  document.querySelectorAll('#auswCodeBlock .calc-bubble').forEach(x => x.remove());
+  if (e.calc && detailMode) {
+    const ln = document.getElementById('auswLine' + (e.b + 1));
+    const bub = document.createElement('div');
+    bub.className = 'calc-bubble';
+    bub.innerHTML = '<span class="cb-l">' + esc(e.calcLabel) + '</span>' + esc(e.calc);
+    const r0 = ln.querySelector('.code-line-row'); r0.parentNode.insertBefore(bub, r0.nextSibling);
+  }
+  highlightAuswLine(e.b);
+  highlightAuswStruk(e.sk);
+  renderCabinet('auswCabinet', auswArr, e.cab);
+  auswLastInfo = { i: e.i };
+  const out = document.getElementById('auswOutput');
+  if (e.out !== null) { out.innerHTML = '<span class="out">' + e.out + '</span>'; out.classList.add('visible'); }
+  else { out.classList.remove('visible'); out.innerHTML = ''; }
+  const vis = auswTrace.filter(auswVisible);
+  document.getElementById('auswStatus').innerHTML = e.status + ' <span style="color:var(--muted);font-size:.8rem">(Schritt ' + (vis.indexOf(e) + 1) + ' von ' + vis.length + ')</span>';
+  if (document.getElementById('auswExplainBox').style.display === 'block') explainAuswStep(true);
 }
-
-let auswLastPhase = null;
-let auswLastInfo = {};
 
 function auswStep() {
-  if (auswIndex === -2) {
-    document.getElementById('auswStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu starten.';
-    return;
-  }  if (auswIndex === -1) {
-    const isMinMax = auswMode === 'maximum' || auswMode === 'minimum';
-    auswAcc = isMinMax ? auswArr[0] : 0;
-    auswIndex = isMinMax ? 1 : 0;
-    renderCabinet('auswCabinet', auswArr, isMinMax ? 0 : -1);
-    updateAuswVars();
-    highlightAuswLine(0);
-    document.getElementById('auswStatus').innerHTML = isMinMax
-      ? 'Startwert gesetzt: array[0] = ' + auswArr[0]
-      : 'Startwert gesetzt: 0';
-    auswLastPhase = 'init';
-    auswLastInfo = { isMinMax };
-    if (document.getElementById('auswExplainBox').style.display === 'block') explainAuswStep();
-    return;
-  }
-  if (auswIndex >= auswArr.length) {
-    let result = auswAcc;
-    if (auswMode === 'durchschnitt') result = Math.round((auswAcc / auswArr.length) * 100) / 100;
-    document.getElementById('auswOutput').innerHTML = '<span class="out">' + result + '</span>';
-    document.getElementById('auswOutput').classList.add('visible');
-    document.getElementById('auswStatus').innerHTML = '<b>Fertig!</b> Ergebnis: ' + result;
-    renderCabinet('auswCabinet', auswArr, -1);
-    highlightAuswLine(auswCodeBody().length - 1);
-    auswIndex = -2;
-    auswLastPhase = 'done';
-    auswLastInfo = { result };
-    if (document.getElementById('auswExplainBox').style.display === 'block') explainAuswStep();
-    return;
-  }
-  const i = auswIndex;
-  const val = auswArr[i];
-  if (auswMode === 'summe' || auswMode === 'durchschnitt') {
-    auswAcc += val;
-    document.getElementById('auswStatus').innerHTML =
-      'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' &nbsp;·&nbsp; neue Summe = ' + auswAcc;
-    highlightAuswLine(2);
-    auswLastPhase = 'accumulate';
-    auswLastInfo = { i, val, acc: auswAcc };
-  } else {
-    const better = auswMode === 'maximum' ? (val > auswAcc) : (val < auswAcc);
-    if (better) {
-      auswAcc = val;
-      document.getElementById('auswStatus').innerHTML =
-        'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' → neuer ' + (auswMode === 'maximum' ? 'Höchstwert' : 'Tiefstwert') + ': ' + auswAcc;
-      highlightAuswLine(3);
-    } else {
-      document.getElementById('auswStatus').innerHTML =
-        'i = ' + i + ' &nbsp;·&nbsp; array[' + i + '] = ' + val + ' → keine Änderung (' + auswAcc + ' bleibt).';
-      highlightAuswLine(2);
-    }
-    auswLastPhase = 'compare';
-    auswLastInfo = { i, val, better, acc: auswAcc };
-  }
-  renderCabinet('auswCabinet', auswArr, i);
-  updateAuswVars();
-  auswIndex++;
-  if (document.getElementById('auswExplainBox').style.display === 'block') explainAuswStep();
+  for (let k = auswPos + 1; k < auswTrace.length; k++) if (auswVisible(auswTrace[k])) { auswPos = k; showAuswEntry(); return; }
+  document.getElementById('auswStatus').textContent = 'Bereits fertig – klickt „Zurücksetzen“, um erneut zu starten.';
+}
+function auswBack() {
+  for (let k = auswPos - 1; k >= 0; k--) if (auswVisible(auswTrace[k])) { auswPos = k; showAuswEntry(); return; }
+  auswPos = -1; showAuswEntry();
 }
 
-function explainAuswStep() {
+function explainAuswStep(refresh) {
   const box = document.getElementById('auswExplainBox');
-  box.style.display = 'block';
-  const varName = auswMode === 'summe' ? 'ergebnis' : auswMode === 'durchschnitt' ? 'summe' : (auswMode === 'maximum' ? 'hoechstwert' : 'tiefstwert');
-  if (!auswLastPhase) {
-    box.innerHTML = '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Nächster Schritt“.';
-    return;
-  }
-  if (auswLastPhase === 'init') {
-    box.innerHTML = '<strong>Das ist die Zeile vor der Schleife</strong>, sie läuft nur ein einziges Mal. Hier wird die Variable ' +
-      '<code>' + varName + '</code> auf ihren Startwert gesetzt' + (auswLastInfo.isMinMax
-        ? ' – und zwar auf <code>array[0]</code>, den ersten Wert. Deshalb startet die eigentliche Schleife bei Maximum/Minimum ' +
-          'auch erst bei <code>i = 1</code>, nicht bei 0: array[0] ist ja bereits "verbraucht".'
-        : ' – bei einer Summe ist der neutrale Startwert 0, weil das Addieren dann nichts verfälscht.');
-  } else if (auswLastPhase === 'done') {
-    box.innerHTML = '<strong>Die Schleife ist komplett durchlaufen</strong> – es gibt kein <code>array[i]</code> mit gültigem Index mehr. ' +
-      'Deshalb wird jetzt nur noch das Endergebnis ausgegeben' +
-      (auswMode === 'durchschnitt' ? ' (die Summe wurde zusätzlich noch durch <code>len(array)</code> geteilt).' : '.');
-  } else if (auswLastPhase === 'accumulate') {
-    box.innerHTML = '<strong>Es gibt hier nur eine einzige Schleife</strong>, die einmal durchs Array läuft. Wir sind beim Durchlauf mit ' +
-      '<code>i = ' + auswLastInfo.i + '</code>: Der Wert <code>array[' + auswLastInfo.i + '] = ' + auswLastInfo.val + '</code> wird zur bisherigen ' +
-      '<code>' + varName + '</code> addiert, das Ergebnis ist jetzt <code>' + auswLastInfo.acc + '</code>. Danach erhöht Python <code>i</code> um 1 ' +
-      'und prüft, ob noch ein weiteres Element folgt.';
-  } else if (auswLastPhase === 'compare') {
-    box.innerHTML = '<strong>Es gibt hier nur eine einzige Schleife</strong>, die einmal durchs Array läuft. Wir sind beim Durchlauf mit ' +
-      '<code>i = ' + auswLastInfo.i + '</code>: Es wird verglichen, ob <code>array[' + auswLastInfo.i + '] = ' + auswLastInfo.val + '</code> ' +
-      (auswMode === 'maximum' ? 'größer' : 'kleiner') + ' ist als der bisherige <code>' + varName + '</code>.<br><br>' +
-      (auswLastInfo.better
-        ? 'Das ist hier der Fall – deshalb wird <code>' + varName + '</code> jetzt auf ' + auswLastInfo.acc + ' aktualisiert.'
-        : 'Das ist hier <strong>nicht</strong> der Fall – deshalb bleibt <code>' + varName + '</code> unverändert bei ' + auswLastInfo.acc + '.') +
-      ' Danach erhöht Python <code>i</code> um 1 und prüft das nächste Element.';
-  }
+  if (!refresh && box.style.display === 'block') { box.style.display = 'none'; return; }
+  const e = auswTrace[auswPos];
+  setExplain(box, e ? e.exp : '<strong>Noch kein Schritt ausgeführt.</strong> Klickt zuerst auf „Nächster Schritt“.');
 }
 
 function auswReset() {
-  auswIndex = -1;
-  auswAcc = 0;
-  auswLastPhase = null;
+  auswTrace = buildAuswTrace();
+  auswPos = -1;
   auswLastInfo = {};
   renderAuswChips();
   renderAuswCodeBlock();
   renderAuswStruk();
-  renderCabinet('auswCabinet', auswArr, -1);
-  updateAuswVars();
-  const out = document.getElementById('auswOutput');
-  out.classList.remove('visible');
-  out.innerHTML = '';
-  document.getElementById('auswStatus').textContent = 'Noch nicht gestartet – klickt auf „Nächster Schritt“.';
   document.getElementById('auswExplainBox').style.display = 'none';
+  showAuswEntry();
 }
 
 // ---------- Tabs ----------
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
+    closeExplainPops();
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     tab.classList.add('active');
@@ -2869,7 +3081,7 @@ const modalTexts = {
 };
 
 function openModal(key) {
-  document.getElementById('modalContent').innerHTML = modalTexts[key] || '';
+  document.getElementById('modalContent').innerHTML = (modalTexts[key] || '') + '<div class="modal-hint">Schließen: <kbd class="kb">I</kbd> oder <kbd class="kb">Esc</kbd></div>';
   document.getElementById('modalOverlay').classList.add('open');
 }
 function closeModal() {
@@ -3128,7 +3340,7 @@ function renderLf1AufgabenBrowser() {
           statusHtml = '<button onclick="event.stopPropagation();lf1AddTaskToSprint(\'' + t.id + '\')">+ In Sprint aufnehmen</button>';
         }
         const badge = '<span class="lf1-fz-badge">' + lf1Esc(fzList.length > 1 ? "Feinziele " + fzList.join(", ") : "Feinziel " + fzList[0]) + '</span>';
-        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf1OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text">' + lf1TaskLabel(t, cleanText) + '</span>' + badge + statusHtml + '</div>';
+        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf1OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text">' + lf1TaskLabel(t, cleanText) + '</span>' + badge + statusHtml + llMarkHtml(t.id) + '</div>';
       }).join("");
       return '<div class="lf1-fz-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + rowKey + '" onclick="this.classList.toggle(\'expanded\')">' +
         '<span class="lf1-fz-text">' + lf1Esc(LF1_THEMA_META[thema] || thema) + '</span>' +
@@ -3153,7 +3365,7 @@ function renderLf1AufgabenBrowser() {
         } else {
           statusHtml = '<button onclick="event.stopPropagation();lf1AddTaskToSprint(\'' + t.id + '\')">+ In Sprint aufnehmen</button>';
         }
-        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf1OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text">' + lf1TaskLabel(t, cleanText) + '</span>' + statusHtml + '</div>';
+        return '<div class="lf1-task-row" onclick="if(event.target.tagName!==\'BUTTON\')lf1OpenInfoModal(\'' + t.id + '\')"><span class="lf1-task-text">' + lf1TaskLabel(t, cleanText) + '</span>' + statusHtml + llMarkHtml(t.id) + '</div>';
       }).join("");
       return '<div class="lf1-fz-row' + (isExpanded ? ' expanded' : '') + '" data-fzkey="' + rowKey + '" onclick="this.classList.toggle(\'expanded\')">' +
         '<span class="lf1-fz-text">[' + fz + '] ' + (LF1_FEINZIEL_TITLES[fz] || "") + '</span>' +
@@ -3235,6 +3447,7 @@ function lf1OpenInfoModal(taskId) {
   const auftragText = m ? m[2] : task.text;
   const fzLabel = fzList.length > 1 ? "Feinziele " + fzList.join(", ") : (fzList[0] ? "Feinziel " + fzList[0] : "");
   document.getElementById("lf1InfoModalId").textContent = taskId + (fzLabel ? " · " + fzLabel : "");
+  llModalTask = taskId; llPlaceModalMarks();
   const problemEl = document.getElementById("lf1InfoModalProblem");
   if (task.problem) {
     problemEl.innerHTML = "<strong>Problemstellung</strong>" + lf1Esc(task.problem);
@@ -3367,12 +3580,13 @@ function renderLfNav(currentPage) {
     { href: "bpe7-lf1.html", label: "LF1 · Arrays", id: "LF1" },
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
     { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
-    { href: "index.html#handbuch", label: "Handbuch", id: "HB" }
+    { href: "index.html#handbuch", label: "Handbuch", id: "HB" },
+    { href: "fehler.html", label: "Fehler", id: "ERR" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && item.id !== "HB" && !LF_FREIGABE[item.id];
+    const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
@@ -3398,6 +3612,80 @@ function startHeartbeat() {
 }
 
 window.__logout = () => { signOut(auth).then(() => window.location.href = "anmeldung.html"); };
+
+// ---------------------------------------------------------------------------
+// Markierungen: "Merken" (nur fuer mich selbst) und "Besprechen" (Hinweis an die
+// Lehrkraft: diese Aufgabe sollten wir gemeinsam besprechen).
+// Speicherort: schueler/{uid}/markierungen/{taskId} = { merken, besprechen, updated }
+// ---------------------------------------------------------------------------
+let llMarks = {};
+let llModalTask = null;
+const LL_MARK_CFG = { getTask: id => lf1GetTaskById(id), openInfo: id => lf1OpenInfoModal(id), rerender: () => renderLf1AufgabenBrowser(), container: 'lf1AufgabenBrowser', modalIdEl: 'lf1InfoModalId' };
+
+async function llLadeMarks() {
+  try {
+    const snap = await getDocs(collection(db, "schueler", currentUid, "markierungen"));
+    llMarks = {};
+    snap.forEach(d => { llMarks[d.id] = d.data(); });
+  } catch (e) { console.warn("Markierungen konnten nicht geladen werden:", e.code || e.message); }
+}
+function llMarkHtml(id) {
+  const m = llMarks[id] || {};
+  const q = "\'" + id + "\'";
+  return '<span class="mk-wrap" onclick="event.stopPropagation()">' +
+    '<button type="button" class="mk mk-me' + (m.merken ? ' on' : '') + '" title="Nur für mich: Aufgabe merken, um sie später schnell wiederzufinden" onclick="event.stopPropagation();llToggleMark(' + q + ',\'merken\')">' + (m.merken ? 'Gemerkt ✓' : 'Merken') + '</button>' +
+    '<button type="button" class="mk mk-ask' + (m.besprechen ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (m.besprechen ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
+    '</span>';
+}
+function llMarkLabel(id) {
+  const t = LL_MARK_CFG.getTask(id);
+  const kurz = t ? (t.kurz || String(t.text || '').replace(/^\[[\d.,\s]+\]\s*/, '').slice(0, 50)) : '';
+  return id + (kurz ? ' · ' + kurz : '');
+}
+function llRenderMarkPanel() {
+  const cont = document.getElementById(LL_MARK_CFG.container);
+  if (!cont) return;
+  let panel = document.getElementById('llMarkPanel');
+  if (!panel) { panel = document.createElement('details'); panel.id = 'llMarkPanel'; panel.className = 'mk-panel'; cont.parentNode.insertBefore(panel, cont); }
+  const ids = Object.keys(llMarks);
+  const me = ids.filter(i => llMarks[i].merken).sort();
+  const ask = ids.filter(i => llMarks[i].besprechen).sort();
+  if (!me.length && !ask.length) { panel.style.display = 'none'; return; }
+  panel.style.display = '';
+  const chips = list => list.map(i => '<span class="mk-chip" onclick="llOpenMarked(\'' + i + '\')">' + llEsc(llMarkLabel(i)) + '</span>').join('');
+  const wasOpen = panel.open;
+  panel.innerHTML = '<summary>Meine Markierungen <span class="mk-count">' + me.length + ' gemerkt · ' + ask.length + ' zur Besprechung</span></summary>' +
+    (me.length ? '<div class="mk-group"><b>Gemerkt (nur für mich)</b><div>' + chips(me) + '</div></div>' : '') +
+    (ask.length ? '<div class="mk-group"><b>Zur gemeinsamen Besprechung (Lehrkraft sieht das)</b><div>' + chips(ask) + '</div></div>' : '');
+  panel.open = wasOpen;
+}
+function llEsc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function llPlaceModalMarks() {
+  const idEl = document.getElementById(LL_MARK_CFG.modalIdEl);
+  if (!idEl) return;
+  let w = document.getElementById('llModalMarks');
+  if (!w) { w = document.createElement('span'); w.id = 'llModalMarks'; w.style.marginLeft = '10px'; idEl.parentNode.insertBefore(w, idEl.nextSibling); }
+  w.innerHTML = llModalTask ? llMarkHtml(llModalTask) : '';
+}
+function llOpenMarked(id) { LL_MARK_CFG.openInfo(id); }
+async function llToggleMark(id, kind) {
+  const alt = llMarks[id] ? Object.assign({}, llMarks[id]) : null;
+  const m = Object.assign({ merken: false, besprechen: false }, llMarks[id]);
+  m[kind] = !m[kind];
+  m.updated = new Date().toISOString();
+  llMarks[id] = m;
+  LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
+  try {
+    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), { merken: !!m.merken, besprechen: !!m.besprechen, updated: m.updated });
+  } catch (e) {
+    console.warn("Markierung konnte nicht gespeichert werden:", e.code || e.message);
+    if (alt) llMarks[id] = alt; else delete llMarks[id];
+    LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
+    alert("Markierung konnte nicht gespeichert werden (" + (e.code || e.message) + ").");
+  }
+}
+window.llToggleMark = llToggleMark;
+window.llOpenMarked = llOpenMarked;
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "anmeldung.html"; return; }
@@ -3432,6 +3720,8 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
     await ladeAlleSprints();
+    await llLadeMarks();
+    llRenderMarkPanel();
     renderLf1AufgabenBrowser();
     renderLfNav("LF1");
     startHeartbeat();
@@ -3443,7 +3733,7 @@ onAuthStateChanged(auth, async (user) => {
 // Funktionen, die per Inline-onclick aus dem HTML aufgerufen werden, muessen in
 // einem Modul-Script explizit auf window gelegt werden.
 [
-  accessValue, appendValue, auswReset, auswStep, closeModal, doSwap,
+  accessValue, appendValue, auswReset, auswStep, auswBack, insertBack, removeBack, toggleDetail, setVerMode, loopBack, closeModal, doSwap, setBuildMode,
   explainAuswStep, explainInsertStep, explainLoopStep, explainRemoveStep,
   insertReset, insertStart, insertStep, lf1OpenInfoModal, lf1CloseInfoModal,
   lf1AddTaskToSprint, lf1ExportTaskAsPdf, lf1ExportAllAsPdf, loopReset, loopStep,
