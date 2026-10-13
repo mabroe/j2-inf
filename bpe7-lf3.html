@@ -332,7 +332,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot, deleteField, arrayUnion } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_aYBkyNqfJLjSVVgbkL1gRJL0BytMNBs",
@@ -899,10 +899,11 @@ async function llLadeMarks() {
 }
 function llMarkHtml(id) {
   const m = llMarks[id] || {};
+  const ask = !!(m.besprechen && !m.besprechenErledigt);
   const q = "\'" + id + "\'";
   return '<span class="mk-wrap" onclick="event.stopPropagation()">' +
     '<button type="button" class="mk mk-me' + (m.merken ? ' on' : '') + '" title="Nur für mich: Aufgabe merken, um sie später schnell wiederzufinden" onclick="event.stopPropagation();llToggleMark(' + q + ',\'merken\')">' + (m.merken ? 'Gemerkt ✓' : 'Merken') + '</button>' +
-    '<button type="button" class="mk mk-ask' + (m.besprechen ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (m.besprechen ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
+    '<button type="button" class="mk mk-ask' + (ask ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (ask ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
     '</span>';
 }
 function llMarkLabel(id) {
@@ -917,7 +918,7 @@ function llRenderMarkPanel() {
   if (!panel) { panel = document.createElement('details'); panel.id = 'llMarkPanel'; panel.className = 'mk-panel'; cont.parentNode.insertBefore(panel, cont); }
   const ids = Object.keys(llMarks);
   const me = ids.filter(i => llMarks[i].merken).sort();
-  const ask = ids.filter(i => llMarks[i].besprechen).sort();
+  const ask = ids.filter(i => llMarks[i].besprechen && !llMarks[i].besprechenErledigt).sort();
   if (!me.length && !ask.length) { panel.style.display = 'none'; return; }
   panel.style.display = '';
   const chips = list => list.map(i => '<span class="mk-chip" onclick="llOpenMarked(\'' + i + '\')">' + llEsc(llMarkLabel(i)) + '</span>').join('');
@@ -939,12 +940,31 @@ function llOpenMarked(id) { LL_MARK_CFG.openInfo(id); }
 async function llToggleMark(id, kind) {
   const alt = llMarks[id] ? Object.assign({}, llMarks[id]) : null;
   const m = Object.assign({ merken: false, besprechen: false }, llMarks[id]);
-  m[kind] = !m[kind];
-  m.updated = new Date().toISOString();
+  const jetzt = new Date().toISOString();
+  let payload;
+  if (kind === 'merken') {
+    m.merken = !m.merken;
+    payload = { merken: !!m.merken, updated: jetzt };
+  } else if (m.besprechen && !m.besprechenErledigt) {
+    // Markierung wieder zuruecknehmen
+    m.besprechen = false;
+    payload = { besprechen: false, updated: jetzt };
+  } else {
+    // (Erneut) zur Besprechung markieren. War die letzte Besprechung schon erledigt, bleibt sie
+    // fuer die Lehrkraft als fruehere Besprechung (mit Sprint-Zeitpunkt) erhalten.
+    payload = { besprechen: true, besprechenAm: jetzt, besprechenErledigt: deleteField(), updated: jetzt };
+    if (m.besprechen && m.besprechenErledigt) {
+      const fr = { am: m.besprechenAm || m.updated || jetzt, erledigt: m.besprechenErledigt };
+      payload.fruehere = arrayUnion(fr);
+      m.fruehere = (m.fruehere || []).concat([fr]);
+    }
+    m.besprechen = true; m.besprechenAm = jetzt; delete m.besprechenErledigt;
+  }
+  m.updated = jetzt;
   llMarks[id] = m;
   LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
   try {
-    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), { merken: !!m.merken, besprechen: !!m.besprechen, updated: m.updated });
+    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), payload, { merge: true });
   } catch (e) {
     console.warn("Markierung konnte nicht gespeichert werden:", e.code || e.message);
     if (alt) llMarks[id] = alt; else delete llMarks[id];

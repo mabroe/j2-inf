@@ -544,44 +544,6 @@
   .status-strip b { color: var(--navy); }
   .status-strip .amber-val { color: var(--amber-dark); font-weight: 700; }
 
-  /* Quiz */
-  .quiz-array-label {
-    font-family: -apple-system, "Segoe UI", sans-serif;
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .quiz-question-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 12px 14px;
-    background: var(--empty);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-family: -apple-system, "Segoe UI", sans-serif;
-  }
-  .quiz-question-row .qtext { font-size: 0.95rem; }
-  .quiz-question-row input { width: 110px; }
-  .quiz-question-row.correct { background: #E4F3EA; border: 1px solid var(--good); }
-  .quiz-question-row.wrong { background: #FBEAE8; border: 1px solid var(--bad); }
-  .quiz-question-row .verdict { font-size: 0.85rem; font-weight: 700; min-width: 130px; text-align: right; }
-  .quiz-question-row.correct .verdict { color: var(--good); }
-  .quiz-question-row.wrong .verdict { color: var(--bad); }
-  .quiz-score {
-    display: none;
-    font-family: -apple-system, "Segoe UI", sans-serif;
-    background: var(--navy-dark);
-    color: white;
-    border-radius: 8px;
-    padding: 14px 18px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-  }
-  .quiz-score.visible { display: block; }
-
   /* Struktogramm */
   .struk-table {
     width: 100%;
@@ -1269,7 +1231,6 @@
     </section>
   </div>
 
-  <!-- QUIZ VIEW -->
   <!-- AUFGABEN-BROWSER VIEW -->
   <div class="view" id="view-aufgaben">
     <div class="view-head">
@@ -1318,7 +1279,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot, deleteField, arrayUnion } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_aYBkyNqfJLjSVVgbkL1gRJL0BytMNBs",
@@ -1484,11 +1445,11 @@ function renderBubbleCode() {
 }
 
 function renderBubbleStruk() {
-  const inner = altStrukHtml('array[j] &gt; array[j+1]',
-    'Zuweisung: temp = array[j]<br>Zuweisung: array[j] = array[j+1]<br>Zuweisung: array[j+1] = temp', '', true,
+  const inner = altStrukHtml('array[j] &gt; array[j + 1]',
+    'Zuweisung: temp = array[j]<br>Zuweisung: array[j] = array[j + 1]<br>Zuweisung: array[j + 1] = temp', '', true,
     { cond: 'bsCond', j: 'bsSwapBranch' });
-  const innerLoop = loopStrukHtml('Wiederhole von j = 0 solange j &lt; n-1-i, Schrittweite 1', inner, true, 'bsInnerHeader');
-  document.getElementById('bubbleStruk').innerHTML = loopStrukHtml('Wiederhole von i = 0 solange i &lt; n-1, Schrittweite 1', innerLoop, true, 'bsOuterHeader');
+  const innerLoop = loopStrukHtml('Wiederhole von j = 0 solange j &lt; n - 1 - i, Schrittweite 1', inner, true, 'bsInnerHeader');
+  document.getElementById('bubbleStruk').innerHTML = loopStrukHtml('Wiederhole von i = 0 solange i &lt; n - 1, Schrittweite 1', innerLoop, true, 'bsOuterHeader');
 }
 const BUBBLE_STRUK_IDS = ['bsOuterHeader', 'bsInnerHeader', 'bsCond', 'bsSwapBranch'];
 function highlightBubbleStruk(step) {
@@ -1723,18 +1684,18 @@ function renderSelectionCode() {
 
 function renderSelectionStruk() {
   const inner = altStrukHtml('array[j] &lt; array[kleinsterIndex]', 'Zuweisung:<br>kleinsterIndex = j', '', true, { cond: 'ssCond', j: 'ssUpdateBranch' });
-  const innerLoop = loopStrukHtml('Wiederhole von j = i+1 solange j &lt; n, Schrittweite 1', inner, true, 'ssInnerHeader');
+  const innerLoop = loopStrukHtml('Wiederhole von j = i + 1 solange j &lt; n, Schrittweite 1', inner, true, 'ssInnerHeader');
   const outerBody =
     '<div class="struk-loop-header" id="ssInitLine" style="border:none;padding:6px 0;">Zuweisung: kleinsterIndex = i</div>' +
     innerLoop +
     '<div class="struk-loop-header" id="ssSwapLine" style="border:none;padding:6px 0;">Zuweisung: temp = array[i]<br>Zuweisung: array[i] = array[kleinsterIndex]<br>Zuweisung: array[kleinsterIndex] = temp</div>';
-  document.getElementById('selectionStruk').innerHTML = loopStrukHtml('Wiederhole von i = 0 solange i &lt; n-1, Schrittweite 1', outerBody, true, 'ssOuterHeader');
+  document.getElementById('selectionStruk').innerHTML = loopStrukHtml('Wiederhole von i = 0 solange i &lt; n - 1, Schrittweite 1', outerBody, true, 'ssOuterHeader');
 
   // Referenz im Struktogramm-Tab (eigenständig, nicht verschachtelt)
   const refEl = document.getElementById('strukRefMinSearch');
   if (refEl) {
     const refInner = altStrukHtml('array[j] &lt; array[kleinsterIndex]', 'Zuweisung:<br>kleinsterIndex = j', '');
-    refEl.innerHTML = loopStrukHtml('Wiederhole von j = i+1 solange j &lt; n, Schrittweite 1', refInner);
+    refEl.innerHTML = loopStrukHtml('Wiederhole von j = i + 1 solange j &lt; n, Schrittweite 1', refInner);
   }
 }
 const SELECTION_STRUK_IDS = ['ssOuterHeader', 'ssInitLine', 'ssInnerHeader', 'ssCond', 'ssUpdateBranch', 'ssSwapLine'];
@@ -1986,7 +1947,7 @@ function renderLinearCode() {
 function renderLinearStruk() {
   const inner = altStrukHtml('array[i] == gesucht', 'Zuweisung:<br>gefunden = True', 'Zuweisung:<br>i = i + 1', true,
     { cond: 'lsCond', j: 'lsFoundBranch', n: 'lsNextBranch' });
-  document.getElementById('linearStruk').innerHTML = loopStrukHtml('Wiederhole solange i &lt; len(array) und nicht gefunden', inner, true, 'lsHeader');
+  document.getElementById('linearStruk').innerHTML = loopStrukHtml('Wiederhole solange i &lt; Anzahl der Elemente des Arrays array AND NOT gefunden', inner, true, 'lsHeader');
 }
 const LINEAR_STRUK_IDS = ['lsHeader', 'lsCond', 'lsFoundBranch', 'lsNextBranch'];
 function highlightLinearStruk(step) {
@@ -2195,9 +2156,9 @@ function renderBinaryStruk() {
   const inner =
     '<div class="struk-loop-header" id="bnMidLine" style="border-bottom:1.5px solid var(--ink);padding:6px 10px;">Zuweisung: mitte = (start + ende) // 2</div>' +
     altStrukHtml('array[mitte] == gesucht', 'Zuweisung:<br>gefunden = True',
-      '<span style="font-size:0.75rem;">Wenn array[mitte] &lt; gesucht:<br>&nbsp;&nbsp;start = mitte+1<br>sonst: ende = mitte-1</span>', true,
+      '<span style="font-size:0.75rem;">Wenn array[mitte] &lt; gesucht:<br>&nbsp;&nbsp;start = mitte + 1<br>sonst: ende = mitte - 1</span>', true,
       { cond: 'bnCond', j: 'bnFoundBranch', n: 'bnAdjustBranch' });
-  document.getElementById('binaryStruk').innerHTML = loopStrukHtml('Wiederhole solange start ≤ ende und nicht gefunden', inner, true, 'bnHeader');
+  document.getElementById('binaryStruk').innerHTML = loopStrukHtml('Wiederhole solange start &lt;= ende AND NOT gefunden', inner, true, 'bnHeader');
 }
 const BINARY_STRUK_IDS = ['bnHeader', 'bnMidLine', 'bnCond', 'bnFoundBranch', 'bnAdjustBranch'];
 function highlightBinaryStruk(step) {
@@ -2475,105 +2436,6 @@ function setStrukActive(ids, activeIds) {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('struk-active', activeIds.includes(id));
   });
-}
-
-// ---------- QUIZ (deckt alle vier Algorithmen ab) ----------
-function quizRandInt(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
-function checkAnswer(given, answer) {
-  const g = given.trim().toLowerCase();
-  const accepted = Array.isArray(answer) ? answer : [answer];
-  return accepted.some(a => g === String(a).trim().toLowerCase());
-}
-function answerLabel(answer) { return Array.isArray(answer) ? answer[0] : answer; }
-
-const QUIZ_GENERATORS = [
-  () => {
-    const a = quizRandInt(1, 20), b = quizRandInt(1, 20);
-    return { category: 'Bubble Sort', prompt: 'Bubble Sort vergleicht array[j]=' + a + ' und array[j+1]=' + b + '. Wird getauscht? (ja/nein)', answer: a > b ? 'ja' : 'nein' };
-  },
-  () => {
-    const n = quizRandInt(4, 8);
-    return { category: 'Bubble Sort', prompt: 'Ein Array mit ' + n + ' Elementen wird mit Bubble Sort sortiert. Wie viele äußere Durchgänge (im schlechtesten Fall) sind höchstens nötig?', answer: String(n - 1) };
-  },
-  () => {
-    const nums = Array.from({ length: 5 }, () => quizRandInt(1, 30));
-    let minIdx = 0;
-    for (let i = 1; i < nums.length; i++) if (nums[i] < nums[minIdx]) minIdx = i;
-    return { category: 'Selection Sort', prompt: 'array = [' + nums.join(', ') + '] — an welchem Index steht das kleinste Element (das, was Selection Sort im ersten Durchgang suchen würde)?', answer: String(minIdx) };
-  },
-  () => {
-    const n = quizRandInt(4, 8);
-    return { category: 'Selection Sort', prompt: 'Ein Array mit ' + n + ' Elementen wird mit Selection Sort sortiert. Wie viele Tauschvorgänge sind höchstens nötig?', answer: String(n - 1) };
-  },
-  () => ({
-    category: 'Selection Sort',
-    prompt: 'Welchen Python-Befehl darf man beim Programmieren von Selection Sort NICHT verwenden, um das kleinste Element zu finden?',
-    answer: ['min', 'min()']
-  }),
-  () => {
-    const nums = Array.from({ length: 6 }, () => quizRandInt(1, 30));
-    const targetIdx = quizRandInt(0, 5);
-    const target = nums[targetIdx];
-    return { category: 'Lineare Suche', prompt: 'array = [' + nums.join(', ') + '] — wie viele Vergleiche braucht die lineare Suche, um den Wert ' + target + ' zu finden?', answer: String(targetIdx + 1) };
-  },
-  () => {
-    const n = quizRandInt(5, 9);
-    return { category: 'Lineare Suche', prompt: 'Ein Array mit ' + n + ' Elementen enthält den gesuchten Wert NICHT. Wie viele Vergleiche macht die lineare Suche insgesamt?', answer: String(n) };
-  },
-  () => ({
-    category: 'Binäre Suche',
-    prompt: 'Kann die binäre Suche direkt auf einem unsortierten Array angewendet werden? (ja/nein)',
-    answer: 'nein'
-  }),
-  () => {
-    const n = quizRandInt(7, 15);
-    return { category: 'Binäre Suche', prompt: 'Ein sortiertes Array hat die Indizes 0 bis ' + (n - 1) + '. Welchen Index prüft die binäre Suche zuerst als „Mitte“ (start=0, ende=' + (n - 1) + ', abgerundet)?', answer: String(Math.floor((0 + n - 1) / 2)) };
-  },
-  () => ({
-    category: 'Binäre Suche',
-    prompt: 'array[mitte] ist kleiner als der gesuchte Wert. Wie wird „start“ als Nächstes gesetzt?',
-    answer: ['mitte + 1', 'mitte+1']
-  })
-];
-
-let quizItems = [];
-
-function newQuiz() {
-  document.getElementById('quizScore').classList.remove('visible');
-  quizItems = QUIZ_GENERATORS.map(gen => gen());
-  for (let i = quizItems.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [quizItems[i], quizItems[j]] = [quizItems[j], quizItems[i]];
-  }
-  const wrap = document.getElementById('quizQuestions');
-  wrap.innerHTML = quizItems.map((item, idx) =>
-    '<div class="quiz-question-row" id="quizRow' + idx + '">' +
-      '<span class="qtext"><span class="hb-tag" style="margin-right:8px;">' + item.category + '</span>' + (idx + 1) + '. ' + item.prompt + '</span>' +
-      '<input type="text" id="quizInput' + idx + '">' +
-      '<span class="verdict" id="quizVerdict' + idx + '"></span>' +
-    '</div>'
-  ).join('');
-}
-
-function evaluateQuiz() {
-  let correct = 0;
-  quizItems.forEach((item, idx) => {
-    const given = document.getElementById('quizInput' + idx).value;
-    const row = document.getElementById('quizRow' + idx);
-    const verdict = document.getElementById('quizVerdict' + idx);
-    row.classList.remove('correct', 'wrong');
-    if (checkAnswer(given, item.answer)) {
-      correct++;
-      row.classList.add('correct');
-      verdict.textContent = 'Richtig ✓';
-    } else {
-      row.classList.add('wrong');
-      verdict.textContent = 'Richtig wäre: ' + answerLabel(item.answer);
-    }
-  });
-  const scoreBox = document.getElementById('quizScore');
-  scoreBox.textContent = 'Ergebnis: ' + correct + ' von ' + quizItems.length + ' richtig';
-  scoreBox.classList.add('visible');
 }
 
 // ---------- AUFGABEN ----------
@@ -2871,10 +2733,6 @@ const modalTexts = {
     '<strong>Worum geht\'s hier?</strong><br><br>' +
     'Übersicht, welcher Struktogramm-Baustein zu welchem Algorithmus gehört, plus die vollständige Darstellung der ' +
     'Minimum-Suche aus Selection Sort – dem Baustein, der zeigt, warum <code class="inline">min()</code> hier nicht erlaubt ist.',
-  quiz:
-    '<strong>Worum geht\'s hier?</strong><br><br>' +
-    'Fragen zu allen vier Algorithmen – von einzelnen Vergleichen bis zur Gesamtzahl der Durchgänge. Überlegt selbst, bevor ' +
-    'ihr auf „Auswertung starten“ klickt.',
   aufgaben:
     '<strong>Worum geht\'s hier?</strong><br><br>' +
     'Hier findet ihr alle Arbeitsaufträge zu Bubble Sort, Selection Sort, linearer und binärer Suche an einem ' +
@@ -2983,10 +2841,11 @@ async function llLadeMarks() {
 }
 function llMarkHtml(id) {
   const m = llMarks[id] || {};
+  const ask = !!(m.besprechen && !m.besprechenErledigt);
   const q = "\'" + id + "\'";
   return '<span class="mk-wrap" onclick="event.stopPropagation()">' +
     '<button type="button" class="mk mk-me' + (m.merken ? ' on' : '') + '" title="Nur für mich: Aufgabe merken, um sie später schnell wiederzufinden" onclick="event.stopPropagation();llToggleMark(' + q + ',\'merken\')">' + (m.merken ? 'Gemerkt ✓' : 'Merken') + '</button>' +
-    '<button type="button" class="mk mk-ask' + (m.besprechen ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (m.besprechen ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
+    '<button type="button" class="mk mk-ask' + (ask ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (ask ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
     '</span>';
 }
 function llMarkLabel(id) {
@@ -3001,7 +2860,7 @@ function llRenderMarkPanel() {
   if (!panel) { panel = document.createElement('details'); panel.id = 'llMarkPanel'; panel.className = 'mk-panel'; cont.parentNode.insertBefore(panel, cont); }
   const ids = Object.keys(llMarks);
   const me = ids.filter(i => llMarks[i].merken).sort();
-  const ask = ids.filter(i => llMarks[i].besprechen).sort();
+  const ask = ids.filter(i => llMarks[i].besprechen && !llMarks[i].besprechenErledigt).sort();
   if (!me.length && !ask.length) { panel.style.display = 'none'; return; }
   panel.style.display = '';
   const chips = list => list.map(i => '<span class="mk-chip" onclick="llOpenMarked(\'' + i + '\')">' + llEsc(llMarkLabel(i)) + '</span>').join('');
@@ -3023,12 +2882,31 @@ function llOpenMarked(id) { LL_MARK_CFG.openInfo(id); }
 async function llToggleMark(id, kind) {
   const alt = llMarks[id] ? Object.assign({}, llMarks[id]) : null;
   const m = Object.assign({ merken: false, besprechen: false }, llMarks[id]);
-  m[kind] = !m[kind];
-  m.updated = new Date().toISOString();
+  const jetzt = new Date().toISOString();
+  let payload;
+  if (kind === 'merken') {
+    m.merken = !m.merken;
+    payload = { merken: !!m.merken, updated: jetzt };
+  } else if (m.besprechen && !m.besprechenErledigt) {
+    // Markierung wieder zuruecknehmen
+    m.besprechen = false;
+    payload = { besprechen: false, updated: jetzt };
+  } else {
+    // (Erneut) zur Besprechung markieren. War die letzte Besprechung schon erledigt, bleibt sie
+    // fuer die Lehrkraft als fruehere Besprechung (mit Sprint-Zeitpunkt) erhalten.
+    payload = { besprechen: true, besprechenAm: jetzt, besprechenErledigt: deleteField(), updated: jetzt };
+    if (m.besprechen && m.besprechenErledigt) {
+      const fr = { am: m.besprechenAm || m.updated || jetzt, erledigt: m.besprechenErledigt };
+      payload.fruehere = arrayUnion(fr);
+      m.fruehere = (m.fruehere || []).concat([fr]);
+    }
+    m.besprechen = true; m.besprechenAm = jetzt; delete m.besprechenErledigt;
+  }
+  m.updated = jetzt;
   llMarks[id] = m;
   LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
   try {
-    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), { merken: !!m.merken, besprechen: !!m.besprechen, updated: m.updated });
+    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), payload, { merge: true });
   } catch (e) {
     console.warn("Markierung konnte nicht gespeichert werden:", e.code || e.message);
     if (alt) llMarks[id] = alt; else delete llMarks[id];

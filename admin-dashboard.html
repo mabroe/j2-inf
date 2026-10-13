@@ -158,6 +158,9 @@
     el.textContent = msg;
     el.style.display = "block";
   }
+  document.querySelectorAll("#loginView input").forEach(inp => inp.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("loginBtn").click(); }
+  }));
   document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;

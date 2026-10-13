@@ -625,44 +625,6 @@
   .status-strip b { color: var(--navy); }
   .status-strip .amber-val { color: var(--amber-dark); font-weight: 700; }
 
-  /* Quiz */
-  .quiz-array-label {
-    font-family: -apple-system, "Segoe UI", sans-serif;
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .quiz-question-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 12px 14px;
-    background: var(--empty);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-family: -apple-system, "Segoe UI", sans-serif;
-  }
-  .quiz-question-row .qtext { font-size: 0.95rem; }
-  .quiz-question-row input { width: 110px; }
-  .quiz-question-row.correct { background: #E4F3EA; border: 1px solid var(--good); }
-  .quiz-question-row.wrong { background: #FBEAE8; border: 1px solid var(--bad); }
-  .quiz-question-row .verdict { font-size: 0.85rem; font-weight: 700; min-width: 130px; text-align: right; }
-  .quiz-question-row.correct .verdict { color: var(--good); }
-  .quiz-question-row.wrong .verdict { color: var(--bad); }
-  .quiz-score {
-    display: none;
-    font-family: -apple-system, "Segoe UI", sans-serif;
-    background: var(--navy-dark);
-    color: white;
-    border-radius: 8px;
-    padding: 14px 18px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-  }
-  .quiz-score.visible { display: block; }
-
   /* Struktogramm */
   .struk-table {
     width: 100%;
@@ -1189,7 +1151,7 @@
         <div class="struk-mini-wrap" id="loopStruk">
         <div class="struk-band-mini" id="loopStrukDecl" data-sk="decl">Deklaration und Initialisierung: array = []</div>
         <div class="struk-loop-frame">
-          <div class="struk-loop-header" data-sk="loop">Wiederhole von i = 0 solange i &lt; len(array), Schrittweite 1</div>
+          <div class="struk-loop-header" data-sk="loop">Wiederhole von i = 0 solange i &lt; Anzahl der Elemente des Arrays array, Schrittweite 1</div>
           <div class="struk-loop-row">
             <div class="struk-loop-gutter"></div>
             <div class="struk-loop-body" data-sk="out">Ausgabe: array[i]</div>
@@ -1297,9 +1259,9 @@
               <div class="struk-band-mini" id="insStrukDecl" data-sk="decl">Deklaration und Initialisierung: array = []</div>
               <div class="struk-band-mini" data-sk="inp">Einlesen: neuer_wert</div>
               <div class="struk-band-mini" data-sk="inp">Einlesen: index</div>
-              <div class="struk-band-mini" data-sk="append">Zuweisung (Anhängen): array[len(array)] = neuer_wert</div>
+              <div class="struk-band-mini" data-sk="append">Zuweisung: array[Anzahl der Elemente des Arrays array] = neuer_wert</div>
               <div class="struk-loop-frame">
-                <div class="struk-loop-header" data-sk="loop">Wiederhole von i = len(array) - 1 solange i &gt; index, Schrittweite -1</div>
+                <div class="struk-loop-header" data-sk="loop">Wiederhole von i = Anzahl der Elemente des Arrays array - 1 solange i &gt; index, Schrittweite -1</div>
                 <div class="struk-loop-row">
                   <div class="struk-loop-gutter"></div>
                   <div class="struk-loop-body tight">
@@ -1360,7 +1322,7 @@
               <div class="struk-band-mini" id="remStrukDecl" data-sk="decl">Deklaration und Initialisierung: array = []</div>
               <div class="struk-band-mini" data-sk="inp">Einlesen: index</div>
               <div class="struk-loop-frame">
-                <div class="struk-loop-header" data-sk="loop">Wiederhole von j = index solange j &lt; len(array) - 1, Schrittweite 1</div>
+                <div class="struk-loop-header" data-sk="loop">Wiederhole von j = index solange j &lt; Anzahl der Elemente des Arrays array - 1, Schrittweite 1</div>
                 <div class="struk-loop-row">
                   <div class="struk-loop-gutter"></div>
                   <div class="struk-loop-body" data-sk="assign">Zuweisung: array[j] = array[j+1]</div>
@@ -1478,7 +1440,6 @@
     </section>
   </div>
 
-  <!-- QUIZ VIEW -->
   <!-- AUFGABEN-BROWSER VIEW -->
   <div class="view" id="view-aufgaben">
     <div class="view-head">
@@ -1532,7 +1493,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot, deleteField, arrayUnion } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_aYBkyNqfJLjSVVgbkL1gRJL0BytMNBs",
@@ -2671,16 +2632,16 @@ function renderAuswStruk() {
   const v = auswVarName();
   if (auswMode === 'summe' || auswMode === 'durchschnitt') {
     pre = [['Deklaration und Initialisierung: ' + v + ' = 0', 'init']];
-    loopHeader = 'Wiederhole von i = 0 solange i < len(array), Schrittweite 1';
+    loopHeader = 'Wiederhole von i = 0 solange i < Anzahl der Elemente des Arrays array, Schrittweite 1';
     loopBodyHtml = '<div class="struk-band-mini" data-sk="assign" style="border:none;">' +
       esc('Zuweisung: ' + v + ' = ' + v + ' + array[i]') + '</div>';
     post = [];
-    if (auswMode === 'durchschnitt') post.push(['Deklaration und Initialisierung: durchschnitt = summe / len(array)', 'calc']);
+    if (auswMode === 'durchschnitt') post.push(['Deklaration und Initialisierung: durchschnitt = summe / Anzahl der Elemente des Arrays array', 'calc']);
     post.push(['Ausgabe: ' + (auswMode === 'durchschnitt' ? 'durchschnitt' : v), 'out']);
   } else {
     const cmp = auswMode === 'maximum' ? '>' : '<';
     pre = [['Deklaration und Initialisierung: ' + v + ' = array[0]', 'init']];
-    loopHeader = 'Wiederhole von i = 1 solange i < len(array), Schrittweite 1';
+    loopHeader = 'Wiederhole von i = 1 solange i < Anzahl der Elemente des Arrays array, Schrittweite 1';
     const jHtml = '<div class="struk-band-mini" data-sk="assign" style="border:none;">' + esc('Zuweisung: ' + v + ' = array[i]') + '</div>';
     loopBodyHtml = altStrukHtml(esc('array[i] ' + cmp + ' ' + v), jHtml, '', true);
     post = [['Ausgabe: ' + v, 'out']];
@@ -2845,7 +2806,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.getElementById('view-' + tab.dataset.view).classList.add('active');
 
     const cabinetWrap = document.getElementById('cabinetWrap');
-    const hiddenViews = ['quiz', 'aufgaben', 'auswerten'];
+    const hiddenViews = ['aufgaben', 'auswerten'];
     if (hiddenViews.includes(tab.dataset.view)) {
       cabinetWrap.style.display = 'none';
       if (tab.dataset.view === 'auswerten') auswReset();
@@ -2874,153 +2835,6 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// ---------- QUIZ tab (deckt alle Bereiche der Werkstatt ab) ----------
-const quizPools = [
-  ["Nord", "Ost", "Süd", "West"],
-  ["Rechnungswesen", "Marketing", "Personal", "IT"],
-  ["Mo", "Di", "Mi", "Do", "Fr"],
-  ["Apfel", "Birne", "Kirsche", "Pflaume"]
-];
-let quizArr = [];
-let quizItems = [];
-
-function quizRandInt(min, max) {
-  return min + Math.floor(Math.random() * (max - min + 1));
-}
-
-function checkAnswer(given, answer) {
-  const g = given.trim().toLowerCase();
-  const accepted = Array.isArray(answer) ? answer : [answer];
-  return accepted.some(a => g === String(a).trim().toLowerCase());
-}
-
-function answerLabel(answer) {
-  return Array.isArray(answer) ? answer[0] : answer;
-}
-
-// Jede Funktion erzeugt genau eine Frage zu einem Bereich der Werkstatt.
-const QUIZ_GENERATORS = [
-  // Grundlagen: Index-Zählung
-  arr => {
-    const len = arr.length;
-    return { category: 'Grundlagen', prompt: 'Das Array hat ' + len + ' Elemente. Was ist der höchste gültige Index?', answer: String(len - 1) };
-  },
-  // Zugriff: Wert an Index / Index von Wert
-  arr => {
-    const i = quizRandInt(0, arr.length - 1);
-    if (Math.random() < 0.5) {
-      return { category: 'Zugriff', prompt: 'Welcher Wert steht an Index ' + i + '?', answer: arr[i] };
-    }
-    return { category: 'Zugriff', prompt: 'An welchem Index steht der Wert "' + arr[i] + '"?', answer: String(i) };
-  },
-  // Anhängen: append()
-  arr => {
-    if (Math.random() < 0.5) {
-      return { category: 'Anhängen', prompt: 'array.append("X") wird ausgeführt. Wie viele Elemente hat array danach?', answer: String(arr.length + 1) };
-    }
-    return { category: 'Anhängen', prompt: 'array.append("X") wird ausgeführt. Welchen Index bekommt der neue Wert "X"?', answer: String(arr.length) };
-  },
-  // len()
-  arr => ({ category: 'len()', prompt: 'Was gibt len(array) für dieses Array zurück?', answer: String(arr.length) }),
-  // IndexError
-  arr => {
-    const len = arr.length;
-    return { category: 'IndexError', prompt: 'Das Array hat ' + len + ' Elemente. Ist array[' + len + '] gültig? (ja/nein)', answer: 'nein' };
-  },
-  // Schleife
-  arr => {
-    if (Math.random() < 0.5) {
-      return { category: 'Schleife', prompt: 'for i in range(len(array)): print(i) — wie oft läuft diese Schleife?', answer: String(arr.length) };
-    }
-    return { category: 'Schleife', prompt: 'for i in range(len(array)): print(i) — welchen Wert hat i beim letzten Durchlauf?', answer: String(arr.length - 1) };
-  },
-  // Tauschen
-  () => ({
-    category: 'Tauschen',
-    prompt: 'Wie heißt die Variable, die man zum sicheren Tauschen zweier Arraywerte zusätzlich braucht?',
-    answer: ['zwischenspeicher', 'temp']
-  }),
-  // Einfügen / Entfernen
-  arr => {
-    if (Math.random() < 0.5) {
-      return { category: 'Einfügen', prompt: 'Das Array hat ' + arr.length + ' Elemente. Nach dem Einfügen eines neuen Werts an einer beliebigen Stelle hat es wie viele Elemente?', answer: String(arr.length + 1) };
-    }
-    return { category: 'Entfernen', prompt: 'Das Array hat ' + arr.length + ' Elemente. Nach dem Entfernen eines Werts hat es wie viele Elemente?', answer: String(Math.max(0, arr.length - 1)) };
-  },
-  // Auswerten: eigenes Zahlen-Array
-  () => {
-    const nums = Array.from({ length: 4 }, () => quizRandInt(1, 20));
-    const mode = ['summe', 'maximum', 'minimum'][quizRandInt(0, 2)];
-    const literal = '[' + nums.join(', ') + ']';
-    if (mode === 'summe') {
-      return { category: 'Auswerten', prompt: 'zahlen = ' + literal + ' — wie groß ist die Summe aller Werte?', answer: String(nums.reduce((a, b) => a + b, 0)) };
-    }
-    if (mode === 'maximum') {
-      return { category: 'Auswerten', prompt: 'zahlen = ' + literal + ' — wie groß ist der größte Wert?', answer: String(Math.max(...nums)) };
-    }
-    return { category: 'Auswerten', prompt: 'zahlen = ' + literal + ' — wie groß ist der kleinste Wert?', answer: String(Math.min(...nums)) };
-  },
-  // Struktogramm: Anhängen-Sonderfall
-  () => ({
-    category: 'Struktogramm',
-    prompt: 'Welchen Python-Befehl nutzt man zum Anhängen eines Werts, statt ihn im Struktogramm als Zuweisung an einen neuen Index darzustellen?',
-    answer: ['append', 'append()', '.append()']
-  })
-];
-
-function newQuiz() {
-  quizArr = [...quizPools[Math.floor(Math.random() * quizPools.length)]];
-  renderCabinet('quizCabinet', quizArr, -1);
-  document.getElementById('quizArrayLabel').textContent = 'array = ' + arrLiteral(quizArr);
-  document.getElementById('quizScore').classList.remove('visible');
-
-  quizItems = QUIZ_GENERATORS.map(gen => gen(quizArr));
-  // Reihenfolge mischen, damit die Themen nicht immer in derselben Abfolge kommen.
-  for (let i = quizItems.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [quizItems[i], quizItems[j]] = [quizItems[j], quizItems[i]];
-  }
-  renderQuizQuestions();
-}
-
-function renderQuizQuestions() {
-  const wrap = document.getElementById('quizQuestions');
-  wrap.innerHTML = '';
-  quizItems.forEach((item, idx) => {
-    const row = document.createElement('div');
-    row.className = 'quiz-question-row';
-    row.id = 'quizRow' + idx;
-    row.innerHTML =
-      '<span class="qtext"><span class="hb-tag" style="margin-right:8px;">' + item.category + '</span>' + (idx + 1) + '. ' + item.prompt + '</span>' +
-      '<input type="text" id="quizInput' + idx + '">' +
-      '<span class="verdict" id="quizVerdict' + idx + '"></span>';
-    wrap.appendChild(row);
-  });
-}
-
-function evaluateQuiz() {
-  let correctCount = 0;
-  quizItems.forEach((item, idx) => {
-    const input = document.getElementById('quizInput' + idx);
-    const given = input.value;
-    const row = document.getElementById('quizRow' + idx);
-    const verdict = document.getElementById('quizVerdict' + idx);
-    const isCorrect = checkAnswer(given, item.answer);
-    row.classList.remove('correct', 'wrong');
-    if (isCorrect) {
-      correctCount++;
-      row.classList.add('correct');
-      verdict.textContent = 'Richtig ✓';
-    } else {
-      row.classList.add('wrong');
-      verdict.textContent = 'Richtig wäre: ' + answerLabel(item.answer);
-    }
-  });
-  const scoreBox = document.getElementById('quizScore');
-  scoreBox.textContent = 'Ergebnis: ' + correctCount + ' von ' + quizItems.length + ' richtig';
-  scoreBox.classList.add('visible');
-}
-
 // ---------- Modal ----------
 const modalTexts = {
   build:
@@ -3045,12 +2859,6 @@ const modalTexts = {
     'Die Tabelle zeigt dir, welcher Struktogramm-Baustein zu welcher Python-Zeile gehört. Besonders wichtig: ' +
     'Das <strong>Anhängen</strong> eines Elements wird im Struktogramm als Zuweisung an einen neuen Index ' +
     'dargestellt, in Python nutzen wir dafür aber die Methode <code class="inline">append()</code>.',
-  quiz:
-    '<strong>Worum geht\'s hier?</strong><br><br>' +
-    'Jede Runde deckt gezielt alle Bereiche der Werkstatt ab – von den Grundlagen (Index, len()) über Zugriff, ' +
-    'Anhängen, Schleifen und IndexError bis hin zu Tauschen, Einfügen/Entfernen, Auswerten und Struktogramm. Das ' +
-    'kleine Etikett vor jeder Frage zeigt, zu welchem Bereich sie gehört. Beantwortet zuerst alle Fragen, dann ' +
-    'klickt auf „Auswertung starten“. Über „Neue Runde“ gibt es neue Zahlen/Werte zu denselben Bereichen.',
   aufgaben:
     '<strong>Worum geht\'s hier?</strong><br><br>' +
     'Hier findet ihr alle Arbeitsaufträge zu diesem Lernfortschritt an einem Ort, gruppiert nach Thema bzw. ' +
@@ -3631,10 +3439,11 @@ async function llLadeMarks() {
 }
 function llMarkHtml(id) {
   const m = llMarks[id] || {};
+  const ask = !!(m.besprechen && !m.besprechenErledigt);
   const q = "\'" + id + "\'";
   return '<span class="mk-wrap" onclick="event.stopPropagation()">' +
     '<button type="button" class="mk mk-me' + (m.merken ? ' on' : '') + '" title="Nur für mich: Aufgabe merken, um sie später schnell wiederzufinden" onclick="event.stopPropagation();llToggleMark(' + q + ',\'merken\')">' + (m.merken ? 'Gemerkt ✓' : 'Merken') + '</button>' +
-    '<button type="button" class="mk mk-ask' + (m.besprechen ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (m.besprechen ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
+    '<button type="button" class="mk mk-ask' + (ask ? ' on' : '') + '" title="An die Lehrkraft: Diese Aufgabe sollten wir gemeinsam besprechen" onclick="event.stopPropagation();llToggleMark(' + q + ',\'besprechen\')">' + (ask ? 'Zur Besprechung ✓' : 'Besprechen') + '</button>' +
     '</span>';
 }
 function llMarkLabel(id) {
@@ -3649,7 +3458,7 @@ function llRenderMarkPanel() {
   if (!panel) { panel = document.createElement('details'); panel.id = 'llMarkPanel'; panel.className = 'mk-panel'; cont.parentNode.insertBefore(panel, cont); }
   const ids = Object.keys(llMarks);
   const me = ids.filter(i => llMarks[i].merken).sort();
-  const ask = ids.filter(i => llMarks[i].besprechen).sort();
+  const ask = ids.filter(i => llMarks[i].besprechen && !llMarks[i].besprechenErledigt).sort();
   if (!me.length && !ask.length) { panel.style.display = 'none'; return; }
   panel.style.display = '';
   const chips = list => list.map(i => '<span class="mk-chip" onclick="llOpenMarked(\'' + i + '\')">' + llEsc(llMarkLabel(i)) + '</span>').join('');
@@ -3671,12 +3480,31 @@ function llOpenMarked(id) { LL_MARK_CFG.openInfo(id); }
 async function llToggleMark(id, kind) {
   const alt = llMarks[id] ? Object.assign({}, llMarks[id]) : null;
   const m = Object.assign({ merken: false, besprechen: false }, llMarks[id]);
-  m[kind] = !m[kind];
-  m.updated = new Date().toISOString();
+  const jetzt = new Date().toISOString();
+  let payload;
+  if (kind === 'merken') {
+    m.merken = !m.merken;
+    payload = { merken: !!m.merken, updated: jetzt };
+  } else if (m.besprechen && !m.besprechenErledigt) {
+    // Markierung wieder zuruecknehmen
+    m.besprechen = false;
+    payload = { besprechen: false, updated: jetzt };
+  } else {
+    // (Erneut) zur Besprechung markieren. War die letzte Besprechung schon erledigt, bleibt sie
+    // fuer die Lehrkraft als fruehere Besprechung (mit Sprint-Zeitpunkt) erhalten.
+    payload = { besprechen: true, besprechenAm: jetzt, besprechenErledigt: deleteField(), updated: jetzt };
+    if (m.besprechen && m.besprechenErledigt) {
+      const fr = { am: m.besprechenAm || m.updated || jetzt, erledigt: m.besprechenErledigt };
+      payload.fruehere = arrayUnion(fr);
+      m.fruehere = (m.fruehere || []).concat([fr]);
+    }
+    m.besprechen = true; m.besprechenAm = jetzt; delete m.besprechenErledigt;
+  }
+  m.updated = jetzt;
   llMarks[id] = m;
   LL_MARK_CFG.rerender(); llRenderMarkPanel(); llPlaceModalMarks();
   try {
-    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), { merken: !!m.merken, besprechen: !!m.besprechen, updated: m.updated });
+    await setDoc(doc(db, "schueler", currentUid, "markierungen", id), payload, { merge: true });
   } catch (e) {
     console.warn("Markierung konnte nicht gespeichert werden:", e.code || e.message);
     if (alt) llMarks[id] = alt; else delete llMarks[id];
