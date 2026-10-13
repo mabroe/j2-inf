@@ -127,6 +127,9 @@
   .lf1-info-io, .lf1-info-darstellung { background: var(--empty); border-radius: 8px; padding: 10px 12px; font-family: Consolas, monospace; font-size: 0.82rem; white-space: pre-line; }
   .lf1-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(20,10,10,0.45); z-index: 100; align-items: center; justify-content: center; }
   .lf1-modal-overlay.open { display: flex; }
+  .lf1-teile { margin-top: 6px; }
+  .lf1-teil { display: flex; gap: 8px; margin: 3px 0; }
+  .lf1-teil-k { font-weight: 700; min-width: 1.6em; }
   .lf1-info-hint { font-size: 0.82rem; color: var(--navy); background: #FBF0E8; border: 1px solid var(--amber); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
   .lf1-pdf-btn { background: none; border: 1px solid var(--navy); color: var(--navy); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
   .lf1-pdf-btn:hover { background: var(--navy); color: white; }
@@ -363,7 +366,7 @@ const LF3_BLOCKS = [
       { id: "LF3_D1.2b", tier: 2,  kurz: "Knoten ersetzen",text: "[1.2] Erlaeutern Sie die einzelnen Schritte, die zum Einfuegen von „Zuverlaessig\" anstelle von „Schnell\" noetig sind.", problem: "Statt „Schnell\" soll kuenftig der Jingle „Zuverlaessig\" an zweiter Stelle gespielt werden.", darstellung: "1. Neuen Knoten mit den Daten \"Zuverlaessig\" erzeugen.\n2. Zeiger des neuen Knotens auf den bisherigen Nachfolger von \"Schnell\" richten (also auf Knoten3 \"Guenstig\").\n3. Zeiger von Knoten1 (\"Frisch\") auf den neuen Knoten umbiegen.\n4. Der alte Knoten \"Schnell\" wird dadurch nicht mehr referenziert und ist damit aus der Liste entfernt." },
       { id: "LF3_D1.2c", tier: 3,  kurz: "Knoten-Klasse und Anhängen",text: "[1.2] Entwickeln Sie eine Python-Klasse Knoten sowie eine Funktion, die einen neuen Song ans Ende einer verketteten Liste anhaengt.", problem: "Eine einfache Playlist soll als verkettete Liste in Python nachgebildet werden, um einen Song am Ende anzuhaengen." },
       { id: "LF3_D1.3a", tier: 1,  kurz: "Warteliste modellieren",text: "[1.3] Modellieren Sie diese Warteliste als verkettete Liste.", problem: "Eine Warteliste fuer einen Frisoertermin fuehrt drei Kunden in der Reihenfolge ihrer Anmeldung: Klein, Meier, Bauer.", darstellung: "Anker -> Knoten1\nKnoten1: Daten=\"Klein\"  Zeiger -> Knoten2\nKnoten2: Daten=\"Meier\"  Zeiger -> Knoten3\nKnoten3: Daten=\"Bauer\"  Zeiger -> NULL" },
-      { id: "LF3_D1.3b", tier: 2,  kurz: "Namensliste modellieren",text: "[1.3] Modellieren Sie eine Liste mit den Namen Anton, Claudia, Dennis als verkettete Liste und beurteilen Sie kurz, warum sich diese Datenstruktur fuer haeufiges Einfuegen besser eignet als ein Array.", problem: "Ein Vereinsvorstand fuehrt eine Mitgliederliste, bei der haeufig neue Mitglieder in der Mitte eingefuegt werden (alphabetisch sortiert).", darstellung: "Anker -> Knoten1\nKnoten1: Daten=\"Anton\"   Zeiger -> Knoten2\nKnoten2: Daten=\"Claudia\" Zeiger -> Knoten3\nKnoten3: Daten=\"Dennis\"  Zeiger -> NULL" },
+      { id: "LF3_D1.3b", tier: 2,  kurz: "Namensliste modellieren",text: "[1.3] Gegeben sind die Namen Anton, Claudia, Dennis:", teile: [{k: "a)", text: "Modellieren Sie die Namen als verkettete Liste."}, {k: "b)", text: "Beurteilen Sie kurz, warum sich diese Datenstruktur fuer haeufiges Einfuegen besser eignet als ein Array."}], problem: "Ein Vereinsvorstand fuehrt eine Mitgliederliste, bei der haeufig neue Mitglieder in der Mitte eingefuegt werden (alphabetisch sortiert).", darstellung: "Anker -> Knoten1\nKnoten1: Daten=\"Anton\"   Zeiger -> Knoten2\nKnoten2: Daten=\"Claudia\" Zeiger -> Knoten3\nKnoten3: Daten=\"Dennis\"  Zeiger -> NULL" },
       { id: "LF3_D1.3c", tier: 3,  kurz: "Element löschen",text: "[1.3] Modellieren Sie eine Playlist mit vier Songs als verkettete Liste und stellen Sie dar, wie sich die Liste veraendert, wenn der zweite Song uebersprungen (geloescht) wird.", problem: "Eine Musik-App verwaltet den „Weiter\"-Verlauf einer Playlist. Nutzer koennen Songs ueberspringen; uebersprungene Songs sollen aus der Liste entfernt werden koennen, ohne die Reihenfolge der uebrigen zu stoeren.", darstellung: "Vorher:  Anker -> K1(\"Song A\") -> K2(\"Song B\") -> K3(\"Song C\") -> K4(\"Song D\") -> NULL\nNachher: Anker -> K1(\"Song A\") -> K3(\"Song C\") -> K4(\"Song D\") -> NULL\n(Der Zeiger von K1 wird direkt auf K3 umgebogen; K2 wird nicht mehr referenziert.)" },
       { id: "LF3_D1.4a", tier: 1,  kurz: "Alltagsbeispiel",text: "[1.4] Nennen Sie ein Beispiel aus dem Alltag, bei dem eine verkettete Liste als Datenstruktur sinnvoll waere." },
       { id: "LF3_D1.4b", tier: 2,  kurz: "Anwendungsbereiche",text: "[1.4] Beschreiben Sie zwei Anwendungsbereiche verketteter Listen in der Informatik." },
@@ -410,7 +413,7 @@ const LF3_BLOCKS = [
     id: "LF3G4",
     title: "LF3 – Grobziel 4: Baum",
     tasks: [
-      { id: "LF3_D4.1a", tier: 1,  kurz: "Wurzel und Blatt benennen",text: "[4.1] Nennen Sie die Bezeichnung fuer den obersten Knoten eines Baumes sowie fuer Knoten ohne Nachfolger." },
+      { id: "LF3_D4.1a", tier: 1,  kurz: "Wurzel und Blatt benennen",text: "[4.1] Beantworten Sie folgende Fragen zu Baeumen:", teile: [{k: "a)", text: "Nennen Sie die Bezeichnung fuer den obersten Knoten eines Baumes."}, {k: "b)", text: "Nennen Sie die Bezeichnung fuer Knoten ohne Nachfolger."}] },
       { id: "LF3_D4.1b", tier: 2,  kurz: "Aufbau eines Baumes",text: "[4.1] Beschreiben Sie den Aufbau eines Baumes anhand der Begriffe Wurzel, Kind-Knoten, Eltern-Knoten und Blatt." },
       { id: "LF3_D4.1c", tier: 3,  kurz: "Baum vs. verkettete Liste",text: "[4.1] Erlaeutern Sie den Unterschied zwischen einem Baum und einer verketteten Liste hinsichtlich der Anzahl moeglicher Nachfolger je Knoten." },
       { id: "LF3_D4.2a", tier: 1,  kurz: "Binärbaum definieren",text: "[4.2] Definieren Sie den Begriff Binärbaum." },
@@ -418,7 +421,7 @@ const LF3_BLOCKS = [
       { id: "LF3_D4.2c", tier: 3,  kurz: "Binärbaum vs. sortierter Binärbaum",text: "[4.2] Beurteilen Sie, ob jeder Baum mit maximal zwei Kind-Knoten pro Knoten automatisch auch ein sortierter Binärbaum ist." },
       { id: "LF3_D4.3a", tier: 1,  kurz: "Voller Binärbaum",text: "[4.3] Nennen Sie, was man unter einem vollen Binärbaum versteht." },
       { id: "LF3_D4.3b", tier: 2,  kurz: "Baum auf „voll“ prüfen",text: "[4.3] Gegeben ist ein Binärbaum mit der Wurzel 10, deren linkes Kind 5 (ohne eigene Kinder) und rechtes Kind 15 (mit einem einzigen linken Kind 12) ist. Beurteilen Sie, ob dieser Baum voll ist." },
-      { id: "LF3_D4.3c", tier: 3,  kurz: "Binärbaum-Eigenschaften beurteilen",text: "[4.3] Beurteilen Sie fuer einen Binärbaum mit den Knoten 6, 9, 10, 11, 13, bei dem 10 die Wurzel ist, 6 und 11 die Kinder von 10 sind, und 9 sowie 13 die jeweiligen Kinder von 6 bzw. 11 sind, ob dieser Baum vollstaendig, voll und/oder sortiert ist." },
+      { id: "LF3_D4.3c", tier: 3,  kurz: "Binärbaum-Eigenschaften beurteilen",text: "[4.3] Gegeben ist ein Binärbaum mit den Knoten 6, 9, 10, 11, 13, bei dem 10 die Wurzel ist, 6 und 11 die Kinder von 10 sind, und 9 sowie 13 die jeweiligen Kinder von 6 bzw. 11 sind. Beurteilen Sie, ob dieser Baum …", teile: [{k: "a)", text: "vollstaendig ist."}, {k: "b)", text: "voll ist."}, {k: "c)", text: "sortiert ist."}] },
       { id: "LF3_D4.4a", tier: 1,  kurz: "Organigramm als Baum",text: "[4.4] Zeichnen Sie dieses Organigramm als Baum (in Textform: Wurzel und ihre Kinder benennen).", problem: "Ein Firmen-Organigramm zeigt eine Geschaeftsfuehrerin mit zwei direkt unterstellten Abteilungsleitern.", darstellung: "Wurzel: Geschaeftsfuehrerin\n  Kind 1: Abteilungsleiter A\n  Kind 2: Abteilungsleiter B" },
       { id: "LF3_D4.4b", tier: 2,  kurz: "Voller, sortierter Binärbaum",text: "[4.4] Zeichnen Sie einen Binärbaum mit diesen fuenf Knoten, der voll und sortiert ist (in Textform darstellen).", problem: "Ein sortierter und voller Binärbaum soll aus den Knoten 6, 9, 10, 11 und 13 aufgebaut werden.", darstellung: "Wurzel: 10\n  Linkes Kind von 10: 9\n    Linkes Kind von 9: 6\n  Rechtes Kind von 10: 11\n    Rechtes Kind von 11: 13" },
       { id: "LF3_D4.4c", tier: 3,  kurz: "Entscheidungsbaum modellieren",text: "[4.4] Modellieren Sie diese Entscheidungshilfe als Baum mit Wurzel, Zwischenknoten und Blaettern.", problem: "Eine Entscheidungshilfe fuer den Kauf eines Laptops soll als Baum modelliert werden: Zuerst wird nach dem Budget gefragt (unter 500€ / ueber 500€), dann je nach Budget nach dem Verwendungszweck (Büro / Gaming).", darstellung: "Wurzel: \"Budget?\"\n  Kind \"unter 500€\": \"Verwendungszweck?\"\n    Blatt \"Büro\": Empfehlung Einsteiger-Laptop\n    Blatt \"Gaming\": Empfehlung Budget-Gaming-Laptop\n  Kind \"ueber 500€\": \"Verwendungszweck?\"\n    Blatt \"Büro\": Empfehlung Business-Laptop\n    Blatt \"Gaming\": Empfehlung High-End-Gaming-Laptop" },
@@ -753,6 +756,11 @@ function lf3CodeStrukHint(task) {
   return "Zu dieser Aufgabe sind sowohl der Python-Code als auch ein passendes Struktogramm zu erstellen.";
 }
 // Arbeitsauftrag mit "Beispiel:" in eigener Zeile (Schlagwort hervorgehoben).
+function lfTeileHtml(task, escFn) {
+  if (!task.teile || !task.teile.length) return "";
+  return '<div class="lf1-teile">' + task.teile.map(t =>
+    '<div class="lf1-teil"><span class="lf1-teil-k">' + escFn(t.k) + '</span><span class="lf1-teil-t">' + escFn(t.text) + '</span></div>').join("") + '</div>';
+}
 function lfAuftragHtml(text, escFn) {
   const m = text.match(/^([\s\S]*?)\s*Beispiel:\s*([\s\S]*)$/);
   if (!m) return escFn(text);
@@ -770,7 +778,7 @@ function lf3OpenInfoModal(taskId) {
   const problemEl = document.getElementById("lf1InfoModalProblem");
   if (task.problem) { problemEl.innerHTML = "<strong>Problemstellung</strong>" + esc(task.problem); problemEl.style.display = "block"; }
   else problemEl.style.display = "none";
-  document.getElementById("lf1InfoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + lfAuftragHtml(auftragText, esc);
+  document.getElementById("lf1InfoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + lfAuftragHtml(auftragText, esc) + lfTeileHtml(task, esc);
   const hintEl = document.getElementById("lf1InfoModalHint");
   const hintText = lf3CodeStrukHint(task);
   if (hintText) { hintEl.textContent = "ℹ️ " + hintText; hintEl.style.display = "block"; }
@@ -803,7 +811,7 @@ function lf3BuildTaskPrintPageHtml(task) {
   let html = '<div class="lf1-print-page">' + lf3PrintHeadHtml();
   html += '<div class="lf1-print-id">' + esc(task.id) + (fz ? " · Feinziel " + esc(fz) : "") + '</div>';
   if (task.problem) html += '<div class="lf1-print-block"><strong>Problemstellung</strong>' + esc(task.problem) + '</div>';
-  html += '<div class="lf1-print-block"><strong>Arbeitsauftrag</strong>' + lfAuftragHtml(auftragText, esc) + '</div>';
+  html += '<div class="lf1-print-block"><strong>Arbeitsauftrag</strong>' + lfAuftragHtml(auftragText, esc) + lfTeileHtml(task, esc) + '</div>';
   const hintText = lf3CodeStrukHint(task);
   if (hintText) html += '<div class="lf1-print-hint">ℹ️ ' + esc(hintText) + '</div>';
   if (task.darstellung) html += '<div class="lf1-print-block lf1-print-io"><strong>Darstellung (Beispiel)</strong>' + esc(task.darstellung) + '</div>';

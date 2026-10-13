@@ -884,6 +884,9 @@
   .lf1-info-io { background: var(--empty); border-radius: 8px; padding: 10px 12px; font-family: Consolas, monospace; font-size: 0.82rem; white-space: pre-line; }
   .lf1-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(20,10,10,0.45); z-index: 100; align-items: center; justify-content: center; }
   .lf1-modal-overlay.open { display: flex; }
+  .lf1-teile { margin-top: 6px; }
+  .lf1-teil { display: flex; gap: 8px; margin: 3px 0; }
+  .lf1-teil-k { font-weight: 700; min-width: 1.6em; }
   .lf1-info-hint { font-size: 0.82rem; color: var(--navy); background: #FBF0E8; border: 1px solid var(--amber); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
   .lf1-pdf-btn { background: none; border: 1px solid var(--navy); color: var(--navy); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
   .lf1-pdf-btn:hover { background: var(--navy); color: white; }
@@ -2479,8 +2482,8 @@ const LF2_BLOCKS = [
       { id: "LF2_L2.4b", tier: 2,  kurz: "Bubble Sort: Anzahl Vergleiche",text: "[2.4] Ermitteln Sie, wie viele Vergleiche insgesamt bei einem Array mit 6 Elementen durchgefuehrt werden, wenn alle Durchgaenge vollstaendig ablaufen." },
       { id: "LF2_L2.4c", tier: 3,  kurz: "Durchgänge unabhängig von Reihenfolge",text: "[2.4] Begruenden Sie, warum die Anzahl der Bubble-Phasen unabhaengig von der Ausgangsreihenfolge des Arrays immer gleich bleibt, obwohl die Anzahl der tatsaechlichen Tauschvorgaenge variieren kann." },
       { id: "LF2_L2.5a", tier: 1,  kurz: "Schreibtischtest: erster Durchgang",text: "[2.5] Fuehren Sie fuer zahlen = [3, 1, 2] einen Schreibtischtest des ersten Bubble-Sort-Durchgangs durch. Dokumentieren Sie das Array nach jedem Vergleich." },
-      { id: "LF2_L2.5b", tier: 2,  kurz: "Schreibtischtest: Bubble Sort komplett",text: "[2.5] Fuehren Sie fuer zahlen = [5, 2, 8, 1] einen vollstaendigen Schreibtischtest von Bubble Sort durch. Dokumentieren Sie das Array nach jedem Durchgang und geben Sie die Gesamtzahl der Tauschvorgaenge an." },
-      { id: "LF2_L2.5c", tier: 3,  kurz: "Schreibtischtest: vorzeitiges Ende",text: "[2.5] Fuehren Sie fuer zahlen = [4, 1, 3, 2, 5] einen Schreibtischtest durch und geben Sie an, nach wie vielen Durchgaengen keine Vertauschung mehr stattfindet, obwohl die aeussere Schleife noch nicht beendet ist. Erlaeutern Sie, wie man diesen Umstand zur vorzeitigen Beendigung nutzen koennte." },
+      { id: "LF2_L2.5b", tier: 2,  kurz: "Schreibtischtest: Bubble Sort komplett",text: "[2.5] Fuehren Sie fuer zahlen = [5, 2, 8, 1] einen vollstaendigen Schreibtischtest von Bubble Sort durch:", teile: [{k: "a)", text: "Dokumentieren Sie das Array nach jedem Durchgang."}, {k: "b)", text: "Geben Sie die Gesamtzahl der Tauschvorgaenge an."}] },
+      { id: "LF2_L2.5c", tier: 3,  kurz: "Schreibtischtest: vorzeitiges Ende",text: "[2.5] Fuehren Sie fuer zahlen = [4, 1, 3, 2, 5] einen Schreibtischtest durch:", teile: [{k: "a)", text: "Geben Sie an, nach wie vielen Durchgaengen keine Vertauschung mehr stattfindet, obwohl die aeussere Schleife noch nicht beendet ist."}, {k: "b)", text: "Erlaeutern Sie, wie man diesen Umstand zur vorzeitigen Beendigung nutzen koennte."}] },
       { id: "LF2_L2.6a", tier: 1,  kurz: "Selection Sort: Suche im Durchgang",text: "[2.6] Beschreiben Sie in einem Satz, wonach bei Selection Sort in jedem Durchgang gesucht wird." },
       { id: "LF2_L2.6b", tier: 2,  kurz: "Selection Sort: erster Durchgang",text: "[2.6] Erklaeren Sie die Funktionsweise von Selection Sort anhand des Arrays [7, 2, 6, 3]: Was passiert im ersten Durchgang?" },
       { id: "LF2_L2.6c", tier: 3,  kurz: "Bubble Sort vs. Selection Sort",text: "[2.6] Erlaeutern Sie den zentralen Unterschied zwischen Bubble Sort und Selection Sort bezueglich der Anzahl der Tauschvorgaenge." },
@@ -2626,6 +2629,11 @@ function lf2CodeStrukHint(task) {
   return "Zu dieser Aufgabe sind sowohl der Python-Code als auch ein passendes Struktogramm zu erstellen.";
 }
 // Arbeitsauftrag mit "Beispiel:" in eigener Zeile (Schlagwort hervorgehoben).
+function lfTeileHtml(task, escFn) {
+  if (!task.teile || !task.teile.length) return "";
+  return '<div class="lf1-teile">' + task.teile.map(t =>
+    '<div class="lf1-teil"><span class="lf1-teil-k">' + escFn(t.k) + '</span><span class="lf1-teil-t">' + escFn(t.text) + '</span></div>').join("") + '</div>';
+}
 function lfAuftragHtml(text, escFn) {
   const m = text.match(/^([\s\S]*?)\s*Beispiel:\s*([\s\S]*)$/);
   if (!m) return escFn(text);
@@ -2645,7 +2653,7 @@ function lf2OpenInfoModal(taskId) {
     problemEl.innerHTML = "<strong>Problemstellung</strong>" + lf2Esc(task.problem);
     problemEl.style.display = "block";
   } else { problemEl.style.display = "none"; }
-  document.getElementById("lf1InfoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + lfAuftragHtml(auftragText, lf2Esc);
+  document.getElementById("lf1InfoModalAuftrag").innerHTML = "<strong>Arbeitsauftrag</strong>" + lfAuftragHtml(auftragText, lf2Esc) + lfTeileHtml(task, lf2Esc);
   const hintEl = document.getElementById("lf1InfoModalHint");
   const hintText = lf2CodeStrukHint(task);
   if (hintText) {
@@ -2683,7 +2691,7 @@ function lf2BuildTaskPrintPageHtml(task) {
   let html = '<div class="lf1-print-page">' + lf2PrintHeadHtml();
   html += '<div class="lf1-print-id">' + lf2Esc(task.id) + (fz ? " · Feinziel " + lf2Esc(fz) : "") + '</div>';
   if (task.problem) html += '<div class="lf1-print-block"><strong>Problemstellung</strong>' + lf2Esc(task.problem) + '</div>';
-  html += '<div class="lf1-print-block"><strong>Arbeitsauftrag</strong>' + lfAuftragHtml(auftragText, lf2Esc) + '</div>';
+  html += '<div class="lf1-print-block"><strong>Arbeitsauftrag</strong>' + lfAuftragHtml(auftragText, lf2Esc) + lfTeileHtml(task, lf2Esc) + '</div>';
   const hintText = lf2CodeStrukHint(task);
   if (hintText) html += '<div class="lf1-print-hint">ℹ️ ' + lf2Esc(hintText) + '</div>';
   if (task.io) html += '<div class="lf1-print-block lf1-print-io"><strong>Gewünschte Ausgabe (Beispiel)</strong>' + lf2Esc(task.io) + '</div>';
