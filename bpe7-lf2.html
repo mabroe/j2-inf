@@ -1293,7 +1293,7 @@ const firebaseConfig = {
   messagingSenderId: "876305783920",
   appId: "1:876305783920:web:f74b508b86c923e01a68b5"
 };
-const fbApp = initializeApp(firebaseConfig);
+const fbApp = initializeApp(firebaseConfig, "schueler"); // eigener App-Name: Schueler-Login ueberschreibt nicht die Lehrkraft-Anmeldung im selben Browser
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 // Muss zur Persistenz in anmeldung.html passen (browserSessionPersistence),
@@ -2806,13 +2806,12 @@ function renderLfNav(currentPage) {
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
     { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
     { href: "index.html#handbuch", label: "Handbuch", id: "HB" },
-    { href: "index.html#markierungen", label: "🔖 Markierungen", id: "MK" },
     { href: "fehler.html", label: "Fehler", id: "ERR" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && !["HB", "ERR", "MK"].includes(item.id) && !LF_FREIGABE[item.id];
+    const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
@@ -2870,7 +2869,7 @@ function llMarkLabel(id) {
   return id + (kurz ? ' · ' + kurz : '');
 }
 function llRenderMarkPanel() {
-  return; // Markierungen stehen im eigenen Menuepunkt (index.html#markierungen)
+  return; // Markierungen stehen auf dem Sprint-Board (index.html)
   const cont = document.getElementById(LL_MARK_CFG.container);
   if (!cont) return;
   let panel = document.getElementById('llMarkPanel');

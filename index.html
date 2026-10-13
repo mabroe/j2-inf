@@ -233,7 +233,7 @@
   .mk-chip { display: inline-block; background: var(--empty); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin: 2px 4px 2px 0; cursor: pointer; font-size: 0.8rem; }
   .mk-chip:hover { background: #fff; border-color: var(--amber); }
   .user-chip { font-size: 0.82rem; color: var(--navy); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; white-space: nowrap; }
-  #viewMarks .hb-intro, #viewMarks .hb-controls { padding-left: 20px; padding-right: 20px; }
+  #mkSection .hb-intro, #mkSection .hb-controls { padding-left: 20px; padding-right: 20px; }
   #mkListe { padding: 0 20px 16px; }
   .mk-sprint { margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
   .mk-sprint-h { background: var(--empty); padding: 7px 12px; font-weight: 700; font-size: 0.86rem; color: var(--navy); }
@@ -243,6 +243,9 @@
   .mk-row-date { color: var(--muted); font-size: 0.78rem; }
   .mk-tag { font-size: 0.74rem; font-weight: 600; border-radius: 999px; padding: 2px 9px; border: 1px solid var(--line); white-space: nowrap; }
   .mk-tag.me { background: #FFF3DC; } .mk-tag.ask { background: #DFF0F8; }
+  #mkSection > summary { cursor: pointer; list-style: none; } #mkSection > summary::-webkit-details-marker { display: none; }
+  #mkSection > summary h2 { display: inline-block; } #mkSection > summary h2::before { content: '▾ '; } #mkSection:not([open]) > summary h2::before { content: '▸ '; }
+  #mkSection > summary h2 { padding: 14px 20px 8px; margin: 0; font-size: 1.1rem; color: var(--navy); }
 </style>
 </head>
 <body>
@@ -273,7 +276,7 @@
     <div class="carried-over-note" id="carriedOverNote" style="display:none;"></div>
   </div>
 
-  <div class="mk-legend">Markieren: <span>🔖 <b>Merken</b> – nur für dich, zum späteren Wiederfinden (siehe Menüpunkt „Markierungen“)</span> <span>🙋 <b>Besprechen</b> – deine Lehrkraft sieht, dass ihr diese Aufgabe gemeinsam besprechen sollt</span></div>
+  <div class="mk-legend">Markieren: <span>🔖 <b>Merken</b> – nur für dich, zum späteren Wiederfinden (siehe Bereich „Markierungen“ weiter unten)</span> <span>🙋 <b>Besprechen</b> – deine Lehrkraft sieht, dass ihr diese Aufgabe gemeinsam besprechen sollt</span></div>
 
   <div class="kanban-columns">
     <div class="kanban-column todo">
@@ -329,6 +332,16 @@
   <span class="retro-toggle" id="retroToggle">▸ Ergebnisübersicht aller vergangenen Sprints anzeigen</span>
   <div class="retro-box" id="retroBox"></div>
 
+  <details class="ichkann-section" id="mkSection" open>
+    <summary class="mk-sum"><h2>Markierungen <span class="mk-count" id="mkCount" style="font-size:0.8rem;"></span></h2></summary>
+    <p class="hb-intro">Aufgaben, die du <b>🔖 gemerkt</b> (nur für dich) oder <b>🙋 zur Besprechung</b> markiert hast (deine Lehrkraft sieht das), sortiert nach dem Sprint der Markierung. Bereits besprochene Aufgaben verschwinden hier.</p>
+    <div class="hb-controls">
+      <select id="mkSprint" title="Nach Sprint filtern"></select>
+      <select id="mkArt" title="Nach Art filtern"><option value="">Alle Markierungen</option><option value="merken">🔖 Nur gemerkt</option><option value="besprechen">🙋 Nur zur Besprechung</option></select>
+    </div>
+    <div id="mkListe"></div>
+  </details>
+
   <div class="ichkann-section">
     <div class="ik-head"><h2>Ich-Kann-Übersicht</h2>
       <span class="ik-actions"><button class="ik-btn" id="ikToggleBtn" onclick="ikToggleAlle()" title="Auch Feinziele zeigen, an denen noch nicht gearbeitet wurde">👁 Nicht bearbeitete einblenden</button><button class="ik-btn" onclick="ikDrucken()" title="Druckansicht öffnen (auch als PDF speicherbar)">🖨️ Drucken / PDF</button><button class="ik-btn" onclick="ikCsv()" title="Als Tabelle (CSV, in Excel öffnen)">⬇️ Tabelle (CSV)</button></span></div>
@@ -336,18 +349,6 @@
   </div>
 
   </div><!-- /viewBoard -->
-
-  <div id="viewMarks" style="display:none;">
-    <div class="ichkann-section">
-      <h2>Markierungen</h2>
-      <p class="hb-intro">Hier findest du alle Aufgaben, die du <b>🔖 gemerkt</b> (nur für dich) oder <b>🙋 zur Besprechung</b> markiert hast (deine Lehrkraft sieht das). Sortiert nach dem Sprint, in dem du markiert hast. Bereits besprochene Aufgaben verschwinden hier.</p>
-      <div class="hb-controls">
-        <select id="mkSprint" title="Nach Sprint filtern"></select>
-        <select id="mkArt" title="Nach Art filtern"><option value="">Alle Markierungen</option><option value="merken">🔖 Nur gemerkt</option><option value="besprechen">🙋 Nur zur Besprechung</option></select>
-      </div>
-      <div id="mkListe"></div>
-    </div>
-  </div>
 
   <div id="viewHandbuch" style="display:none;">
     <div class="ichkann-section">
@@ -380,7 +381,7 @@ const firebaseConfig = {
   messagingSenderId: "876305783920",
   appId: "1:876305783920:web:f74b508b86c923e01a68b5"
 };
-const fbApp = initializeApp(firebaseConfig);
+const fbApp = initializeApp(firebaseConfig, "schueler"); // eigener App-Name: Schueler-Login ueberschreibt nicht die Lehrkraft-Anmeldung im selben Browser
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 // Muss zur Persistenz in anmeldung.html passen (browserSessionPersistence),
@@ -1320,14 +1321,11 @@ document.getElementById("hbFz").addEventListener("change", renderHandbuch);
 
 function showView() {
   const hb = location.hash === "#handbuch";
-  const mk = location.hash === "#markierungen";
-  document.getElementById("viewBoard").style.display = (hb || mk) ? "none" : "";
+  document.getElementById("viewBoard").style.display = hb ? "none" : "";
   document.getElementById("viewHandbuch").style.display = hb ? "" : "none";
-  document.getElementById("viewMarks").style.display = mk ? "" : "none";
-  currentNavId = hb ? "HB" : (mk ? "MK" : null);
+  currentNavId = hb ? "HB" : null;
   renderLfNav();
   if (hb) renderHandbuch();
-  if (mk) llRenderMarkPanel();
 }
 window.addEventListener("hashchange", showView);
 
@@ -1428,13 +1426,12 @@ function renderLfNav() {
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
     { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
     { href: "index.html#handbuch", label: "Handbuch", id: "HB" },
-    { href: "index.html#markierungen", label: "🔖 Markierungen", id: "MK" },
     { href: "fehler.html", label: "Fehler", id: "ERR" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && !["HB", "ERR", "MK"].includes(item.id) && !LF_FREIGABE[item.id];
+    const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
@@ -1518,6 +1515,8 @@ function llRenderMarkPanel() {
   const liste = document.getElementById('mkListe');
   if (!liste) return;
   const eintr = llMarkEintraege();
+  const cnt = document.getElementById('mkCount');
+  if (cnt) cnt.textContent = '— ' + eintr.filter(e => e.art === 'merken').length + ' gemerkt · ' + eintr.filter(e => e.art === 'besprechen').length + ' zur Besprechung';
   const selS = document.getElementById('mkSprint'), selA = document.getElementById('mkArt');
   const sprintKeys = Array.from(new Set(eintr.map(e => e.sprint))).sort().reverse();
   const curS = selS.value;
