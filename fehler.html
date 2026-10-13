@@ -401,7 +401,7 @@ function renderLfNav() {
     const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
     const cls = ((item.id === "ERR" ? "active" : "") + (locked ? " locked" : "")).trim();
     return '<a href="' + (locked ? "#" : item.href) + '" class="' + cls + '"' + (locked ? ' title="Von der Lehrkraft noch nicht freigeschaltet"' : '') + '>' + (locked ? "🔒 " : "") + item.label + '</a>';
-  }).join("") + '<a href="#" onclick="window.__logout();return false;" style="margin-left:auto;">🚪 Abmelden</a>';
+  }).join("") + '<a href="#" onclick="window.__logout();return false;" style="margin-left:auto;">Abmelden</a>';
 }
 renderLfNav();
 window.__logout = () => { signOut(auth).then(() => window.location.href = "anmeldung.html"); };

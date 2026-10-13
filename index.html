@@ -246,6 +246,37 @@
   #mkSection > summary { cursor: pointer; list-style: none; } #mkSection > summary::-webkit-details-marker { display: none; }
   #mkSection > summary h2 { display: inline-block; } #mkSection > summary h2::before { content: '▾ '; } #mkSection:not([open]) > summary h2::before { content: '▸ '; }
   #mkSection > summary h2 { padding: 14px 20px 8px; margin: 0; font-size: 1.1rem; color: var(--navy); }
+  .hb-pane { padding: 0 20px 18px; }
+  .hb-tabs { display: flex; gap: 8px; padding: 0 20px 14px; flex-wrap: wrap; }
+  .hb-tab { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 8px; padding: 8px 14px; font: inherit; font-size: 0.86rem; font-weight: 600; cursor: pointer; }
+  .hb-tab:hover { background: var(--empty); }
+  .hb-tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .op-hinweis { font-size: 0.86rem; color: var(--muted); margin: 0 0 12px; padding-left: 20px; }
+  .op-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: #fff; }
+  .op-table th { background: var(--empty); color: var(--navy); text-align: center; padding: 8px; border: 1px solid #333; }
+  .op-table td { border: 1px solid #333; padding: 8px 10px; vertical-align: top; }
+  .op-table td.op-l { width: 56%; }
+  .op-table td.op-r { color: #222; }
+  .op-zb { flex: 0 0 38px; font-size: 0.82rem; padding-top: 6px; }
+  .op-ex { display: flex; gap: 6px; margin-top: 4px; }
+  .op-boxes { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .op-box { border: 1px solid #333; padding: 5px 8px; background: #fff; font-family: "Segoe UI", Arial, sans-serif; line-height: 1.35; }
+  .op-oder { font-size: 0.82rem; }
+  .op-loop { border: 1px solid #333; }
+  .op-loop-h { padding: 5px 8px; border-bottom: 1px solid #333; line-height: 1.35; }
+  .op-loop-b { display: flex; }
+  .op-loop-g { flex: 0 0 22px; }
+  .op-loop-b .op-box { flex: 1; border-width: 0 0 0 1px; }
+  .op-alt { border: 1px solid #333; text-align: center; }
+  .op-alt-h { position: relative; padding: 6px 8px 34px; }
+  .op-alt-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .op-alt-svg line { stroke: #333; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .op-alt-t { position: relative; }
+  .op-alt-j, .op-alt-n { position: absolute; bottom: 2px; font-size: 0.8rem; }
+  .op-alt-j { left: 6px; } .op-alt-n { right: 6px; }
+  .op-alt-b { display: flex; border-top: 1px solid #333; }
+  .op-alt-b > div { flex: 1; padding: 5px; }
+  .op-alt-b > div + div { border-left: 1px solid #333; }
 </style>
 </head>
 <body>
@@ -353,12 +384,28 @@
   <div id="viewHandbuch" style="display:none;">
     <div class="ichkann-section">
       <h2>Handbuch</h2>
-      <p class="hb-intro">Nachschlagewerk zu allem, was ihr bisher behandelt habt – über alle freigeschalteten Lernfelder hinweg. Es wächst mit jedem Lernfeld, das eure Lehrkraft freischaltet.</p>
-      <div class="hb-controls">
-        <input type="search" id="hbSearch" placeholder="Begriff oder Thema suchen (z. B. „Index“, „push“, „Bubble“)…">
-        <select id="hbFz"></select>
+      <div class="hb-tabs">
+        <button type="button" class="hb-tab active" id="hbTabNach" onclick="location.hash='#handbuch'">📖 Nachschlagewerk</button>
+        <button type="button" class="hb-tab" id="hbTabOp" onclick="location.hash='#operatorenliste'">📋 Operatorenliste</button>
       </div>
-      <div id="hbList"></div>
+      <div id="hbPaneNach" class="hb-pane">
+        <p class="hb-intro">Nachschlagewerk zu allem, was ihr bisher behandelt habt – über alle freigeschalteten Lernfelder hinweg. Es wächst mit jedem Lernfeld, das eure Lehrkraft freischaltet.</p>
+        <div class="hb-controls">
+          <input type="search" id="hbSearch" placeholder="Begriff oder Thema suchen (z. B. „Index“, „push“, „Bubble“)…">
+          <select id="hbFz"></select>
+        </div>
+        <div id="hbList"></div>
+      </div>
+      <div id="hbPaneOp" class="hb-pane" style="display:none;">
+        <p class="hb-intro"><b>Operatorenliste für Struktogramme</b> – Abiturprüfung Baden-Württemberg, Version 2.2 vom 01.09.2024 (vollständig, alle Einträge). Diese Schreibweise gilt für alle Struktogramme in der Lernlandschaft.</p>
+        <ul class="op-hinweis">
+          <li><i>Kursive</i> Ausdrücke sind allgemeine Platzhalter, optionale Erweiterungen stehen in senkrechten Strichen |…|.</li>
+          <li>Kontrollstrukturen (des gleichen oder unterschiedlichen Typs) können miteinander verschachtelt werden.</li>
+        </ul>
+        <div class="hb-controls"><input type="search" id="opSearch" placeholder="Operator suchen (z. B. „Zähle“, „Anhängen“, „Wenn“)…"></div>
+        <table class="op-table"><thead><tr><th>Operator im Struktogramm</th><th>Beschreibung seiner Verwendung</th></tr></thead><tbody><tr class="op-row"><td class="op-l"><div class="op-name"><b>Deklaration:</b> <i>variable</i> |als <i>datentyp</i>|</div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Deklaration: alter als Ganzzahl</div></div></div></td><td class="op-r">Deklaration einer Variablen, optionale Angabe des Datentyps</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Initialisierung:</b> <i>variable</i> = <i>wert</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Initialisierung: guthaben = 10</div></div></div></td><td class="op-r">Initialisierung einer Variablen mit einem Ausgangswert (oder dem Ergebnis einer Berechnung o. ä.)</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Deklaration und Initialisierung:</b><br><i>variable</i> |als <i>datentyp</i>| = <i>wert</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Deklaration und Initialisierung:<br>anzahl als Ganzzahl = 0</div></div></div></td><td class="op-r">Kombination von Deklaration und Initialisierung</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Zuweisung:</b> <i>element</i> = <i>wert</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Zuweisung: qm = laenge * breite</div></div></div></td><td class="op-r">Zuweisung eines Wertes (oder des Ergebnisses einer Berechnung o. ä.) zu einem Element, das eine Variable oder ein anderes Element (z. B. ein Ausgabefeld) sein kann</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Einlesen:</b> <i>variable</i> |als <i>datentyp</i>|</div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Deklaration und Einlesen:<br>betrag als Dezimalzahl</div></div></div></td><td class="op-r">Einlesen einer Eingabe, z. B. aus einem Eingabefeld, einer Kommandozeile, …;<br>auch in Kombination mit Deklaration möglich</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Ausgabe:</b> <i>inhalt</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Ausgabe: "Die Fläche beträgt " + qm<br>+ " Quadratmeter. "</div></div></div></td><td class="op-r">Verwendung einer Ausgabeoption (z. B. Meldungsfenster, Konsole), die eine Variable, einen Array, einen Text oder eine Kombination aus diesen ausgibt</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Zeilenweise Ausgabe:</b> <i>inhalt</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Ausgabe: "Hallo!" + Zeilenumbruch</div></div></div></td><td class="op-r">Ausgabe mit Zeilenumbruch</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Rückgabe:</b> <i>wert</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Rückgabe: strecke</div></div></div></td><td class="op-r">Anweisung zur Rückgabe eines Wertes innerhalb einer Funktion/Methode/Prozedur</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Aufruf:</b> <i>methode/unterprogramm</i>(|<i>parameter</i>|)</div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Aufruf: sortiereListe()</div><div class="op-oder">oder:</div><div class="op-box ">Aufruf: einzahlen(betrag)</div></div></div></td><td class="op-r">Aufruf einer Funktion/Methode/Prozedur/Unterprogramm, auch in Kombination mit anderen Operatoren (wie Zuweisungen oder Bedingungen), wenn Rückgabewerte verwendet werden sollen</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Wenn</b> <i>bedingung</i><b>, dann</b> […] |<b>, sonst</b> […] |</div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-alt"><div class="op-alt-h"><svg class="op-alt-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="50" y2="100"/><line x1="100" y1="0" x2="50" y2="100"/></svg><span class="op-alt-t">alter &gt; 18 AND<br>geschlecht == "w"</span><span class="op-alt-j">J</span><span class="op-alt-n">N</span></div><div class="op-alt-b"><div>…</div><div>…</div></div></div></div></div></td><td class="op-r">Verzweigungs- bzw. Mehrfachauswahlbedingung<br><br>Vergleichsoperatoren: ==, !=, &lt;, &lt;=, &gt;, &gt;=<br>Logische Operatoren: AND, OR, NOT</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Wiederhole solange</b> <i>bedingung</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-loop"><div class="op-loop-h">Wiederhole solange inhalt &gt; 10</div><div class="op-loop-b"><div class="op-loop-g"></div><div class="op-box op-dots">…</div></div></div></div></div></td><td class="op-r">Schleife mit vorausgehender Bedingungsprüfung („while-Schleife“)</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Wiederhole von</b> <i>startwert</i> <b>solange</b> <i>bedingung</i>, <b>Schrittweite</b> <i>schrittweite</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-loop"><div class="op-loop-h">Wiederhole von i = 0 solange i &lt; 5,<br>Schrittweite 1</div><div class="op-loop-b"><div class="op-loop-g"></div><div class="op-box op-dots">…</div></div></div></div></div><div class="op-name" style="margin-top:14px;"><b>Zähle</b> <i>zählvariable</i> <b>von</b> <i>startwert</i> <b>bis</b> <i>endwert</i>, <b>Schrittweite</b> <i>schrittweite</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-loop"><div class="op-loop-h">Zähle i von 0 bis 4, Schrittweite 1</div><div class="op-loop-b"><div class="op-loop-g"></div><div class="op-box op-dots">…</div></div></div></div></div></td><td class="op-r">Zählergesteuerte Schleife („for-Schleife“):<br><br>Alternative Darstellung 1<br><br><br><br><br><br>Alternative Darstellung 2</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Deklaration und Initialisierung:</b><br><i>array</i> |als Array| = [<i>Arrayelement1, Arrayelement2, …</i>]</div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Deklaration und Initialisierung:<br>personen = ["Sven", "Tina", "Anja"]</div><div class="op-box ">Deklaration und Initialisierung:<br>zahlen als Array = [ ]</div></div></div></td><td class="op-r">Kombination aus Deklaration und Initialisierung eines Arrays<br><br><br>Deklaration und Initialisierung eines „leeren“ Arrays</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Zuweisung:</b> <i>array</i>[<i>feldindex</i>] = <i>wert</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Zuweisung: personen[2] = "Kay"</div></div></div></td><td class="op-r">Zuweisung eines Wertes (oder des Ergebnisses einer Berechnung o. ä.) zu einem Arrayelement, dessen Index in den eckigen Klammern angegeben wird</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Anhängen an ein Array</b><br><b>Zuweisung:</b> <i>array</i>[<i>feldindex</i>] = <i>wert</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Zuweisung: personen[3] = "Milo"</div><div class="op-box ">Zuweisung: zahlen[0] = 5</div></div></div></td><td class="op-r">Anhängen eines Arrayelements an einen Array, indem ein Wert einem Index zugeordnet wird, der noch nicht existiert</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Anzahl der Elemente eines Arrays</b> <i>array</i></div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Deklaration und Initialisierung:<br>laenge = Anzahl der Elemente des Arrays personen</div></div></div></td><td class="op-r">Zuweisung der Anzahl der Arrayelemente zu einer Variablen<br>Auch in Kombination (bspw. mit Schleifen und Ausgaben) möglich</td></tr><tr class="op-row"><td class="op-l"><div class="op-name"><b>Ausgabe:</b> <i>array</i>[<i>feldindex</i>]</div><div class="op-ex"><span class="op-zb">z. B.:</span><div class="op-boxes"><div class="op-box ">Ausgabe: zahlen[1]</div><div class="op-box ">Deklaration und Initialisierung: i = 0</div><div class="op-box ">Ausgabe: personen[i]</div><div class="op-box ">Ausgabe: personen[i + 2]</div><div class="op-box ">Ausgabe: zahlen</div></div></div></td><td class="op-r">Ausgabe einzelner Arrayelemente<br>Der gewünschte Index kann direkt, durch eine Berechnung oder durch eine Variable angegeben werden<br><br><br><br><br><br>Ausgabe eines Arrays<br>Der ganze Array kann über den Namen ausgegeben werden.</td></tr></tbody></table>
+        <p class="hb-intro" style="margin-top:10px;">Quelle: Abiturprüfung Baden-Württemberg: Operatorenliste für Struktogramme, Version 2.2 vom 01.09.2024.</p>
+      </div>
     </div>
   </div>
 
@@ -1339,13 +1386,22 @@ document.getElementById("hbSearch").addEventListener("input", renderHandbuch);
 document.getElementById("hbFz").addEventListener("change", renderHandbuch);
 
 function showView() {
-  const hb = location.hash === "#handbuch";
+  const op = location.hash === "#operatorenliste";
+  const hb = location.hash === "#handbuch" || op;
   document.getElementById("viewBoard").style.display = hb ? "none" : "";
   document.getElementById("viewHandbuch").style.display = hb ? "" : "none";
+  document.getElementById("hbPaneNach").style.display = op ? "none" : "";
+  document.getElementById("hbPaneOp").style.display = op ? "" : "none";
+  document.getElementById("hbTabNach").classList.toggle("active", !op);
+  document.getElementById("hbTabOp").classList.toggle("active", op);
   currentNavId = hb ? "HB" : null;
   renderLfNav();
-  if (hb) renderHandbuch();
+  if (hb && !op) renderHandbuch();
 }
+document.getElementById("opSearch").addEventListener("input", () => {
+  const q = document.getElementById("opSearch").value.toLowerCase().trim();
+  document.querySelectorAll("#hbPaneOp .op-row").forEach(r => { r.style.display = !q || r.textContent.toLowerCase().includes(q) ? "" : "none"; });
+});
 window.addEventListener("hashchange", showView);
 
 function sprintKeyRange(key) {
@@ -1424,7 +1480,7 @@ function renderAll() {
   renderSprintBoard();
   renderIchKannListe();
   renderRetro();
-  if (location.hash === "#handbuch") renderHandbuch();
+  if (location.hash === "#handbuch" || location.hash === "#operatorenliste") renderHandbuch();
 }
 
 // ---------------------------------------------------------------------------
@@ -1456,7 +1512,7 @@ function renderLfNav() {
     const label = locked ? "🔒 " + item.label : item.label;
     const titleAttr = locked ? ' title="Von der Lehrkraft noch nicht freigeschaltet"' : '';
     return '<a href="' + (locked ? "#" : item.href) + '" class="' + cls + '"' + titleAttr + '>' + label + '</a>';
-  }).join("") + '<span style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + llUserChip() + '<a href="#" onclick="window.__logout();return false;">🚪 Abmelden</a></span>';
+  }).join("") + '<span style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + llUserChip() + '<a href="#" onclick="window.__logout();return false;">Abmelden</a></span>';
 }
 
 // Sofort mit dem zwischengespeicherten (oder Default-) Freigabe-Stand rendern,

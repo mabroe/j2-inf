@@ -485,7 +485,7 @@ function renderLfNav(currentPage) {
     const label = locked ? "🔒 " + item.label : item.label;
     const titleAttr = locked ? ' title="Von der Lehrkraft noch nicht freigeschaltet"' : '';
     return '<a href="' + (locked ? "#" : item.href) + '" class="' + cls + '"' + titleAttr + '>' + label + '</a>';
-  }).join("") + '<span style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + llUserChip() + '<a href="#" onclick="window.__logout();return false;">🚪 Abmelden</a></span>';
+  }).join("") + '<span style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + llUserChip() + '<a href="#" onclick="window.__logout();return false;">Abmelden</a></span>';
 }
 
 // Sofort mit dem zwischengespeicherten (oder Default-) Freigabe-Stand rendern,
