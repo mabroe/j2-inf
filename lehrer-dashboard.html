@@ -1605,7 +1605,7 @@ function schuljahresWochen() {
     opts = opts || {};
     const t = ALLE_AUFGABEN.find(a => a.id === taskId);
     if (!t) return;
-    taskModalState = { id: taskId, review: !!opts.review, nav: opts.nav || [], sol: !opts.review };
+    taskModalState = { id: taskId, review: !!opts.review, nav: opts.nav || [], sol: false }; // Loesung ist beim Oeffnen IMMER ausgeblendet (Einblenden: Button oder Taste L)
     document.getElementById("taskModalTitle").textContent = t.id + " · Feinziel " + t.feinziel + " · " + TIER_LABEL_AB[t.tier];
     let html = "";
     if (t.problem) html += `<div class="ab-block"><strong>Problemstellung</strong>${esc(t.problem)}</div>`;
@@ -1624,10 +1624,11 @@ function schuljahresWochen() {
     sol += `<div style="color:var(--muted);font-size:0.78rem;margin-top:10px;">Quelle: ${esc(t.quelle || "")}</div>`;
     document.getElementById("taskModalBody").innerHTML = html + `<div id="taskSol" style="${taskModalState.sol ? "" : "display:none;"}">${sol}</div>`;
     const tools = document.getElementById("taskModalTools");
-    tools.style.display = taskModalState.review ? "flex" : "none";
+    tools.style.display = "flex";
     const i = taskModalState.nav.indexOf(taskId);
     document.getElementById("tmPos").textContent = i >= 0 ? (i + 1) + " / " + taskModalState.nav.length : "";
     document.getElementById("tmPrev").disabled = document.getElementById("tmNext").disabled = taskModalState.nav.length < 2;
+    document.getElementById("tmPrev").style.display = document.getElementById("tmNext").style.display = taskModalState.nav.length < 2 ? "none" : "";
     tmSolLabel();
     document.getElementById("taskModalOverlay").classList.add("open");
   };
@@ -1667,10 +1668,10 @@ function schuljahresWochen() {
     const tag = (e.target.tagName || "").toLowerCase();
     if (tag === "input" || tag === "textarea" || tag === "select") return;
     if (e.key === "Escape") { taskModalSchliessen(); return; }
-    if (!taskModalState.review) return;
-    if (e.key === "ArrowRight") { tmNav(1); e.preventDefault(); }
-    else if (e.key === "ArrowLeft") { tmNav(-1); e.preventDefault(); }
-    else if (e.key === "l" || e.key === "L") tmToggleSol();
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "ArrowRight" && taskModalState.nav.length > 1) { tmNav(1); e.preventDefault(); }
+    else if (e.key === "ArrowLeft" && taskModalState.nav.length > 1) { tmNav(-1); e.preventDefault(); }
+    else if (e.key === "l" || e.key === "L") { tmToggleSol(); e.preventDefault(); }
     else if (e.key === "t" || e.key === "T") tmBeamer();
   });
   document.getElementById("taskModalCloseX").addEventListener("click", taskModalSchliessen);
