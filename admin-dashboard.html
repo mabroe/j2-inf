@@ -137,7 +137,7 @@
     appId: "1:876305783920:web:f74b508b86c923e01a68b5"
   };
 
-  const app = initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseConfig, "lehrkraft"); // eigener App-Name: Lehrkraft-Anmeldung wird von Schueler-Logins im selben Browser nicht ueberschrieben
   const auth = getAuth(app);
   const db = getFirestore(app);
 

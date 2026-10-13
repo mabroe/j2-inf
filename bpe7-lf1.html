@@ -1504,7 +1504,7 @@ const firebaseConfig = {
   messagingSenderId: "876305783920",
   appId: "1:876305783920:web:f74b508b86c923e01a68b5"
 };
-const fbApp = initializeApp(firebaseConfig, "schueler"); // eigener App-Name: Schueler-Login ueberschreibt nicht die Lehrkraft-Anmeldung im selben Browser
+const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 // Muss zur Persistenz in anmeldung.html passen (browserSessionPersistence),

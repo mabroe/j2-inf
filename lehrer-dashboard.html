@@ -285,6 +285,7 @@
       </div>
       <p style="color:var(--muted);font-size:0.84rem;margin:6px 0 10px;">Schüler:innen können Aufgaben mit „Besprechen“ markieren. Hier seht ihr, welche Aufgaben wie oft markiert wurden – die häufigsten oben. „Merken“ (persönliche Markierung) wird bewusst <b>nicht</b> angezeigt. Aufgaben anhaken und als Review-Liste kopieren.</p>
       <div class="error-box" id="bsError"></div>
+      <div id="bsDiag" style="font-size:0.78rem;color:var(--muted);margin:4px 0 8px;"></div>
       <div id="bsKpi"></div>
       <div id="bsListe" style="color:var(--muted);">Lade…</div>
       <div class="row" style="margin-top:12px;gap:10px;align-items:center;">
@@ -443,7 +444,7 @@
     appId: "1:876305783920:web:f74b508b86c923e01a68b5"
   };
 
-  const app = initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseConfig, "lehrkraft"); // eigener App-Name: Lehrkraft-Anmeldung wird von Schueler-Logins im selben Browser nicht ueberschrieben
   const auth = getAuth(app);
   const db = getFirestore(app);
 
@@ -1690,6 +1691,8 @@ function schuljahresWochen() {
     if (statistikGeladen && document.getElementById("dashview-besprechung").classList.contains("active") && !document.hidden) ladeStatistik(true);
   }, 45000);
   let marksLeseFehler = null;
+  let marksDiag = { schueler: 0, docs: 0, offen: 0, klassen: 0 };
+  const BUILD_ID = "2026-10-13-b";
   function bsOffen(m) { return !!(m && m.besprechen && !m.besprechenErledigt); }
   let statistikRohdaten = null; // [{id, name, schueler:[{uid,pseudonym,deaktiviert,logins:[Date],erledigtWeekly:{key:n},erledigtGesamt,letzteAktivitaet}]}]
 
@@ -1716,6 +1719,7 @@ function schuljahresWochen() {
     try {
       const klassenDaten = [];
       marksLeseFehler = null;
+      marksDiag = { schueler: 0, docs: 0, offen: 0, klassen: meineKlassen.length };
       for (const k of meineKlassen) {
         const q = query(collection(db, "schueler"), where("klasseId", "==", k.id));
         const snap = await getDocs(q);
@@ -1759,7 +1763,8 @@ function schuljahresWochen() {
           const marks = {};
           try {
             const mkSnap = await getDocs(collection(db, "schueler", s.uid, "markierungen"));
-            mkSnap.forEach(md => { marks[md.id] = md.data(); });
+            mkSnap.forEach(md => { marks[md.id] = md.data(); marksDiag.docs++; if (bsOffen(md.data())) marksDiag.offen++; });
+            marksDiag.schueler++;
           } catch (e) { marksLeseFehler = e.code || e.message; }
 
           const letzteAktivitaet = logins.length ? new Date(Math.max(...logins.map(d => d.getTime()))) : null;
@@ -2153,6 +2158,7 @@ function schuljahresWochen() {
       fehlerEl.textContent = "Die Markierungen der Schüler:innen konnten nicht gelesen werden (" + marksLeseFehler + "). Bitte die aktuelle firestore.rules in der Firebase-Konsole veröffentlichen (Firestore → Regeln → Veröffentlichen).";
       fehlerEl.style.display = "block";
     } else fehlerEl.style.display = "none";
+    document.getElementById("bsDiag").textContent = "Diagnose (Version " + BUILD_ID + "): " + marksDiag.klassen + " Klasse(n), " + marksDiag.schueler + " Schüler:innen gelesen, " + marksDiag.docs + " Markierungen gefunden, davon " + marksDiag.offen + " zur Besprechung offen.";
     const klassen = klassenAuswahl("bsKlasse");
     const aktive = klassen.flatMap(k => k.schueler.filter(s => !s.deaktiviert));
     const total = aktive.length;
