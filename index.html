@@ -232,6 +232,17 @@
   .mk-panel .mk-group { margin-top: 8px; } .mk-panel .mk-group b { font-size: 0.74rem; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
   .mk-chip { display: inline-block; background: var(--empty); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin: 2px 4px 2px 0; cursor: pointer; font-size: 0.8rem; }
   .mk-chip:hover { background: #fff; border-color: var(--amber); }
+  .user-chip { font-size: 0.82rem; color: var(--navy); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; white-space: nowrap; }
+  #viewMarks .hb-intro, #viewMarks .hb-controls { padding-left: 20px; padding-right: 20px; }
+  #mkListe { padding: 0 20px 16px; }
+  .mk-sprint { margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .mk-sprint-h { background: var(--empty); padding: 7px 12px; font-weight: 700; font-size: 0.86rem; color: var(--navy); }
+  .mk-row { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-top: 1px solid var(--line); cursor: pointer; font-size: 0.88rem; flex-wrap: wrap; }
+  .mk-row:hover { background: var(--empty); }
+  .mk-row-text { flex: 1; min-width: 180px; }
+  .mk-row-date { color: var(--muted); font-size: 0.78rem; }
+  .mk-tag { font-size: 0.74rem; font-weight: 600; border-radius: 999px; padding: 2px 9px; border: 1px solid var(--line); white-space: nowrap; }
+  .mk-tag.me { background: #FFF3DC; } .mk-tag.ask { background: #DFF0F8; }
 </style>
 </head>
 <body>
@@ -262,7 +273,7 @@
     <div class="carried-over-note" id="carriedOverNote" style="display:none;"></div>
   </div>
 
-  <div class="mk-legend">Markieren: <span>🔖 <b>Merken</b> – nur für dich, zum späteren Wiederfinden (siehe „Meine Markierungen“)</span> <span>🙋 <b>Besprechen</b> – deine Lehrkraft sieht, dass ihr diese Aufgabe gemeinsam besprechen sollt</span></div>
+  <div class="mk-legend">Markieren: <span>🔖 <b>Merken</b> – nur für dich, zum späteren Wiederfinden (siehe Menüpunkt „Markierungen“)</span> <span>🙋 <b>Besprechen</b> – deine Lehrkraft sieht, dass ihr diese Aufgabe gemeinsam besprechen sollt</span></div>
 
   <div class="kanban-columns">
     <div class="kanban-column todo">
@@ -325,6 +336,18 @@
   </div>
 
   </div><!-- /viewBoard -->
+
+  <div id="viewMarks" style="display:none;">
+    <div class="ichkann-section">
+      <h2>Markierungen</h2>
+      <p class="hb-intro">Hier findest du alle Aufgaben, die du <b>🔖 gemerkt</b> (nur für dich) oder <b>🙋 zur Besprechung</b> markiert hast (deine Lehrkraft sieht das). Sortiert nach dem Sprint, in dem du markiert hast. Bereits besprochene Aufgaben verschwinden hier.</p>
+      <div class="hb-controls">
+        <select id="mkSprint" title="Nach Sprint filtern"></select>
+        <select id="mkArt" title="Nach Art filtern"><option value="">Alle Markierungen</option><option value="merken">🔖 Nur gemerkt</option><option value="besprechen">🙋 Nur zur Besprechung</option></select>
+      </div>
+      <div id="mkListe"></div>
+    </div>
+  </div>
 
   <div id="viewHandbuch" style="display:none;">
     <div class="ichkann-section">
@@ -1297,11 +1320,14 @@ document.getElementById("hbFz").addEventListener("change", renderHandbuch);
 
 function showView() {
   const hb = location.hash === "#handbuch";
-  document.getElementById("viewBoard").style.display = hb ? "none" : "";
+  const mk = location.hash === "#markierungen";
+  document.getElementById("viewBoard").style.display = (hb || mk) ? "none" : "";
   document.getElementById("viewHandbuch").style.display = hb ? "" : "none";
-  currentNavId = hb ? "HB" : null;
+  document.getElementById("viewMarks").style.display = mk ? "" : "none";
+  currentNavId = hb ? "HB" : (mk ? "MK" : null);
   renderLfNav();
   if (hb) renderHandbuch();
+  if (mk) llRenderMarkPanel();
 }
 window.addEventListener("hashchange", showView);
 
@@ -1388,6 +1414,12 @@ function renderAll() {
 // Gemeinsame Navigation ueber alle Seiten (Sprint-Board + je LF-Werkstatt)
 // ---------------------------------------------------------------------------
 let currentNavId = null;
+function llUserChip() {
+  const p = window.__llPseudo || "", k = window.__llKurs || "";
+  if (!p && !k) return "";
+  const esc2 = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return '<span class="user-chip" title="Angemeldet als">👤 <b>' + esc2(p || "–") + '</b>' + (k ? ' · Kurs ' + esc2(k) : '') + '</span>';
+}
 function renderLfNav() {
   const currentPage = currentNavId;
   const items = [
@@ -1396,18 +1428,19 @@ function renderLfNav() {
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
     { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
     { href: "index.html#handbuch", label: "Handbuch", id: "HB" },
+    { href: "index.html#markierungen", label: "🔖 Markierungen", id: "MK" },
     { href: "fehler.html", label: "Fehler", id: "ERR" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
+    const locked = item.id && !["HB", "ERR", "MK"].includes(item.id) && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
     const titleAttr = locked ? ' title="Von der Lehrkraft noch nicht freigeschaltet"' : '';
     return '<a href="' + (locked ? "#" : item.href) + '" class="' + cls + '"' + titleAttr + '>' + label + '</a>';
-  }).join("") + '<a href="#" onclick="window.__logout();return false;" style="margin-left:auto;">🚪 Abmelden</a>';
+  }).join("") + '<span style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + llUserChip() + '<a href="#" onclick="window.__logout();return false;">🚪 Abmelden</a></span>';
 }
 
 // Sofort mit dem zwischengespeicherten (oder Default-) Freigabe-Stand rendern,
@@ -1470,23 +1503,42 @@ function llMarkLabel(id) {
   const kurz = t ? (t.kurz || String(t.text || '').replace(/^\[[\d.,\s]+\]\s*/, '').slice(0, 50)) : '';
   return id + (kurz ? ' · ' + kurz : '');
 }
-function llRenderMarkPanel() {
-  const cont = document.getElementById(LL_MARK_CFG.container);
-  if (!cont) return;
-  let panel = document.getElementById('llMarkPanel');
-  if (!panel) { panel = document.createElement('details'); panel.id = 'llMarkPanel'; panel.className = 'mk-panel'; cont.parentNode.insertBefore(panel, cont); }
-  const ids = Object.keys(llMarks);
-  const me = ids.filter(i => llMarks[i].merken).sort();
-  const ask = ids.filter(i => llMarks[i].besprechen && !llMarks[i].besprechenErledigt).sort();
-  if (!me.length && !ask.length) { panel.style.display = 'none'; return; }
-  panel.style.display = '';
-  const chips = list => list.map(i => '<span class="mk-chip" onclick="llOpenMarked(\'' + i + '\')">' + llEsc(llMarkLabel(i)) + '</span>').join('');
-  const wasOpen = panel.open;
-  panel.innerHTML = '<summary>Meine Markierungen <span class="mk-count">' + me.length + ' gemerkt · ' + ask.length + ' zur Besprechung</span></summary>' +
-    (me.length ? '<div class="mk-group"><b>Gemerkt (nur für mich)</b><div>' + chips(me) + '</div></div>' : '') +
-    (ask.length ? '<div class="mk-group"><b>Zur gemeinsamen Besprechung (Lehrkraft sieht das)</b><div>' + chips(ask) + '</div></div>' : '');
-  panel.open = wasOpen;
+function llMarkEintraege() {
+  // Ein Eintrag je Markierungsart; der Sprint (ISO-Woche) ergibt sich aus dem Zeitpunkt der Markierung.
+  const out = [];
+  Object.keys(llMarks).forEach(id => {
+    const m = llMarks[id];
+    if (m.merken) out.push({ id, art: "merken", am: m.merkenAm || m.updated || "" });
+    if (m.besprechen && !m.besprechenErledigt) out.push({ id, art: "besprechen", am: m.besprechenAm || m.updated || "" });
+  });
+  out.forEach(e => { const d = e.am ? new Date(e.am) : null; e.sprint = d && !isNaN(d) ? isoWeekKey(d) : ""; });
+  return out;
 }
+function llRenderMarkPanel() {
+  const liste = document.getElementById('mkListe');
+  if (!liste) return;
+  const eintr = llMarkEintraege();
+  const selS = document.getElementById('mkSprint'), selA = document.getElementById('mkArt');
+  const sprintKeys = Array.from(new Set(eintr.map(e => e.sprint))).sort().reverse();
+  const curS = selS.value;
+  selS.innerHTML = '<option value="">Alle Sprints</option>' + sprintKeys.map(k => '<option value="' + k + '">' + (k ? (k === todayKey ? 'Aktueller Sprint – ' : '') + sprintKeyRange(k) : 'Ohne Datum') + '</option>').join('');
+  selS.value = sprintKeys.includes(curS) ? curS : '';
+  const fS = selS.value, fA = selA.value;
+  const gef = eintr.filter(e => (!fS || e.sprint === fS) && (!fA || e.art === fA));
+  if (!gef.length) { liste.innerHTML = '<p class="hb-intro" style="padding:6px 20px 14px;">' + (eintr.length ? 'Keine Markierungen für diesen Filter.' : 'Du hast noch nichts markiert. Nutze die Symbole 🔖 und 🙋 an den Aufgaben.') + '</p>'; return; }
+  const gr = {};
+  gef.forEach(e => { (gr[e.sprint] = gr[e.sprint] || []).push(e); });
+  liste.innerHTML = Object.keys(gr).sort().reverse().map(k => {
+    const rows = gr[k].sort((x, y) => (x.am < y.am ? 1 : -1)).map(e => {
+      const tag = e.art === 'merken' ? '<span class="mk-tag me">🔖 gemerkt</span>' : '<span class="mk-tag ask">🙋 zur Besprechung</span>';
+      const dat = e.am ? new Date(e.am).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) : '';
+      return '<div class="mk-row" onclick="llOpenMarked(\'' + e.id + '\')"><span class="mk-row-text">' + llEsc(llMarkLabel(e.id)) + '</span>' + tag + '<span class="mk-row-date">' + dat + '</span>' + llMarkHtml(e.id, true) + '</div>';
+    }).join('');
+    return '<div class="mk-sprint"><div class="mk-sprint-h">' + (k ? (k === todayKey ? 'Aktueller Sprint · ' : '') + sprintKeyRange(k) : 'Ohne Datum') + ' <span class="mk-count">' + gr[k].length + '</span></div>' + rows + '</div>';
+  }).join('');
+}
+document.getElementById('mkSprint').addEventListener('change', () => llRenderMarkPanel());
+document.getElementById('mkArt').addEventListener('change', () => llRenderMarkPanel());
 function llEsc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 function llPlaceModalMarks() {
   const idEl = document.getElementById(LL_MARK_CFG.modalIdEl);
@@ -1503,7 +1555,8 @@ async function llToggleMark(id, kind) {
   let payload;
   if (kind === 'merken') {
     m.merken = !m.merken;
-    payload = { merken: !!m.merken, updated: jetzt };
+    if (m.merken) m.merkenAm = jetzt; else delete m.merkenAm;
+    payload = { merken: !!m.merken, merkenAm: m.merken ? jetzt : deleteField(), updated: jetzt };
   } else if (m.besprechen && !m.besprechenErledigt) {
     // Markierung wieder zuruecknehmen
     m.besprechen = false;
@@ -1540,16 +1593,17 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const schuelerSnap = await getDoc(doc(db, "schueler", currentUid));
     if (schuelerSnap.exists() && schuelerSnap.data().klasseId) {
-      window.__llPseudo = schuelerSnap.data().pseudonym || "";
       // Live-Abo statt einmaligem getDoc: sobald die Lehrkraft ein LF freigibt (oder
       // sperrt), aendert sich das Firestore-Dokument und dieser Callback feuert erneut -
       // ohne dass Schueler:innen die Seite manuell neu laden muessen. Der erste Aufruf
       // kommt sofort mit dem aktuellen Stand (wie getDoc) und loest das Promise unten auf,
       // damit der restliche Ladeablauf wie bisher weiterlaeuft.
       const klasseId = schuelerSnap.data().klasseId;
+      window.__llPseudo = schuelerSnap.data().pseudonym || "";
       await new Promise((resolve) => {
         let ersterAufruf = true;
         onSnapshot(doc(db, "klassen", klasseId), (klasseSnap) => {
+          if (klasseSnap.exists()) window.__llKurs = klasseSnap.data().name || "";
           if (klasseSnap.exists() && klasseSnap.data().freigaben) {
             LF_FREIGABE = klasseSnap.data().freigaben;
             try { localStorage.setItem(LF_FREIGABE_CACHE_KEY, JSON.stringify(LF_FREIGABE)); } catch (e) {}

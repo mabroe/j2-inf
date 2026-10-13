@@ -922,6 +922,7 @@
   .mk-panel .mk-group { margin-top: 8px; } .mk-panel .mk-group b { font-size: 0.74rem; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
   .mk-chip { display: inline-block; background: var(--empty); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin: 2px 4px 2px 0; cursor: pointer; font-size: 0.8rem; }
   .mk-chip:hover { background: #fff; border-color: var(--amber); }
+  .user-chip { font-size: 0.82rem; color: var(--navy); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -2792,6 +2793,12 @@ try {
   if (cached) LF_FREIGABE = cached;
 } catch (e) { /* localStorage evtl. blockiert - dann bleibt es beim Default */ }
 
+function llUserChip() {
+  const p = window.__llPseudo || "", k = window.__llKurs || "";
+  if (!p && !k) return "";
+  const esc2 = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return '<span class="user-chip" title="Angemeldet als">👤 <b>' + esc2(p || "–") + '</b>' + (k ? ' · Kurs ' + esc2(k) : '') + '</span>';
+}
 function renderLfNav(currentPage) {
   const items = [
     { href: "index.html#board", label: "Sprint-Board", id: null },
@@ -2799,18 +2806,19 @@ function renderLfNav(currentPage) {
     { href: "bpe7-lf2.html", label: "LF2 · Algorithmen", id: "LF2" },
     { href: "bpe7-lf3.html", label: "LF3 · Dyn. Datenstrukturen", id: "LF3" },
     { href: "index.html#handbuch", label: "Handbuch", id: "HB" },
+    { href: "index.html#markierungen", label: "🔖 Markierungen", id: "MK" },
     { href: "fehler.html", label: "Fehler", id: "ERR" }
   ];
   const nav = document.getElementById("lfNav");
   if (!nav) return;
   nav.innerHTML = items.map(item => {
-    const locked = item.id && !["HB", "ERR"].includes(item.id) && !LF_FREIGABE[item.id];
+    const locked = item.id && !["HB", "ERR", "MK"].includes(item.id) && !LF_FREIGABE[item.id];
     const isActive = item.id === currentPage;
     const cls = ((isActive ? "active" : "") + (locked ? " locked" : "")).trim();
     const label = locked ? "🔒 " + item.label : item.label;
     const titleAttr = locked ? ' title="Von der Lehrkraft noch nicht freigeschaltet"' : '';
     return '<a href="' + (locked ? "#" : item.href) + '" class="' + cls + '"' + titleAttr + '>' + label + '</a>';
-  }).join("") + '<a href="#" onclick="window.__logout();return false;" style="margin-left:auto;">🚪 Abmelden</a>';
+  }).join("") + '<span style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + llUserChip() + '<a href="#" onclick="window.__logout();return false;">🚪 Abmelden</a></span>';
 }
 
 // Sofort mit dem zwischengespeicherten (oder Default-) Freigabe-Stand rendern,
@@ -2862,6 +2870,7 @@ function llMarkLabel(id) {
   return id + (kurz ? ' · ' + kurz : '');
 }
 function llRenderMarkPanel() {
+  return; // Markierungen stehen im eigenen Menuepunkt (index.html#markierungen)
   const cont = document.getElementById(LL_MARK_CFG.container);
   if (!cont) return;
   let panel = document.getElementById('llMarkPanel');
@@ -2894,7 +2903,8 @@ async function llToggleMark(id, kind) {
   let payload;
   if (kind === 'merken') {
     m.merken = !m.merken;
-    payload = { merken: !!m.merken, updated: jetzt };
+    if (m.merken) m.merkenAm = jetzt; else delete m.merkenAm;
+    payload = { merken: !!m.merken, merkenAm: m.merken ? jetzt : deleteField(), updated: jetzt };
   } else if (m.besprechen && !m.besprechenErledigt) {
     // Markierung wieder zuruecknehmen
     m.besprechen = false;
@@ -2937,9 +2947,11 @@ onAuthStateChanged(auth, async (user) => {
       // kommt sofort mit dem aktuellen Stand (wie getDoc) und loest das Promise unten auf,
       // damit der restliche Ladeablauf wie bisher weiterlaeuft.
       const klasseId = schuelerSnap.data().klasseId;
+      window.__llPseudo = schuelerSnap.data().pseudonym || "";
       await new Promise((resolve) => {
         let ersterAufruf = true;
         onSnapshot(doc(db, "klassen", klasseId), (klasseSnap) => {
+          if (klasseSnap.exists()) window.__llKurs = klasseSnap.data().name || "";
           if (klasseSnap.exists() && klasseSnap.data().freigaben) {
             LF_FREIGABE = klasseSnap.data().freigaben;
             try { localStorage.setItem(LF_FREIGABE_CACHE_KEY, JSON.stringify(LF_FREIGABE)); } catch (e) {}
