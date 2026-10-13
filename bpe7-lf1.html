@@ -690,6 +690,18 @@
     font-size: 0.88rem;
     line-height: 2.15;
   }
+  .struk-sloop { border-bottom: 2px solid var(--navy); }
+  .struk-sloop-h { border-bottom: 2px solid var(--navy); }
+  .struk-sloop-row { display: flex; }
+  .struk-sloop-gutter { flex: 0 0 26px; border-right: 2px solid var(--navy); }
+  .struk-sloop-body { flex: 1 1 auto; min-width: 0; }
+  .struk-alt-h { border-bottom: 2px solid var(--navy); background: #F3EFEF; }
+  .struk-alt-cols { display: flex; }
+  .struk-alt-col { flex: 1 1 50%; min-width: 0; }
+  .struk-alt-col + .struk-alt-col { border-left: 2px solid var(--navy); }
+  .struk-alt-lbl { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 0.72rem; font-weight: 700; text-align: center; background: #F3EFEF; border-bottom: 1.5px solid var(--navy); padding: 2px 0; }
+  .struk-alt-col .struk-band { border-bottom: none; }
+  .struk-alt-empty { padding: 14px; font-family: -apple-system, "Segoe UI", sans-serif; font-size: 0.82rem; color: #67666E; text-align: center; }
   .struk-code .num-badge {
     display: inline-flex;
     width: 20px; height: 20px;
@@ -1406,6 +1418,16 @@
         <td>Anzahl der gespeicherten Elemente ermitteln</td>
       </tr>
       <tr>
+        <td>Wiederhole von <code>i = 0</code> solange <code>i &lt; Anzahl der Elemente des Arrays array</code>, Schrittweite 1</td>
+        <td><code>for i in range(len(array)):</code></td>
+        <td>Schleife: Die Anweisungen im Rahmen werden für jeden Index wiederholt</td>
+      </tr>
+      <tr>
+        <td>Wenn <code>array[i] &gt; 3</code><br><span style="color:#67666E;">Ja-Zweig | Nein-Zweig</span></td>
+        <td><code>if array[i] &gt; 3:</code></td>
+        <td>Verzweigung: Je nach Bedingung wird der Ja- oder der Nein-Zweig ausgeführt</td>
+      </tr>
+      <tr>
         <td>Ausgabe:<br><code>array[2]</code></td>
         <td><code class="auto-annotate">print(array[2])</code></td>
         <td>Einzelnes Element ausgeben</td>
@@ -1419,25 +1441,45 @@
 
     <p class="panel desc" style="margin-top:18px;">
       Klicke auf <code class="inline" style="cursor:pointer;">array</code>, <code class="inline" style="cursor:pointer;">array[i]</code>
-      oder einen Wert wie <code class="inline" style="cursor:pointer;">"Nord"</code> in der Tabelle oder im Beispiel unten –
+      oder einen Wert wie <code class="inline" style="cursor:pointer;">"Nord"</code> in der Tabelle –
       im Array oben wird dann hervorgehoben, worauf sich die Zeile bezieht.
     </p>
 
     <section class="panel">
       <h3>Ein Beispiel im Zusammenhang</h3>
-      <p class="desc">So gehören ein Struktogramm und der zugehörige Python-Code zusammen – Zeile für Zeile:</p>
+      <p class="desc">Aufgabe: Zähle, wie viele Noten im Array <code>noten</code> besser als 3 sind. So gehören Struktogramm und Python-Code zusammen – Zeile für Zeile (gleiche Nummern gehören zusammen):</p>
       <div class="struk-diagram-wrap">
         <div class="struk-diagram">
-          <div class="struk-band"><span class="struk-num">1</span> Deklaration und Initialisierung: array = ["Nord", "Ost", "Süd"]</div>
-          <div class="struk-band"><span class="struk-num">2</span> Zuweisung: array[1] = "Nordost"</div>
-          <div class="struk-band"><span class="struk-num">3</span> Ausgabe: array</div>
+          <div class="struk-band"><span class="struk-num">1</span> Deklaration und Initialisierung: noten als Array = [2, 5, 3, 1, 4]</div>
+          <div class="struk-band"><span class="struk-num">2</span> Deklaration und Initialisierung: anzahl = 0</div>
+          <div class="struk-sloop">
+            <div class="struk-band struk-sloop-h"><span class="struk-num">3</span> Wiederhole von i = 0 solange i &lt; Anzahl der Elemente des Arrays noten, Schrittweite 1</div>
+            <div class="struk-sloop-row">
+              <div class="struk-sloop-gutter"></div>
+              <div class="struk-sloop-body">
+                <div class="struk-alt">
+                  <div class="struk-band struk-alt-h"><span class="struk-num">4</span> Wenn noten[i] &lt; 3</div>
+                  <div class="struk-alt-cols">
+                    <div class="struk-alt-col"><div class="struk-alt-lbl">Ja</div><div class="struk-band"><span class="struk-num">5</span> Zuweisung: anzahl = anzahl + 1</div></div>
+                    <div class="struk-alt-col"><div class="struk-alt-lbl">Nein</div><div class="struk-alt-empty">(nichts tun)</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="struk-band"><span class="struk-num">6</span> Ausgabe: "Gute Noten: " + anzahl</div>
         </div>
         <div class="struk-code">
-          <span class="num-badge">1</span><span class="auto-annotate">array = ["Nord", "Ost", "Süd"]</span><br>
-          <span class="num-badge">2</span><span class="auto-annotate">array[1] = "Nordost"</span><br>
-          <span class="num-badge">3</span><span class="auto-annotate">print(array)</span>
+          <span class="num-badge">1</span>noten = [2, 5, 3, 1, 4]<br>
+          <span class="num-badge">2</span>anzahl = 0<br>
+          <span class="num-badge">3</span>for i in range(len(noten)):<br>
+          <span class="num-badge">4</span>&nbsp;&nbsp;&nbsp;&nbsp;if noten[i] &lt; 3:<br>
+          <span class="num-badge">5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;anzahl = anzahl + 1<br>
+          <span class="num-badge">6</span>print("Gute Noten:", anzahl)<br>
+          <span style="color:#9FB3D1;font-size:.8rem;display:block;margin-top:8px;">Ausgabe: Gute Noten: 2</span>
         </div>
       </div>
+      <p class="desc" style="margin-top:12px;">Die <strong>Schleife</strong> (3) enthält alles, was wiederholt wird – im Struktogramm als Rahmen mit Einzug, im Code durch die Einrückung. Die <strong>Verzweigung</strong> (4) hat zwei Wege: <em>Ja</em> (5) wird ausgeführt, wenn die Bedingung stimmt, sonst passiert in diesem Beispiel nichts.</p>
     </section>
   </div>
 
