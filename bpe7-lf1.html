@@ -2948,7 +2948,7 @@ const LF1_BLOCKS = [
       { id: "LF1_A2.2c", tier: 3, thema: "T1", kurz: "Gültigen Index prüfen", text: "[2.2] Entwickeln Sie einen Algorithmus, der nach Einlesen eines Index prüft, ob dieser gültig ist (zwischen 0 und der Anzahl der Elemente minus 1), und den Wert ausgibt bzw. sonst eine Fehlermeldung. Beispiel: buecher = [\"Momo\", \"Der Prozess\", \"Faust\"]", problem: "In einer Bibliotheks-Software soll ein Nutzer einen Index eingeben, um sich den Titel des zugehörigen Buchs anzeigen zu lassen. Nicht jede Eingabe ist dabei ein gültiger Index.", eingabe: "Bitte geben Sie einen Index ein: 5", ausgabe: "Ungültiger Index" },
       { id: "LF1_A2.9a", tier: 1, thema: "T1", kurz: "Schreibtischtest: Zuweisung", text: "[2.9,2.2] Gegeben ist b = [10, 20, 30]. Führen Sie einen Schreibtischtest durch und dokumentieren Sie den Arrayinhalt nach jeder Zeile.", problem: "Ein Array wird durch eine einzelne Zuweisung an einer bestimmten Indexposition verändert.", darstellung: "Deklaration und Initialisierung: b = [10, 20, 30]\nZuweisung: b[0] = b[1]\nAusgabe: b" },
       { id: "LF1_A2.3a", tier: 1, thema: "T4", kurz: "Werte einlesen und anhängen", text: "[2.3] Erstellen Sie einen Algorithmus, der fünfmal eine Losnummer einliest, jede Losnummer an ein Array anhängt und am Ende alle Losnummern ausgibt.", problem: "Bei einer Tombola werden fünf Losnummern nacheinander gezogen. Die Nummern sollen erfasst und am Ende gemeinsam als Gewinnerlose bekanntgegeben werden.", eingabe: "Bitte geben Sie die Losnummer ein: 1254\nBitte geben Sie die Losnummer ein: 2365\nBitte geben Sie die Losnummer ein: 4587\nBitte geben Sie die Losnummer ein: 5698\nBitte geben Sie die Losnummer ein: 3146", ausgabe: "Gewinnerlose:\n------------------\nLos: 1254\nLos: 2365\nLos: 4587\nLos: 5698\nLos: 3146" },
-      { id: "LF1_A2.3b", tier: 2, thema: "T4", kurz: "Namen anhängen und zählen", text: "[2.3] Erstellen Sie einen Algorithmus, der dreimal einen Namen einliest, an ein Array anhängt und danach jeweils die aktuelle Anzahl der Kontakte ausgibt. Beispiel: eingelesene Namen Lea, Finn und Mia", problem: "Ein Adressbuch soll drei neue Kontakte nacheinander aufnehmen. Nach jedem Hinzufügen soll die aktuelle Anzahl der gespeicherten Kontakte ausgegeben werden.", eingabe: "Bitte geben Sie einen Namen ein: Lea\nBitte geben Sie einen Namen ein: Finn\nBitte geben Sie einen Namen ein: Mia", ausgabe: "Anzahl Kontakte: 1\nAnzahl Kontakte: 2\nAnzahl Kontakte: 3" },
+      { id: "LF1_A2.3b", ablauf: [["e", "Bitte geben Sie einen Namen ein: Lea"], ["a", "Anzahl Kontakte: 1"], ["e", "Bitte geben Sie einen Namen ein: Finn"], ["a", "Anzahl Kontakte: 2"], ["e", "Bitte geben Sie einen Namen ein: Mia"], ["a", "Anzahl Kontakte: 3"]], tier: 2, thema: "T4", kurz: "Namen anhängen und zählen", text: "[2.3] Erstellen Sie einen Algorithmus, der dreimal einen Namen einliest, an ein Array anhängt und danach jeweils die aktuelle Anzahl der Kontakte ausgibt. Beispiel: eingelesene Namen Lea, Finn und Mia", problem: "Ein Adressbuch soll drei neue Kontakte nacheinander aufnehmen. Nach jedem Hinzufügen soll die aktuelle Anzahl der gespeicherten Kontakte ausgegeben werden.", eingabe: "Bitte geben Sie einen Namen ein: Lea\nBitte geben Sie einen Namen ein: Finn\nBitte geben Sie einen Namen ein: Mia", ausgabe: "Anzahl Kontakte: 1\nAnzahl Kontakte: 2\nAnzahl Kontakte: 3" },
       { id: "LF1_A2.4a", tier: 1, thema: "T4", kurz: "Arraywert erhöhen", text: "[2.4] Gegeben ist bestand = [12, 20, 8, 0, 5]. Erstellen Sie eine Zuweisung, die den Wert an Index 2 um 15 erhöht, und geben Sie das Array vor und nach der Änderung aus.", problem: "Ein Lager verwaltet den Bestand mehrerer Artikel in einem Array. Nach einer Lieferung erhöht sich der Bestand eines bestimmten Artikels.", ausgabe: "Alter Bestand: [12, 20, 8, 0, 5]\nNeuer Bestand: [12, 20, 23, 0, 5]" },
       { id: "LF1_A2.4b", tier: 2, thema: "T4", kurz: "Alle Werte verändern", text: "[2.4] Erstellen Sie einen Algorithmus, der jeden Wert eines Arrays preise um 10 Prozent verringert und das Array vor und nach der Änderung ausgibt. Beispiel: preise = [20.00, 45.00, 8.50]", problem: "In einem Onlineshop sollen an einem Rabatttag alle Preise eines Sortiments um 10 Prozent reduziert werden.", ausgabe: "Alte Preise: [20.0, 45.0, 8.5]\nReduzierte Preise: [18.0, 40.5, 7.65]" },
       { id: "LF1_M_T4", tier: 3, thema: "T4", kurz: "Array befüllen und korrigieren", text: "[2.3,2.4] Entwickeln Sie einen Algorithmus für die Rundenzahlen der ersten 10 Trainingswochen:", problem: "Ein Fitnessstudio bietet einen Lauftreff an. Als Trainingsziel sollen in der ersten Trainingswoche 5 Runden gelaufen werden, in jeder weiteren Woche zwei Runden mehr als in der Vorwoche. Die tatsächlich gelaufenen Runden werden manuell erfasst.", teile: [{"k": "a)", "text": "Lesen Sie die tatsächlich gelaufenen Runden der 10 Trainingswochen ein, speichern Sie sie in einem Array runden und geben Sie das Array aus.", "eingabe": "Bitte geben Sie die gelaufenen Runden ein: 6\nBitte geben Sie die gelaufenen Runden ein: 7\nBitte geben Sie die gelaufenen Runden ein: 9\nBitte geben Sie die gelaufenen Runden ein: 10\nBitte geben Sie die gelaufenen Runden ein: 13\nBitte geben Sie die gelaufenen Runden ein: 14\nBitte geben Sie die gelaufenen Runden ein: 17\nBitte geben Sie die gelaufenen Runden ein: 18\nBitte geben Sie die gelaufenen Runden ein: 22\nBitte geben Sie die gelaufenen Runden ein: 23", "ausgabe": "Gelaufene Runden: [6, 7, 9, 10, 13, 14, 17, 18, 22, 23]"}, {"k": "b)", "text": "Erzeugen Sie ein neues Array trainingsziel, das Sie mit der Formel 5 + i*2 befüllen, und geben Sie es aus.", "ausgabe": "Trainingsziel: [5, 7, 9, 11, 13, 15, 17, 19, 21, 23]"}, {"k": "c)", "text": "Setzen Sie im Array runden jeden Wert, der unter dem Trainingsziel der jeweiligen Woche liegt, auf den Zielwert und geben Sie runden erneut aus.", "ausgabe": "Angepasste Runden: [6, 7, 9, 11, 13, 15, 17, 19, 22, 23]"}] },
@@ -3251,7 +3251,13 @@ function lf1TeileAuftragHtml(task) {
   return '<div class="lf1-teile">' + task.teile.map(t =>
     '<div class="lf1-teil"><span class="lf1-teil-k">' + lf1Esc(t.k) + '</span><span class="lf1-teil-t">' + lf1Esc(t.text) + '</span></div>').join("") + '</div>';
 }
+function ablaufGruppen(ablauf) {
+  const g = [];
+  ablauf.forEach(([k, z]) => { if (g.length && g[g.length - 1].k === k) g[g.length - 1].t.push(z); else g.push({ k, t: [z] }); });
+  return g.map(x => ({ k: x.k, text: x.t.join("\n") }));
+}
 function lf1TeileIoHtml(task, blockCls) {
+  if (task.ablauf) return ablaufGruppen(task.ablauf).map(b => '<div class="' + blockCls + '"><strong>' + (b.k === 'e' ? 'Eingabe (Beispiel)' : 'Ausgabe (Beispiel)') + '</strong>' + lf1Esc(b.text) + '</div>').join("");
   if (!task.teile) return "";
   let h = "";
   task.teile.forEach(t => {
@@ -3290,13 +3296,13 @@ function lf1OpenInfoModal(taskId) {
   const teileIoEl = document.getElementById("lf1InfoModalTeileIo");
   teileIoEl.innerHTML = lf1TeileIoHtml(task, "lf1-info-block lf1-info-io lf1-info-console");
   const einEl = document.getElementById("lf1InfoModalEingabe");
-  if (task.eingabe) {
+  if (task.eingabe && !task.ablauf) {
     einEl.innerHTML = "<strong>Gewünschte Eingabe (Beispiel)</strong>" + lf1Esc(task.eingabe);
     einEl.style.display = "block";
   } else { einEl.style.display = "none"; }
   const ioEl = document.getElementById("lf1InfoModalIo");
   const ausgabeText = task.ausgabe || task.io;
-  if (ausgabeText) {
+  if (ausgabeText && !task.ablauf) {
     ioEl.innerHTML = "<strong>Gewünschte Ausgabe (Beispiel)</strong>" + lf1Esc(ausgabeText);
     ioEl.style.display = "block";
   } else { ioEl.style.display = "none"; }
@@ -3347,9 +3353,9 @@ function lf1BuildTaskPrintPageHtml(task) {
   const hintText = lf1CodeStrukHint(task);
   if (hintText) html += '<div class="lf1-print-hint">ℹ️ ' + lf1Esc(hintText) + '</div>';
   if (task.daten) html += '<div class="lf1-print-block lf1-print-io lf1-print-io-pre"><strong>Vorgegebene Daten (zum Kopieren)</strong>' + lf1Esc(task.daten) + '</div>';
-  if (task.eingabe) html += '<div class="lf1-print-block lf1-print-io lf1-print-io-pre"><strong>Gewünschte Eingabe (Beispiel)</strong>' + lf1Esc(task.eingabe) + '</div>';
+  if (task.eingabe && !task.ablauf) html += '<div class="lf1-print-block lf1-print-io lf1-print-io-pre"><strong>Gewünschte Eingabe (Beispiel)</strong>' + lf1Esc(task.eingabe) + '</div>';
   const ausgabeText = task.ausgabe || task.io;
-  if (ausgabeText) html += '<div class="lf1-print-block lf1-print-io lf1-print-io-pre"><strong>Gewünschte Ausgabe (Beispiel)</strong>' + lf1Esc(ausgabeText) + '</div>';
+  if (ausgabeText && !task.ablauf) html += '<div class="lf1-print-block lf1-print-io lf1-print-io-pre"><strong>Gewünschte Ausgabe (Beispiel)</strong>' + lf1Esc(ausgabeText) + '</div>';
   html += lf1TeileIoHtml(task, "lf1-print-block lf1-print-io lf1-print-io-pre");
   if (task.darstellung) html += '<div class="lf1-print-block"><strong>Struktogramm</strong>' + lf1BuildStruktogrammSvg(task.darstellung) + '</div>';
   html += '<div class="lf1-print-solution"><h4>Struktogramm</h4><div class="lf1-print-lines"></div><h4>Code</h4><div class="lf1-print-lines"></div></div>';
@@ -3514,13 +3520,15 @@ async function llToggleMark(id, kind) {
   } else {
     // (Erneut) zur Besprechung markieren. War die letzte Besprechung schon erledigt, bleibt sie
     // fuer die Lehrkraft als fruehere Besprechung (mit Sprint-Zeitpunkt) erhalten.
-    payload = { besprechen: true, besprechenAm: jetzt, besprechenErledigt: deleteField(), updated: jetzt };
+    // Wurde die Markierung nur zurueckgenommen und wieder gesetzt (nicht erledigt), bleibt der urspruengliche Sprint-Zeitpunkt erhalten.
+    const amBehalten = (!m.besprechen && !m.besprechenErledigt && m.besprechenAm) ? m.besprechenAm : jetzt;
+    payload = { besprechen: true, besprechenAm: amBehalten, besprechenErledigt: deleteField(), updated: jetzt };
     if (m.besprechen && m.besprechenErledigt) {
       const fr = { am: m.besprechenAm || m.updated || jetzt, erledigt: m.besprechenErledigt };
       payload.fruehere = arrayUnion(fr);
       m.fruehere = (m.fruehere || []).concat([fr]);
     }
-    m.besprechen = true; m.besprechenAm = jetzt; delete m.besprechenErledigt;
+    m.besprechen = true; m.besprechenAm = amBehalten; delete m.besprechenErledigt;
   }
   m.updated = jetzt;
   llMarks[id] = m;

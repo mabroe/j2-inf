@@ -2924,13 +2924,15 @@ async function llToggleMark(id, kind) {
   } else {
     // (Erneut) zur Besprechung markieren. War die letzte Besprechung schon erledigt, bleibt sie
     // fuer die Lehrkraft als fruehere Besprechung (mit Sprint-Zeitpunkt) erhalten.
-    payload = { besprechen: true, besprechenAm: jetzt, besprechenErledigt: deleteField(), updated: jetzt };
+    // Wurde die Markierung nur zurueckgenommen und wieder gesetzt (nicht erledigt), bleibt der urspruengliche Sprint-Zeitpunkt erhalten.
+    const amBehalten = (!m.besprechen && !m.besprechenErledigt && m.besprechenAm) ? m.besprechenAm : jetzt;
+    payload = { besprechen: true, besprechenAm: amBehalten, besprechenErledigt: deleteField(), updated: jetzt };
     if (m.besprechen && m.besprechenErledigt) {
       const fr = { am: m.besprechenAm || m.updated || jetzt, erledigt: m.besprechenErledigt };
       payload.fruehere = arrayUnion(fr);
       m.fruehere = (m.fruehere || []).concat([fr]);
     }
-    m.besprechen = true; m.besprechenAm = jetzt; delete m.besprechenErledigt;
+    m.besprechen = true; m.besprechenAm = amBehalten; delete m.besprechenErledigt;
   }
   m.updated = jetzt;
   llMarks[id] = m;
