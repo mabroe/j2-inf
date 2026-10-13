@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Migration – Export aus Firebase</title>
+<style>body{font-family:system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 16px;color:#222}input,button{font:inherit;padding:8px 12px;margin:4px 0}input{width:100%;box-sizing:border-box}button{cursor:pointer}#log{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:6px;font-size:.85rem;margin-top:12px}</style></head><body>
+<h1>Export aus der Firebase-Version</h1>
+<p>Diese Seite gehört auf die <b>alte</b> Seite (GitHub Pages, dort ist Firebase erlaubt), nicht auf den Schulserver. Als Lehrkraft anmelden: Es werden alle Klassen exportiert, die du unterrichtest – mit Schüler-Konten (inkl. PIN), Sprints, Markierungen und Sitzungen. Die Datei enthält Pseudonyme und PINs und ist wie ein Passwort zu behandeln.</p>
+<input id="em" type="email" placeholder="E-Mail der Lehrkraft"><input id="pw" type="password" placeholder="Passwort">
+<button id="go">Anmelden und exportieren</button><div id="log"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const cfg = { apiKey:"AIzaSyC_aYBkyNqfJLjSVVgbkL1gRJL0BytMNBs", authDomain:"fls-lernlandschaft-j2.firebaseapp.com", projectId:"fls-lernlandschaft-j2", storageBucket:"fls-lernlandschaft-j2.firebasestorage.app", messagingSenderId:"876305783920", appId:"1:876305783920:web:f74b508b86c923e01a68b5" };
+const app = initializeApp(cfg, "export"); const auth = getAuth(app); const db = getFirestore(app);
+const log = t => { document.getElementById("log").textContent += t + "\n"; };
+document.getElementById("go").onclick = async () => {
+  try {
+    const cr = await signInWithEmailAndPassword(auth, document.getElementById("em").value.trim(), document.getElementById("pw").value);
+    const lk = await getDoc(doc(db, "lehrkraefte", cr.user.uid));
+    if (!lk.exists()) throw new Error("Konto ist keine Lehrkraft.");
+    const out = { format: "lernlandschaft-export-1", exportiertAm: new Date().toISOString(), lehrkraft: { name: lk.data().name, email: cr.user.email }, klassen: [] };
+    for (const kid of (lk.data().klassenIds || [])) {
+      const k = await getDoc(doc(db, "klassen", kid)); if (!k.exists()) continue;
+      const kl = { id: kid, daten: k.data(), schueler: [] };
+      const ss = await getDocs(query(collection(db, "schueler"), where("klasseId", "==", kid)));
+      for (const s of ss.docs) {
+        const e = { daten: s.data(), sprints: {}, markierungen: {}, sessions: {} };
+        for (const sub of ["sprints", "markierungen", "sessions"]) {
+          try { (await getDocs(collection(db, "schueler", s.id, sub))).forEach(d => { e[sub][d.id] = d.data(); }); } catch (x) { log("  " + sub + " nicht lesbar: " + x.code); }
+        }
+        kl.schueler.push(e);
+      }
+      log("Klasse " + kid + ": " + kl.schueler.length + " Konten"); out.klassen.push(kl);
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(out)], { type: "application/json" }));
+    a.download = "lernlandschaft-export-" + new Date().toISOString().slice(0, 10) + ".json"; a.click();
+    log("Fertig. Datei wurde heruntergeladen.");
+  } catch (e) { log("Fehler: " + (e.code || e.message)); }
+};
+</script></body></html>
