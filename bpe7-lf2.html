@@ -1293,13 +1293,26 @@ const firebaseConfig = {
   messagingSenderId: "876305783920",
   appId: "1:876305783920:web:f74b508b86c923e01a68b5"
 };
-const fbApp = initializeApp(firebaseConfig);
+const studApp = initializeApp(firebaseConfig);
+const studAuth = getAuth(studApp);
+await setPersistence(studAuth, browserSessionPersistence);
+// Lehrkraefte melden sich im Dashboard ueber die App-Instanz "lehrkraft" an. Findet diese Seite keine
+// Schueler-Sitzung, aber eine Lehrkraft-Sitzung, nutzt sie diese (Werkstaetten/Sprint-Board ansehen).
+let fbApp = studApp;
+try {
+  await studAuth.authStateReady();
+  if (!studAuth.currentUser) {
+    const lehrApp = initializeApp(firebaseConfig, "lehrkraft");
+    const lehrAuth = getAuth(lehrApp);
+    await lehrAuth.authStateReady();
+    if (lehrAuth.currentUser) fbApp = lehrApp;
+  }
+} catch (e) { console.warn("Lehrkraft-Sitzung konnte nicht geprueft werden:", e.message); }
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 // Muss zur Persistenz in anmeldung.html passen (browserSessionPersistence),
 // sonst findet diese Seite die dort angelegte Sitzung nicht wieder und wirft
 // direkt nach dem Login zurueck zur Anmeldeseite. Siehe Kommentar dort.
-await setPersistence(auth, browserSessionPersistence);
 let currentUid = null;
 
 function esc(s) {
