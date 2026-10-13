@@ -719,6 +719,7 @@ function schuljahresWochen() {
       document.getElementById("loginView").style.display = "none";
       document.getElementById("dashboardView").style.display = "block";
       await ladeKlassen(lehrkraftSnap.data().klassenIds || []);
+      try { const _dt = sessionStorage.getItem("ll_dashtab"); const _de = _dt && _dt !== "klassen" && document.querySelector('.dash-tab[data-tab="' + _dt + '"]'); if (_de && !_de.classList.contains("active")) _de.click(); } catch (e) {}
       bsStart(); // Besprechung live: Echtzeit-Abos starten (laeuft im Hintergrund, Badge am Reiter)
       // Automatische Aktualisierung des Online-Status/Fortschritts, damit man nicht
       // staendig manuell auf "Aktualisieren" klicken muss (aber auch nicht zu oft,
@@ -1400,6 +1401,7 @@ function schuljahresWochen() {
   // ---------------------------------------------------------------------------
   document.querySelectorAll(".dash-tab").forEach(tab => {
     tab.addEventListener("click", () => {
+      try { sessionStorage.setItem("ll_dashtab", tab.dataset.tab); } catch (e) {}
       document.querySelectorAll(".dash-tab").forEach(t => t.classList.remove("active"));
       document.querySelectorAll(".dash-view").forEach(v => v.classList.remove("active"));
       tab.classList.add("active");
@@ -1733,7 +1735,7 @@ function schuljahresWochen() {
   let statistikGeladen = false;
   let marksLeseFehler = null;
   let marksDiag = { schueler: 0, docs: 0, offen: 0, klassen: 0 };
-  const BUILD_ID = "2026-10-13-f";
+  const BUILD_ID = "2026-10-13-g";
   function bsOffen(m) { return !!(m && m.besprechen && !m.besprechenErledigt); }
   let statistikRohdaten = null; // [{id, name, schueler:[{uid,pseudonym,deaktiviert,logins:[Date],erledigtWeekly:{key:n},erledigtGesamt,letzteAktivitaet}]}]
 
@@ -2185,7 +2187,11 @@ function schuljahresWochen() {
         (m.fruehere || []).forEach(f => add(f.am, f.erledigt, false));
       });
     }));
-    return Object.values(g).map(e => {
+    // Aeltere erledigte Eintraege derselben Schueler:in zur selben Aufgabe ausblenden, wenn ein neuerer offener existiert.
+    const offenSeit = {};
+    Object.values(g).forEach(e => e.eintraege.forEach(x => { if (!x.erledigt) { const k = x.s.uid + "|" + e.id; if (!offenSeit[k] || x.am > offenSeit[k]) offenSeit[k] = x.am; } }));
+    Object.values(g).forEach(e => { e.eintraege = e.eintraege.filter(x => !(x.erledigt && offenSeit[x.s.uid + "|" + e.id] && offenSeit[x.s.uid + "|" + e.id] > x.am)); });
+    return Object.values(g).filter(e => e.eintraege.length).map(e => {
       const uids = new Set(e.eintraege.map(x => x.s.uid));
       const erledigt = e.eintraege.every(x => x.erledigt);
       const datum = erledigt ? e.eintraege.map(x => x.erledigt).sort().pop() : null;

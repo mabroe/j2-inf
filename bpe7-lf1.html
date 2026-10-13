@@ -695,16 +695,20 @@
   .struk-sloop-row { display: flex; }
   .struk-sloop-gutter { flex: 0 0 26px; border-right: 2px solid var(--navy); }
   .struk-sloop-body { flex: 1 1 auto; min-width: 0; }
-  .struk-alt-h { position: relative; padding: 10px 10px 44px; text-align: center; border-bottom: 2px solid var(--navy); font-family: -apple-system, "Segoe UI", sans-serif; font-size: 0.85rem; }
-  .struk-alt-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .struk-alt-svg line { stroke: var(--navy); stroke-width: 2; vector-effect: non-scaling-stroke; }
-  .struk-alt-t { position: relative; display: inline-flex; align-items: center; gap: 10px; }
-  .struk-alt-j, .struk-alt-n { position: absolute; bottom: 4px; font-weight: 700; font-size: 0.8rem; }
-  .struk-alt-j { left: 10px; } .struk-alt-n { right: 10px; }
-  .struk-alt-cols { display: flex; min-height: 54px; }
-  .struk-alt-col { flex: 1 1 50%; min-width: 0; }
-  .struk-alt-col + .struk-alt-col { border-left: 2px solid var(--navy); }
-  .struk-alt-col .struk-band { border-bottom: none; height: 100%; box-sizing: border-box; }
+  .exalt-h { position: relative; padding: 10px 10px 44px; text-align: center; border-bottom: 2px solid var(--navy); font-family: -apple-system, "Segoe UI", sans-serif; font-size: 0.85rem; }
+  .exalt-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .exalt-svg line { stroke: var(--navy); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .exalt-t { position: relative; display: inline-flex; align-items: center; gap: 10px; }
+  .exalt-j, .exalt-n { position: absolute; bottom: 4px; font-weight: 700; font-size: 0.8rem; }
+  .exalt-j { left: 10px; } .exalt-n { right: 10px; }
+  .exalt-cols { display: flex; min-height: 54px; }
+  .exalt-col { flex: 1 1 50%; min-width: 0; }
+  .exalt-col + .exalt-col { border-left: 2px solid var(--navy); }
+  .exalt-col .struk-band { border-bottom: none; height: 100%; box-sizing: border-box; }
+  .struk-left { flex: 1 1 320px; display: flex; flex-direction: column; }
+  .struk-left .struk-diagram { flex: 0 1 auto; }
+  .struk-right { flex: 1 1 280px; display: flex; flex-direction: column; }
+  .struk-right .struk-code { flex: 0 0 auto; }
   .struk-code .num-badge {
     display: inline-flex;
     width: 20px; height: 20px;
@@ -1452,6 +1456,8 @@
       <h3>Ein Beispiel im Zusammenhang</h3>
       <p class="desc">Aufgabe: Zähle, wie viele Noten im Array <code>noten</code> besser als 3 sind. So gehören Struktogramm und Python-Code zusammen – Zeile für Zeile (gleiche Nummern gehören zusammen):</p>
       <div class="struk-diagram-wrap">
+        <div class="struk-left">
+        <div class="block-label" style="margin-top:0;">Struktogramm</div>
         <div class="struk-diagram">
           <div class="struk-band"><span class="struk-num">1</span> Deklaration und Initialisierung: noten als Array = [2, 5, 3, 1, 4]</div>
           <div class="struk-band"><span class="struk-num">2</span> Deklaration und Initialisierung: anzahl = 0</div>
@@ -1460,15 +1466,15 @@
             <div class="struk-sloop-row">
               <div class="struk-sloop-gutter"></div>
               <div class="struk-sloop-body">
-                <div class="struk-alt">
-                  <div class="struk-alt-h">
-                    <svg class="struk-alt-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="50" y2="100"/><line x1="100" y1="0" x2="50" y2="100"/></svg>
-                    <span class="struk-alt-t"><span class="struk-num">4</span> Wenn noten[i] &lt; 3</span>
-                    <span class="struk-alt-j">J</span><span class="struk-alt-n">N</span>
+                <div class="exalt">
+                  <div class="exalt-h">
+                    <svg class="exalt-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="50" y2="100"/><line x1="100" y1="0" x2="50" y2="100"/></svg>
+                    <span class="exalt-t"><span class="struk-num">4</span> Wenn noten[i] &lt; 3</span>
+                    <span class="exalt-j">J</span><span class="exalt-n">N</span>
                   </div>
-                  <div class="struk-alt-cols">
-                    <div class="struk-alt-col"><div class="struk-band"><span class="struk-num">5</span> Zuweisung: anzahl = anzahl + 1</div></div>
-                    <div class="struk-alt-col"></div>
+                  <div class="exalt-cols">
+                    <div class="exalt-col"><div class="struk-band"><span class="struk-num">5</span> Zuweisung: anzahl = anzahl + 1</div></div>
+                    <div class="exalt-col"></div>
                   </div>
                 </div>
               </div>
@@ -1476,6 +1482,9 @@
           </div>
           <div class="struk-band"><span class="struk-num">6</span> Ausgabe: "Gute Noten: " + anzahl</div>
         </div>
+        </div>
+        <div class="struk-right">
+        <div class="block-label" style="margin-top:0;">Code</div>
         <div class="struk-code">
           <span class="num-badge">1</span>noten = [2, 5, 3, 1, 4]<br>
           <span class="num-badge">2</span>anzahl = 0<br>
@@ -1483,7 +1492,9 @@
           <span class="num-badge">4</span>&nbsp;&nbsp;&nbsp;&nbsp;if noten[i] &lt; 3:<br>
           <span class="num-badge">5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;anzahl = anzahl + 1<br>
           <span class="num-badge">6</span>print("Gute Noten:", anzahl)<br>
-          <span style="color:#9FB3D1;font-size:.8rem;display:block;margin-top:8px;">Ausgabe: Gute Noten: 2</span>
+        </div>
+        <div class="block-label">Ausgabe (Konsole)</div>
+        <div class="console visible"><span class="out">Gute Noten: 2</span></div>
         </div>
       </div>
       <p class="desc" style="margin-top:12px;">Die <strong>Schleife</strong> (3) enthält alles, was wiederholt wird – im Struktogramm als Rahmen mit Einzug, im Code durch die Einrückung. Die <strong>Verzweigung</strong> (4) hat zwei Wege: <em>J</em> (5) wird ausgeführt, wenn die Bedingung stimmt, bei <em>N</em> passiert in diesem Beispiel nichts.</p>
@@ -2862,6 +2873,7 @@ function auswReset() {
 // ---------- Tabs ----------
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
+    try { sessionStorage.setItem('ll_tab:' + location.pathname, tab.dataset.view); } catch (e) {}
     closeExplainPops();
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -2897,6 +2909,12 @@ document.querySelectorAll('.tab').forEach(tab => {
     }
   });
 });
+// Nach Neuladen (F5) wieder den zuletzt geoeffneten Reiter oeffnen
+try {
+  const _lt = sessionStorage.getItem('ll_tab:' + location.pathname);
+  const _el = _lt && document.querySelector('.tab[data-view="' + _lt + '"]');
+  if (_el && !_el.classList.contains('active')) _el.click();
+} catch (e) {}
 
 // ---------- Modal ----------
 const modalTexts = {
